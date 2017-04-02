@@ -1,0 +1,113 @@
+# German translations for DSBMixer package.
+# Copyright (C) 2015 Marcel Kaiser
+# This file is distributed under the same license as the DSBMixer package.
+# Marcel Kaiser <mk@freeshell.de>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: DSBMixer 0.2.4\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-08-28 04:55+0200\n"
+"PO-Revision-Date: 2016-03-07 14:34+0100\n"
+"Last-Translator: Marcel Kaiser <mk@nic-nac-project.org>\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: dsbmixer.c:211
+msgid "Couldn't connect to devd"
+msgstr "Konnte keine Verbindung zu devd herstellen"
+
+#: dsbmixer.c:419
+msgid "No mixer devices found"
+msgstr "Keine Mixergeräte gefunden"
+
+#: dsbmixer.c:437 dsbmixer.c:446
+#, c-format
+msgid "Couldn't open mixer %s"
+msgstr "Konnte den Mixer %s nicht öffnen"
+
+#: dsbmixer.c:663
+msgid "Couldn't add/delete recording source"
+msgstr "Konnte die Aufnahmequelle nicht hinzufügen/entfernen"
+
+#: dsbmixer.c:800
+msgid "Add to recording sources"
+msgstr "Kanal zu den Aufnahmequellen hinzufügen"
+
+#: dsbmixer.c:863
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: dsbmixer.c:880
+msgid "<b>Visible channels</b>"
+msgstr "<b>Anzuzeigende Kanäle</b>"
+
+#: dsbmixer.c:883
+msgid "Select the mixer channels to be visible.\n"
+msgstr "Wählen Sie die anzuzeigenden Kanäle aus.\n"
+
+#: dsbmixer.c:915
+msgid "View"
+msgstr "Ansicht"
+
+#: dsbmixer.c:925
+msgid "<b>Default audio device</b>"
+msgstr "<b>Standardgerät</b>"
+
+#: dsbmixer.c:927
+msgid "Choose the default audio device to be used by applications.\n"
+msgstr "Wählen Sie die Soundkarte, die standardmäßig\nvon Anwendungen benutzt werden soll.\n"
+
+#: dsbmixer.c:941
+msgid "Default device"
+msgstr "Standardgerät"
+
+#: dsbmixer.c:956
+msgid "<b>Advanced settings</b>"
+msgstr "<b>Fortgeschritten</b>"
+
+#: dsbmixer.c:973
+#msgid "Feeder rate quality:"
+#msgstr ""
+
+#: dsbmixer.c:983
+msgid "Amplify:"
+msgstr "Verstärkung:"
+
+#: dsbmixer.c:1002
+msgid "Advanced settings"
+msgstr "Fortgeschritten"
+
+#: dsbmixer.c:1008
+msgid "_Apply"
+msgstr "_Anwenden"
+
+#: dsbmixer.c:1010
+msgid "_Close"
+msgstr "_Schließen"
+
+#: dsbmixer.c:1049
+#, c-format
+msgid "Failed to execute %s"
+msgstr "Konnte %s nicht ausführen"
+
+#: dsbmixer.c:1051
+msgid "Failed to execute %s:\n"
+msgstr "Konnte %s nicht ausführen:\n"
+
+#: dsbmixer.c:1099
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: dsbmixer.c:1105
+msgid "Exit"
+msgstr "Beenden"
+
+#: dsbmixer.c:1109
+msgid "_File"
+msgstr "_Datei"
+
