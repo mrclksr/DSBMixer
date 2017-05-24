@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=DSBMixer
+Exec=dsbmixer
+Icon=audio-volume-high
+Terminal=false
+StartupNotify=false
+Type=Application
+Categories=AudioVideo;Utility;System;Application
+
