@@ -1,0 +1,12 @@
+				  ABOUT
+
+DSBMixer is a tabbed Qt (GTK+) mixer for FreeBSD®. For each installed mixer
+device, DSBMixer opens a tab. It adds a new mixer tab at runtime when you
+plug in an USB sound device. DSBMixer allows you set amplification, to select
+recording sources, and to choose your default audio device.
+
+				INSTALLATION
+
+# qmake
+# make && make install
+
