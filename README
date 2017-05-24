@@ -7,6 +7,16 @@ recording sources, and to choose your default audio device.
 
 				INSTALLATION
 
+In order to save settings, DSBMixer requires DSBWrtSysctl:
+
+# git clone https://github.com/mrclksr/DSBWrtSysctl.git
+# cd DSBWrtSysctl && make install
+
+or fetch the latest version from fetch https://freeshell.de/~mk/projects/dsbwrtsysctl.html:
+
+# fetch https://freeshell.de/~mk/download/dsbwrtsysctl-version.tgz
+# tar xf dsbwrtsysctl-version.tgz && cd dsbwrtsysctl-version && make install
+
 # qmake
 # make && make install
 
