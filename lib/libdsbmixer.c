@@ -157,7 +157,7 @@ dsbmixer_default_unit()
 void
 dsbmixer_setvol(dsbmixer_t *mixer, int chan, int vol)
 {
-	if (mixer == NULL)
+	if (mixer == NULL || mixer->removed)
 		return;
 	set_vol(mixer, chan, vol);
 }
@@ -165,7 +165,7 @@ dsbmixer_setvol(dsbmixer_t *mixer, int chan, int vol)
 void
 dsbmixer_setlvol(dsbmixer_t *mixer, int chan, int lvol)
 {
-	if (mixer == NULL)
+	if (mixer == NULL || mixer->removed)
 		return;
 	set_vol(mixer, chan,
 	    DSBMIXER_CHAN_CONCAT(lvol,
@@ -175,7 +175,7 @@ dsbmixer_setlvol(dsbmixer_t *mixer, int chan, int lvol)
 void
 dsbmixer_setrvol(dsbmixer_t *mixer, int chan, int rvol)
 {
-	if (mixer == NULL)
+	if (mixer == NULL || mixer->removed)
 		return;
 	set_vol(mixer, chan,
 	    DSBMIXER_CHAN_CONCAT(DSBMIXER_CHAN_LEFT(mixer->chan[chan].vol),
@@ -199,14 +199,14 @@ dsbmixer_canrec(dsbmixer_t *mixer, int chan)
 int
 dsbmixer_setrec(dsbmixer_t *mixer, int chan, bool on)
 {
-	int mask = mixer->recsrc;
+	int mask;
 
-	if (mixer == NULL)
-		return (0);
+	if (mixer == NULL || mixer->removed)
+		return (-1);
 	if (on)
-		mask |= (1 << chan);
+		mask = (1 << chan);
 	else
-		mask &=~(1 << chan);
+		mask =~(1 << chan);
 	return (set_recsrc(mixer, mask));
 }
 
@@ -905,7 +905,6 @@ set_recsrc(dsbmixer_t *mixer, int mask)
 		if ((mask & (1 << i)) && !(mixer->recmask & (1 << i)))
 			mask &= ~(1 << i);
 	}
-	
 	if (ioctl(mixer->fd, SOUND_MIXER_WRITE_RECSRC, &mask) == -1) {
 		ERROR(-1, FATAL_SYSERR, false,
 		    "Couldn't add/delete recording source(s)");
