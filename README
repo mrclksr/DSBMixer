@@ -1,4 +1,4 @@
-				  ABOUT
+				   ABOUT
 
 DSBMixer is a tabbed Qt (GTK+) mixer for FreeBSD®. For each installed mixer
 device, DSBMixer opens a tab. It adds a new mixer tab at runtime when you
@@ -19,4 +19,9 @@ or fetch the latest version from https://freeshell.de/~mk/projects/dsbwrtsysctl.
 
 # qmake
 # make && make install
+
+				   USAGE
+
+Usage: dsbmixer [-hi]
+   -i: Start dsbmixer as tray icon
 
