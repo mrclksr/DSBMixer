@@ -23,13 +23,40 @@
  */
 
 #include <QTranslator>
+#include <unistd.h>
 #include "mainwin.h"
 #include "libdsbmixer.h"
 #include "qt-helper/qt-helper.h"
 
+static void
+usage()
+{
+	(void)fprintf(stderr, "Usage: %s [-hi]\n" \
+	    "   -i: Start %s as tray icon\n", PROGRAM, PROGRAM);
+	exit(EXIT_FAILURE);
+}
+
 int
 main(int argc, char *argv[])
 {
+	int  ch;
+	bool iflag;
+
+	iflag = false;
+	while ((ch = getopt(argc, argv, "ih")) != -1) {
+		switch (ch) {
+		case 'i':
+			/* Start as tray icon. */
+			iflag = true;
+			break;
+		case '?':
+		case 'h':
+			usage();
+		}
+	}
+	argc -= optind;
+	argv += optind;
+
 	QApplication app(argc, argv);
 	QTranslator translator;
 
@@ -43,7 +70,7 @@ main(int argc, char *argv[])
 		qh_err(0, EXIT_FAILURE, r);
 	}
 	MainWin w;
-	w.show();
-
-	return app.exec();
+	if (!iflag)
+		w.show();
+	return (app.exec());
 }
