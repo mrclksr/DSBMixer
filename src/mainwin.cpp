@@ -112,7 +112,7 @@ MainWin::redrawMixers()
 void
 MainWin::addNewMixer(dsbmixer_t *dev)
 {
-	Mixer *mixer = new Mixer(dev, *lrView, this);
+	Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
 	tabs->addTab(mixer, dev->name);
 	mixers.append(mixer);
 	tabs->setTabToolTip(mixers.count() - 1, QString(dev->cardname));
