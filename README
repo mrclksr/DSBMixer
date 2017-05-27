@@ -20,6 +20,10 @@ or fetch the latest version from https://freeshell.de/~mk/projects/dsbwrtsysctl.
 # qmake
 # make && make install
 
+or if you don't want devd support:
+
+# make -DWITHOUT_DEVD && make install
+
 				   USAGE
 
 Usage: dsbmixer [-hi]
