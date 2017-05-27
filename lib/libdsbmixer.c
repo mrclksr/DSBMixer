@@ -63,7 +63,7 @@
 
 struct dsbmixer_snd_settings_s dsbmixer_snd_settings;
 
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 /*
  * Struct to represent the fields of a devd notify event.
  */
@@ -93,7 +93,7 @@ static int  set_recsrc(dsbmixer_t *mixer, int mask);
 static char *get_cardname(const char *mixer);
 static char *get_ugen(int pcmunit);
 static char *exec_backend(const char *cmd, int *ret);
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 static FILE *uconnect(const char *path);
 static void *devd_watcher(void *unused);
 static void parse_devd_event(char *str);
@@ -105,7 +105,7 @@ static void read_recsrc(dsbmixer_t *mixer);
 static void set_vol(dsbmixer_t *mixer, int dev, int vol);
 
 static int	  _error = 0, nmixers = 0;
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 static int	  mqid;
 static FILE	  *devdfp;
 #endif
@@ -117,7 +117,7 @@ int
 dsbmixer_init()
 {
 	get_snd_settings();
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 	int	  n;
 	pthread_t thr;
 
@@ -142,7 +142,7 @@ dsbmixer_init()
 void
 dsbmixer_cleanup()
 {
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 	msgctl(mqid, IPC_RMID, NULL);
 	mqid = -1;
 #endif
@@ -336,7 +336,7 @@ dsbmixer_pollmixers()
 	return (NULL);
 }
 
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 /*
  * *state = { -1 if device was removed, > 0 if device was added. }
  * If 'block' is true block until a new mixer was added or a mixer
@@ -369,7 +369,7 @@ dsbmixer_querydevlist(int *state, bool block)
 	return (dqi->mixer);
 	
 }
-#endif /* WITH_DEVD */
+#endif /* !WITHOUT_DEVD */
 
 int
 dsbmixer_change_settings(int dfltunit, int amp, int qual)
@@ -472,7 +472,7 @@ get_snd_settings()
 	    &dsbmixer_snd_settings.feeder_rate_quality, &sz, NULL, 0);
 }
 
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 static void
 parse_devd_event(char *str)
 {
@@ -567,7 +567,7 @@ devd_watcher(void *unused)
 		}
 	}
 }
-#endif	/* WITH_DEVD */
+#endif	/* !WITHOUT_DEVD */
 
 static int
 get_unit(const char *mixer)
@@ -916,7 +916,7 @@ set_recsrc(dsbmixer_t *mixer, int mask)
 	return (0);
 }
 
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 static FILE *
 uconnect(const char *path)
 {

@@ -42,7 +42,7 @@ public:
 	QMenu *menu();
 
 public slots:
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 	void addNewMixer(dsbmixer_t *mixer);
 	void removeMixer(dsbmixer_t *mixer);
 #endif

@@ -27,7 +27,7 @@
 void
 Thread::run()
 {
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 	int state;
 	dsbmixer_t *mixer;
 

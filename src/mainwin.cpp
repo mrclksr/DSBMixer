@@ -70,7 +70,7 @@ MainWin::MainWin(QWidget *parent)
 	setCentralWidget(tabs);
 	tabs->setCurrentIndex(dsbmixer_snd_settings.default_unit);
 
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 	Thread *thread = new Thread();
 	connect(thread, SIGNAL(sendNewMixer(dsbmixer_t*)), this,
 	    SLOT(addNewMixer(dsbmixer_t*)));
@@ -108,7 +108,7 @@ MainWin::redrawMixers()
 	saveGeometry();
 }
 
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 void
 MainWin::addNewMixer(dsbmixer_t *dev)
 {

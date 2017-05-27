@@ -98,7 +98,7 @@ extern const char *dsbmixer_error(void);
 extern const char *dsbmixer_getchaname(dsbmixer_t *mixer, int chan);
 extern const char **dsbmixer_getchanames(void);
 extern dsbmixer_t *dsbmixer_getmixer_byid(int);
-#ifdef WITH_DEVD
+#ifndef WITHOUT_DEVD
 extern dsbmixer_t *dsbmixer_querydevlist(int *, bool);
 #endif
 extern dsbmixer_t *dsbmixer_pollmixers(void);
