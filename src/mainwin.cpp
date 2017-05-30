@@ -26,6 +26,7 @@
 #include <QTimer>
 #include <QMenu>
 #include <QMenuBar>
+#include <unistd.h>
 #include "mainwin.h"
 #include "thread.h"
 #include "mixer.h"
@@ -35,6 +36,7 @@
 MainWin::MainWin(QWidget *parent)
 	: QMainWindow(parent) {
 	QTimer *timer = new QTimer(this);
+	traytimer = new QTimer(this);
 
 	cfg = dsbcfg_read(PROGRAM, "config", vardefs, CFG_NVARS);
 	if (cfg == NULL && errno == ENOENT) {
@@ -55,7 +57,9 @@ MainWin::MainWin(QWidget *parent)
 	
 	createMenuActions();
 	createMainMenu();
-	createTrayIcon();
+
+	connect(traytimer, SIGNAL(timeout()), this, SLOT(checkForSysTray()));
+    	traytimer->start(500);
 
 	for (int i = 0, n = 0; i < dsbmixer_getndevs(); i++) {
 		dsbmixer_t *dev = dsbmixer_getmixer(i);
@@ -237,6 +241,18 @@ MainWin::createMainMenu()
 	mainMenu = menuBar()->addMenu(tr("&File"));
 	mainMenu->addAction(preferencesAction);
 	mainMenu->addAction(quitAction);
+}
+
+void
+MainWin::checkForSysTray()
+{
+	static int tries = 60;
+
+	if (QSystemTrayIcon::isSystemTrayAvailable()) {
+		traytimer->stop();
+		createTrayIcon();
+	} else if (tries-- <= 0)
+		traytimer->stop();
 }
 
 void

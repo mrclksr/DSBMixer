@@ -51,7 +51,8 @@ public slots:
 	void closeEvent(QCloseEvent *event);
 	void showConfigMenu();
 	void quit();
-
+private slots:
+	void checkForSysTray();
 private:
 	void redrawMixers();
 	void createMenuActions();
@@ -69,7 +70,7 @@ private:
 
 	QSystemTrayIcon *trayIcon;
 	QMenu *mainMenu;
-	
+	QTimer *traytimer;
 	QTabWidget *tabs;
 	QList<Mixer *>mixers;
 
