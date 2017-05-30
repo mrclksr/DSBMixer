@@ -24,3 +24,5 @@ SOURCES += chanslider.cpp \
 	   ../lib/config.c \
 	   ../lib/dsbcfg/dsbcfg.c
 
+QMAKE_POST_LINK=$(STRIP) $(TARGET)
+

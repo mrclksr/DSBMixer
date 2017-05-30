@@ -13,4 +13,5 @@ DEFINES += PATH_DSBWRTSYSCTL=\\\"$${PATH_DSBWRTSYSCTL}\\\"
 target.path  = $${BACKEND_INSTALL_DIR}
 target.files = $${BACKEND}
 INSTALLS = target
+QMAKE_POST_LINK=$(STRIP) $(TARGET)
 
