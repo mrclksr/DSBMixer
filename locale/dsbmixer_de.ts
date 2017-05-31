@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de_DE">
+<TS version="2.1" language="de_DE">
+<context>
+    <name>ChanSlider</name>
+    <message>
+        <location filename="../src/chanslider.cpp" line="50"/>
+        <location filename="../src/chanslider.cpp" line="106"/>
+        <source>Set/unset recording source</source>
+        <translation>Aufnahmequelle aktivieren/deaktieren</translation>
+    </message>
+    <message>
+        <location filename="../src/chanslider.cpp" line="72"/>
+        <location filename="../src/chanslider.cpp" line="138"/>
+        <source>Mute</source>
+        <translation>Stumm</translation>
+    </message>
+</context>
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="226"/>
+        <location filename="../src/mainwin.cpp" line="242"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="227"/>
+        <location filename="../src/mainwin.cpp" line="243"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="237"/>
+        <location filename="../src/mainwin.cpp" line="253"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
@@ -75,13 +90,23 @@
         <translation>Erweiterte Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="183"/>
+        <location filename="../src/preferences.cpp" line="188"/>
         <source>Amplification:</source>
         <translation>Verstärkung:</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="189"/>
+        <location filename="../src/preferences.cpp" line="194"/>
         <source>Feeder rate quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/preferences.cpp" line="198"/>
+        <source>Vchans for playback (pcm%1):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/preferences.cpp" line="203"/>
+        <source>Vchans for recording:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

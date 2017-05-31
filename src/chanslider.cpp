@@ -47,7 +47,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 		delete recCB;
 		recCB = 0;
 	} else {
-		recCB->setToolTip("Set/unset recording source");
+		recCB->setToolTip(tr("Set/unset recording source"));
 		layout->addWidget(recCB, 0, Qt::AlignHCenter);
 		connect(recCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitStateChanged(int)));
@@ -69,7 +69,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 		delete muteCB;
 		muteCB = 0;
 	} else {
-		muteCB->setToolTip("Mute");
+		muteCB->setToolTip(tr("Mute"));
 		layout->addWidget(muteCB, 1, Qt::AlignHCenter);
 		connect(muteCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitMuteChanged(int)));
@@ -103,6 +103,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 		delete recCB;
 		recCB = 0;
 	} else {
+		recCB->setToolTip(tr("Set/unset recording source"));
 		vbox->addWidget(recCB, 0, Qt::AlignHCenter);
 		connect(recCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitStateChanged(int)));
@@ -134,7 +135,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 		delete muteCB;
 		muteCB = 0;
 	} else {
-		muteCB->setToolTip("Mute");
+		muteCB->setToolTip(tr("Mute"));
 		vbox->addWidget(muteCB, 0, Qt::AlignHCenter);
 		connect(muteCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitMuteChanged(int)));
