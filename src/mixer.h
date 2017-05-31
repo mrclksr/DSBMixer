@@ -41,6 +41,7 @@ public slots:
 	void setLVol(int chan, int lvol);
 	void setRVol(int chan, int rvol);
 	void setRecSrc(int chan, int state);
+	void setMute(int state);
 	void update();
 private:
 	bool lrview;

@@ -34,32 +34,38 @@ class ChanSlider : public QGroupBox {
 	Q_OBJECT
 public:
 	ChanSlider(const QString &name, int id, int vol, bool rec,
-	    QWidget *parent = 0);
+	    bool muteable, QWidget *parent = 0);
 	ChanSlider(const QString &name, int id, int lvol, int rvol, bool rec,
-	    QWidget *parent = 0);
+	    bool muteable, QWidget *parent = 0);
 	void setVol(int vol);
 	void setVol(int lvol, int rvol);
 	void setRecSrc(bool state);
 	void sliderSetToolTip(int vol);
 	void sliderSetToolTip(int lvol, int rvol);
+	void setMute(bool mute);
 signals:
 	void VolumeChanged(int id, int val);
 	void stateChanged(int id, int state);
 	void lVolumeChanged(int id, int vol);
 	void rVolumeChanged(int id, int vol);
+	void muteChanged(int state);
 private slots:
 	void emitVolumeChanged(int);
 	void emitStateChanged(int);
 	void emitLVolumeChanged(int lvol);
 	void emitRVolumeChanged(int rvol);
+	void emitMuteChanged(int state);
 public:
 	int id;
 private:
 	int vol;
 	int rvol;
 	int lvol;
-	bool lrview;
-	QCheckBox *recCB;
+	int saved_lvol;
+	int saved_rvol;
+	int saved_vol;
+	bool lrview, mute;
+	QCheckBox *recCB, *muteCB;
 	QSlider *slider, *rslider, *lslider;;
 	QVBoxLayout *layout;
 };

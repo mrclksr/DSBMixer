@@ -59,11 +59,13 @@ typedef struct mixer_s {
 	char  *name;       /* Device name of mixer. */
 	char  *cardname;   /* Name of soundcard. */
 	bool  removed;	   /* If mixer was removed don't try to access it */
+	bool  mute;
 	int recsrc;	   /* Bitmask of current recording sources. */
 	int recmask;	   /* Bitmask of all rec. devices/channels. */
 	int dmask;	   /* Bitmask of all channels. */
 	int changemask;    /* Mask for volume changes since last poll. */
 	int rchangemask;   /* Mask for record source changes "      "  */
+	int saved_vol;	   /* Saved master volume before muting. */
 	dsbmixer_channel_t chan[SOUND_MIXER_NRDEVICES];
 } dsbmixer_t;
 
@@ -87,6 +89,8 @@ extern int	  dsbmixer_default_unit(void);
 extern int	  dsbmixer_getvol(dsbmixer_t *mixer, int chan);
 extern int	  dsbmixer_apply_settings(void);
 extern int	  dsbmixer_change_settings(int dfltunit, int amp, int qual);
+extern void	  dsbmixer_setmute(dsbmixer_t *mixer, bool mute);
+extern bool	  dsbmixer_getmute(dsbmixer_t *mixer);
 extern bool	  dsbmixer_canrec(dsbmixer_t *mixer, int chan);
 extern bool	  dsbmixer_getrec(dsbmixer_t *mixer, int chan);
 extern void	  dsbmixer_cleanup(void);

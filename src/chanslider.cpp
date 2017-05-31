@@ -28,13 +28,16 @@
 #include <QString>
 
 ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
-    QWidget *parent)
+    bool muteable, QWidget *parent)
 	: QGroupBox(name, parent)
 {
 	this->id  = id;
 	this->vol = vol;
-
+	this->lrview = false;
+	mute = false;
+	saved_lvol = saved_rvol = saved_vol = -1;
 	layout = new QVBoxLayout(parent);
+
 	recCB = new QCheckBox();
 	if (!rec) {
 		/* Padding space */
@@ -55,6 +58,21 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	sliderSetToolTip(vol);
 
 	layout->addWidget(slider, 1, Qt::AlignHCenter);
+
+	muteCB = new QCheckBox();
+	if (!muteable) {
+		/* Padding space */
+		QLabel *l = new QLabel("");
+		l->resize(muteCB->width(), muteCB->height());
+		layout->addWidget(l, 0, Qt::AlignHCenter);
+		delete muteCB;
+		muteCB = 0;
+	} else {
+		muteCB->setToolTip("Mute");
+		layout->addWidget(muteCB, 1, Qt::AlignHCenter);
+		connect(muteCB, SIGNAL(stateChanged(int)), this,
+		    SLOT(emitMuteChanged(int)));
+	}
 	setLayout(layout);
 
 	connect(slider, SIGNAL(valueChanged(int)), this,
@@ -62,13 +80,15 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 }
 
 ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
-    bool rec, QWidget *parent)
+    bool rec, bool muteable, QWidget *parent)
 	: QGroupBox(name, parent)
 {
 	this->id  = id;
 	this->lvol = lvol;
 	this->rvol = rvol;
-	this->lrview = true;
+	lrview = true;
+	mute = false;
+	saved_lvol = saved_rvol = saved_vol = -1;
 
 	QVBoxLayout *vbox = new QVBoxLayout(parent);
 	QHBoxLayout *hbox = new QHBoxLayout(parent);
@@ -103,6 +123,21 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	hbox->addWidget(rslider, 1, Qt::AlignHCenter);
 
 	vbox->addLayout(hbox, 0);
+
+	muteCB = new QCheckBox();
+	if (!muteable) {
+		/* Padding space */
+		QLabel *l = new QLabel("");
+		l->resize(muteCB->width(), muteCB->height());
+		vbox->addWidget(l, 0, Qt::AlignHCenter);
+		delete muteCB;
+		muteCB = 0;
+	} else {
+		muteCB->setToolTip("Mute");
+		vbox->addWidget(muteCB, 0, Qt::AlignHCenter);
+		connect(muteCB, SIGNAL(stateChanged(int)), this,
+		    SLOT(emitMuteChanged(int)));
+	}
 	setLayout(vbox);
 
 	connect(lslider, SIGNAL(valueChanged(int)), this,
@@ -114,6 +149,8 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 void
 ChanSlider::emitVolumeChanged(int val)
 {
+	if (muteCB != 0 && mute)
+		return;
 	this->vol = val;
 	sliderSetToolTip(val);
 	emit VolumeChanged(this->id, val);
@@ -122,6 +159,8 @@ ChanSlider::emitVolumeChanged(int val)
 void
 ChanSlider::emitLVolumeChanged(int vol)
 {
+	if (muteCB != 0 && mute)
+		return;
 	this->lvol = vol;
 	sliderSetToolTip(this->lvol, this->rvol);
 	emit lVolumeChanged(this->id, vol);
@@ -130,6 +169,8 @@ ChanSlider::emitLVolumeChanged(int vol)
 void
 ChanSlider::emitRVolumeChanged(int vol)
 {
+	if (muteCB != 0 && mute)
+		return;
 	this->rvol = vol;
 	sliderSetToolTip(this->lvol, this->rvol);
 	emit rVolumeChanged(this->id, vol);
@@ -139,6 +180,16 @@ void
 ChanSlider::emitStateChanged(int state)
 {
 	emit stateChanged(this->id, state);
+}
+
+void
+ChanSlider::emitMuteChanged(int state)
+{
+	if (state == Qt::Unchecked)
+		mute = false;
+	else
+		mute = true;
+	emit muteChanged(state);
 }
 
 void
@@ -161,6 +212,12 @@ ChanSlider::setRecSrc(bool state)
 {
 	if (recCB)
 		recCB->setCheckState(state ? Qt::Checked : Qt::Unchecked);
+}
+
+void
+ChanSlider::setMute(bool state)
+{
+	muteCB->setCheckState(state ? Qt::Checked : Qt::Unchecked);
 }
 
 void

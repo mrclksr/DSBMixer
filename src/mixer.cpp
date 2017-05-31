@@ -48,19 +48,26 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 
 		if (lrview) {
 			cs = new ChanSlider(QString(name), chan, lvol, rvol,
-			    dsbmixer_canrec(mixer, chan));
+			    dsbmixer_canrec(mixer, chan),
+			    chan == 0 ? true : false);
 			connect(cs, SIGNAL(lVolumeChanged(int, int)), this,
 			    SLOT(setLVol(int, int)));
 			connect(cs, SIGNAL(rVolumeChanged(int, int)), this,
 			    SLOT(setRVol(int, int)));
 		} else {
 			cs = new ChanSlider(QString(name), chan, uvol,
-			    dsbmixer_canrec(mixer, chan));
+			    dsbmixer_canrec(mixer, chan),
+			    chan == 0 ? true : false);
 			connect(cs, SIGNAL(VolumeChanged(int, int)), this,
 			    SLOT(setVol(int, int)));
 		}
 		connect(cs, SIGNAL(stateChanged(int, int)), this,
 		    SLOT(setRecSrc(int, int)));
+		if (chan == 0) {
+			cs->setMute(dsbmixer_getmute(mixer));
+			connect(cs, SIGNAL(muteChanged(int)), this,
+			    SLOT(setMute(int)));
+		}
 		cs->setRecSrc(dsbmixer_getrec(mixer, chan));
 		channel.append(cs);
 		hbox->addWidget(cs, 0, Qt::AlignLeft);
@@ -105,6 +112,13 @@ Mixer::setRecSrc(int chan, int state)
 }
 
 void
+Mixer::setMute(int state)
+{
+	dsbmixer_setmute(mixer, state == Qt::Checked ? true : false);
+	update();
+}
+
+void
 Mixer::update()
 {
 	for (int i = 0; i < channel.count(); i++) {
@@ -112,7 +126,8 @@ Mixer::update()
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 		int uvol = (lvol + rvol) >> 1;
-	
+		if (uvol > 0 && chan == 0)
+			channel.at(i)->setMute(false);
 		if (lrview)
 			channel.at(i)->setVol(lvol, rvol);
 		else
