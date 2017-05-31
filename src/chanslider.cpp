@@ -31,13 +31,13 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
     bool muteable, QWidget *parent)
 	: QGroupBox(name, parent)
 {
-	this->id  = id;
-	this->vol = vol;
+	mute	     = false;
+	this->id     = id;
+	this->vol    = vol;
 	this->lrview = false;
-	mute = false;
-	layout = new QVBoxLayout(parent);
 
-	recCB = new QCheckBox();
+	layout = new QVBoxLayout(parent);
+	recCB  = new QCheckBox();
 	if (!rec) {
 		/* Padding space */
 		QLabel *l = new QLabel("");
@@ -54,8 +54,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	slider = new QSlider(Qt::Vertical);
 	slider->setMinimum(0);
 	slider->setMaximum(100);
-	slider->setValue(vol);
-	sliderSetToolTip(vol);
+	setVol(vol);
 
 	layout->addWidget(slider, 1, Qt::AlignHCenter);
 
@@ -83,11 +82,11 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
     bool rec, bool muteable, QWidget *parent)
 	: QGroupBox(name, parent)
 {
-	this->id  = id;
+	mute	   = false;
+	lrview	   = true;
+	this->id   = id;
 	this->lvol = lvol;
 	this->rvol = rvol;
-	lrview = true;
-	mute = false;
 
 	QVBoxLayout *vbox = new QVBoxLayout(parent);
 	QHBoxLayout *hbox = new QHBoxLayout(parent);
@@ -115,10 +114,8 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 
 	rslider->setMinimum(0);
 	rslider->setMaximum(100);
-	rslider->setValue(rvol);
 
-	sliderSetToolTip(lvol, rvol);
-
+	setVol(lvol, rvol);
 	hbox->addWidget(lslider, 1, Qt::AlignHCenter);
 	hbox->addWidget(rslider, 1, Qt::AlignHCenter);
 
@@ -195,6 +192,8 @@ ChanSlider::emitMuteChanged(int state)
 void
 ChanSlider::setVol(int vol)
 {
+	if (vol > 100 || vol < 0)
+		return;
 	slider->setValue(vol);
 	sliderSetToolTip(vol);
 }
@@ -202,6 +201,10 @@ ChanSlider::setVol(int vol)
 void
 ChanSlider::setVol(int lvol, int rvol)
 {
+	if (lvol > 100 || lvol < 0)
+		return;
+	if (rvol > 100 || rvol < 0)
+		return;
 	lslider->setValue(lvol);
 	rslider->setValue(rvol);
 	sliderSetToolTip(lvol, rvol);
@@ -217,7 +220,8 @@ ChanSlider::setRecSrc(bool state)
 void
 ChanSlider::setMute(bool state)
 {
-	muteCB->setCheckState(state ? Qt::Checked : Qt::Unchecked);
+	if (muteCB)
+		muteCB->setCheckState(state ? Qt::Checked : Qt::Unchecked);
 }
 
 void
