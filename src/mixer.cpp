@@ -50,7 +50,7 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 		if (lrview) {
 			cs = new ChanSlider(QString(name), chan, lvol, rvol,
 			    dsbmixer_canrec(mixer, chan),
-			    chan == 0 ? true : false);
+			    chan == DSBMIXER_MASTER ? true : false);
 			connect(cs, SIGNAL(lVolumeChanged(int, int)), this,
 			    SLOT(setLVol(int, int)));
 			connect(cs, SIGNAL(rVolumeChanged(int, int)), this,
@@ -58,13 +58,13 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 		} else {
 			cs = new ChanSlider(QString(name), chan, uvol,
 			    dsbmixer_canrec(mixer, chan),
-			    chan == 0 ? true : false);
+			    chan == DSBMIXER_MASTER ? true : false);
 			connect(cs, SIGNAL(VolumeChanged(int, int)), this,
 			    SLOT(setVol(int, int)));
 		}
 		connect(cs, SIGNAL(stateChanged(int, int)), this,
 		    SLOT(setRecSrc(int, int)));
-		if (chan == 0) {
+		if (chan == DSBMIXER_MASTER) {
 			muted = dsbmixer_getmute(mixer);
 			cs->setMute(muted);
 			connect(cs, SIGNAL(muteChanged(int)), this,
@@ -89,7 +89,7 @@ Mixer::setVol(int chan, int vol)
 {
 	dsbmixer_setvol(this->mixer, chan, DSBMIXER_CHAN_CONCAT(vol, vol));
 
-	if (chan == 0)
+	if (chan == DSBMIXER_MASTER)
 		emit masterVolChanged(vol);
 }
 
@@ -98,7 +98,7 @@ Mixer::setLVol(int chan, int lvol)
 {
 	dsbmixer_setlvol(this->mixer, chan, lvol);
 
-	if (chan == 0) {
+	if (chan == DSBMIXER_MASTER) {
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 		emit masterVolChanged((lvol + rvol) >> 1);
@@ -109,7 +109,7 @@ void
 Mixer::setRVol(int chan, int rvol)
 {
 	dsbmixer_setrvol(this->mixer, chan, rvol);
-	if (chan == 0) {
+	if (chan == DSBMIXER_MASTER) {
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 		emit masterVolChanged((lvol + rvol) >> 1);
@@ -144,7 +144,7 @@ Mixer::update()
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 		int uvol = (lvol + rvol) >> 1;
-		if (uvol > 0 && chan == 0)
+		if (uvol > 0 && chan == DSBMIXER_MASTER)
 			channel.at(i)->setMute(false);
 		if (lrview)
 			channel.at(i)->setVol(lvol, rvol);
