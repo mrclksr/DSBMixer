@@ -61,9 +61,6 @@ private:
 	int vol;
 	int rvol;
 	int lvol;
-	int saved_lvol;
-	int saved_rvol;
-	int saved_vol;
 	bool lrview, mute;
 	QCheckBox *recCB, *muteCB;
 	QSlider *slider, *rslider, *lslider;;

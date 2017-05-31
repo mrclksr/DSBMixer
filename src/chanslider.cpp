@@ -35,7 +35,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	this->vol = vol;
 	this->lrview = false;
 	mute = false;
-	saved_lvol = saved_rvol = saved_vol = -1;
 	layout = new QVBoxLayout(parent);
 
 	recCB = new QCheckBox();
@@ -89,7 +88,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	this->rvol = rvol;
 	lrview = true;
 	mute = false;
-	saved_lvol = saved_rvol = saved_vol = -1;
 
 	QVBoxLayout *vbox = new QVBoxLayout(parent);
 	QHBoxLayout *hbox = new QHBoxLayout(parent);
