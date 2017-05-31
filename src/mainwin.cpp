@@ -35,8 +35,8 @@
 
 MainWin::MainWin(QWidget *parent)
 	: QMainWindow(parent) {
+	traytimer     = new QTimer(this);
 	QTimer *timer = new QTimer(this);
-	traytimer = new QTimer(this);
 
 	cfg = dsbcfg_read(PROGRAM, "config", vardefs, CFG_NVARS);
 	if (cfg == NULL && errno == ENOENT) {
@@ -57,27 +57,17 @@ MainWin::MainWin(QWidget *parent)
 	hVolIcon = qh_loadIcon("audio-volume-high", NULL);
 
 	tabs = new QTabWidget(this);
-	
-	createMenuActions();
-	createMainMenu();
 
-	connect(traytimer, SIGNAL(timeout()), this, SLOT(checkForSysTray()));
-    	traytimer->start(500);
-
-	for (int i = 0, n = 0; i < dsbmixer_getndevs(); i++) {
+	for (int i = 0; i < dsbmixer_getndevs(); i++) {
 		dsbmixer_t *dev = dsbmixer_getmixer(i);
 		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
 
-		connect(mixer, SIGNAL(muteStateChanged()), this,
-		    SLOT(catchMuteStateChanged()));
 		mixers.append(mixer);
 
 		tabs->addTab(mixer, dev->name);
-		tabs->setTabToolTip(n, QString(dev->cardname));
-
-		if (dev->unit == dsbmixer_snd_settings.default_unit)
-			tabs->setCurrentIndex(n);
-		++n;
+		tabs->setTabToolTip(i, QString(dev->cardname));
+		connect(mixer, SIGNAL(muteStateChanged()), this,
+		    SLOT(catchMuteStateChanged()));
 	}
 	setCentralWidget(tabs);
 	tabs->setCurrentIndex(dsbmixer_snd_settings.default_unit);
@@ -86,14 +76,22 @@ MainWin::MainWin(QWidget *parent)
 	Thread *thread = new Thread();
 	connect(thread, SIGNAL(sendNewMixer(dsbmixer_t*)), this,
 	    SLOT(addNewMixer(dsbmixer_t*)));
+
 	connect(thread, SIGNAL(sendRemoveMixer(dsbmixer_t*)), this,
 	    SLOT(removeMixer(dsbmixer_t*)));
 	thread->start();
 #endif
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateMixers()));
     	timer->start(200);
+
 	connect(tabs, SIGNAL(currentChanged(int)), this,
 	    SLOT(catchCurrentChanged()));
+
+	connect(traytimer, SIGNAL(timeout()), this, SLOT(checkForSysTray()));
+    	traytimer->start(500);
+
+	createMenuActions();
+	createMainMenu();
 	setWindowIcon(hVolIcon);
 	setWindowTitle("DSBMixer");
 	resize(*wWidth, *hHeight);	
@@ -117,6 +115,9 @@ MainWin::redrawMixers()
 		mixers.append(mixer);
 		tabs->addTab(mixer, dev->name);
 		tabs->setTabToolTip(i, QString(dev->cardname));
+
+		connect(mixer, SIGNAL(muteStateChanged()), this,
+		    SLOT(catchMuteStateChanged()));
 	}
 	tabs->setCurrentIndex(curIdx);
 	saveGeometry();
@@ -127,6 +128,7 @@ void
 MainWin::addNewMixer(dsbmixer_t *dev)
 {
 	Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
+
 	tabs->addTab(mixer, dev->name);
 	mixers.append(mixer);
 	connect(mixer, SIGNAL(muteStateChanged()), this,
@@ -154,6 +156,7 @@ void
 MainWin::updateMixers()
 {
 	dsbmixer_t *mixer = dsbmixer_pollmixers();
+
 	if (mixer == NULL)
 		return;
 	for (int i = 0; i < mixers.count(); i++) {
@@ -302,6 +305,8 @@ MainWin::updateTrayIcon()
 {
 	int idx = tabs->currentIndex();
 
+	if (idx == -1)
+		return;
 	if (mixers.at(idx)->muted)
 		trayIcon->setIcon(muteIcon);
 	else
