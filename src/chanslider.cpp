@@ -47,6 +47,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 		delete recCB;
 		recCB = 0;
 	} else {
+		recCB->setToolTip("Set/unset recording source");
 		layout->addWidget(recCB, 0, Qt::AlignHCenter);
 		connect(recCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitStateChanged(int)));
