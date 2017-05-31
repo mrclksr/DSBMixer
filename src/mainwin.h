@@ -55,6 +55,7 @@ private slots:
 	void checkForSysTray();
 	void catchMuteStateChanged();
 	void catchCurrentChanged();
+	void catchMasterVolChanged(int vol);
 private:
 	void redrawMixers();
 	void updateTrayIcon();
@@ -70,8 +71,7 @@ private:
 
 	QAction *quitAction;
 	QAction *preferencesAction;
-	QIcon muteIcon;
-	QIcon hVolIcon;
+	QIcon muteIcon, lVolIcon, mVolIcon, hVolIcon;
 	QSystemTrayIcon *trayIcon;
 	QMenu *mainMenu;
 	QTimer *traytimer;

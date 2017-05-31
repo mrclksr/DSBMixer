@@ -88,18 +88,32 @@ void
 Mixer::setVol(int chan, int vol)
 {
 	dsbmixer_setvol(this->mixer, chan, DSBMIXER_CHAN_CONCAT(vol, vol));
+
+	if (chan == 0)
+		emit masterVolChanged(vol);
 }
 
 void
 Mixer::setLVol(int chan, int lvol)
 {
 	dsbmixer_setlvol(this->mixer, chan, lvol);
+
+	if (chan == 0) {
+		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
+		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
+		emit masterVolChanged((lvol + rvol) >> 1);
+	}
 }
 
 void
 Mixer::setRVol(int chan, int rvol)
 {
 	dsbmixer_setrvol(this->mixer, chan, rvol);
+	if (chan == 0) {
+		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
+		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
+		emit masterVolChanged((lvol + rvol) >> 1);
+	}
 }
 
 void

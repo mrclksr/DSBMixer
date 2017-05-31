@@ -38,6 +38,7 @@ public:
 	dsbmixer_t *getDev() const;
 signals:
 	void muteStateChanged();
+	void masterVolChanged(int vol);
 public slots:
 	void setVol(int chan, int vol);
 	void setLVol(int chan, int lvol);

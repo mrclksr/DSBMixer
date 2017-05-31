@@ -54,6 +54,8 @@ MainWin::MainWin(QWidget *parent)
 	chanMask = &dsbcfg_getval(cfg, CFG_MASK).integer;
 
 	muteIcon = qh_loadIcon("audio-volume-muted", NULL);
+	lVolIcon = qh_loadIcon("audio-volume-low", NULL);
+	mVolIcon = qh_loadIcon("audio-volume-medium", NULL);
 	hVolIcon = qh_loadIcon("audio-volume-high", NULL);
 
 	tabs = new QTabWidget(this);
@@ -68,6 +70,8 @@ MainWin::MainWin(QWidget *parent)
 		tabs->setTabToolTip(i, QString(dev->cardname));
 		connect(mixer, SIGNAL(muteStateChanged()), this,
 		    SLOT(catchMuteStateChanged()));
+		connect(mixer, SIGNAL(masterVolChanged(int)), this,
+		    SLOT(catchMasterVolChanged(int)));
 	}
 	setCentralWidget(tabs);
 	tabs->setCurrentIndex(dsbmixer_snd_settings.default_unit);
@@ -118,6 +122,8 @@ MainWin::redrawMixers()
 
 		connect(mixer, SIGNAL(muteStateChanged()), this,
 		    SLOT(catchMuteStateChanged()));
+		connect(mixer, SIGNAL(masterVolChanged(int)), this,
+		    SLOT(catchMasterVolChanged(int)));
 	}
 	tabs->setCurrentIndex(curIdx);
 	saveGeometry();
@@ -298,6 +304,25 @@ void
 MainWin::catchCurrentChanged()
 {
 	updateTrayIcon();
+}
+
+void
+MainWin::catchMasterVolChanged(int vol)
+{
+	if (vol == 0) {
+		trayIcon->setIcon(muteIcon);
+		return;
+	}
+	switch ((vol * 3) / 100) {
+	case 0:
+		trayIcon->setIcon(lVolIcon);
+		break;
+	case 1: trayIcon->setIcon(mVolIcon);
+		break;
+	case 2:
+	case 3:
+		trayIcon->setIcon(hVolIcon);
+	}
 }
 
 void
