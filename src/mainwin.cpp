@@ -279,9 +279,33 @@ MainWin::checkForSysTray()
 void
 MainWin::createTrayIcon()
 {
+	int   vol, idx;
+	QIcon icon;
+
 	QMenu *menu = new QMenu(this);
 
-	trayIcon = new QSystemTrayIcon(hVolIcon, this);
+	if ((idx = tabs->currentIndex()) > -1) {
+		dsbmixer_t *dev = mixers.at(idx)->getDev();
+		vol = dsbmixer_getvol(dev, DSBMIXER_MASTER);
+		vol = DSBMIXER_CHAN_RIGHT(vol) + DSBMIXER_CHAN_LEFT(vol) / 2;
+		if (vol == 0)
+			icon = muteIcon;
+		else {
+			switch (vol * 3 / 100) {
+			case 0:
+				icon = lVolIcon;
+				break;
+			case 1:
+				icon = mVolIcon;
+				break;
+			case 2:
+			case 3:
+				icon = hVolIcon;
+			}
+		}
+	} else
+		icon = hVolIcon;
+	trayIcon = new QSystemTrayIcon(icon, this);
 
 	menu->addAction(preferencesAction);
 	menu->addAction(quitAction);
@@ -313,7 +337,7 @@ MainWin::catchMasterVolChanged(int vol)
 		trayIcon->setIcon(muteIcon);
 		return;
 	}
-	switch ((vol * 3) / 100) {
+	switch (vol * 3 / 100) {
 	case 0:
 		trayIcon->setIcon(lVolIcon);
 		break;
