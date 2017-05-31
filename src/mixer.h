@@ -36,6 +36,8 @@ class Mixer : public QWidget
 public:
 	Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent = 0);
 	dsbmixer_t *getDev() const;
+signals:
+	void muteStateChanged();
 public slots:
 	void setVol(int chan, int vol);
 	void setLVol(int chan, int lvol);
@@ -43,6 +45,8 @@ public slots:
 	void setRecSrc(int chan, int state);
 	void setMute(int state);
 	void update();
+public:
+	bool muted;
 private:
 	bool lrview;
 	dsbmixer_t *mixer;

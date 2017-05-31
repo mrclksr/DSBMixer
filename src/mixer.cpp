@@ -36,6 +36,7 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 		return;
 	this->mixer  = mixer;
 	this->lrview = lrview;
+	muted = false;
 
 	for (int i = 0; i < dsbmixer_getnchans(mixer); i++) {
 		int chan = dsbmixer_getchanid(mixer, i);
@@ -64,7 +65,8 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 		connect(cs, SIGNAL(stateChanged(int, int)), this,
 		    SLOT(setRecSrc(int, int)));
 		if (chan == 0) {
-			cs->setMute(dsbmixer_getmute(mixer));
+			muted = dsbmixer_getmute(mixer);
+			cs->setMute(muted);
 			connect(cs, SIGNAL(muteChanged(int)), this,
 			    SLOT(setMute(int)));
 		}
@@ -115,6 +117,8 @@ void
 Mixer::setMute(int state)
 {
 	dsbmixer_setmute(mixer, state == Qt::Checked ? true : false);
+	muted = dsbmixer_getmute(mixer);
+	emit muteStateChanged();
 	update();
 }
 

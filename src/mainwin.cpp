@@ -53,6 +53,9 @@ MainWin::MainWin(QWidget *parent)
 	lrView   = &dsbcfg_getval(cfg, CFG_LRVIEW).boolean;
 	chanMask = &dsbcfg_getval(cfg, CFG_MASK).integer;
 
+	muteIcon = qh_loadIcon("audio-volume-muted", NULL);
+	hVolIcon = qh_loadIcon("audio-volume-high", NULL);
+
 	tabs = new QTabWidget(this);
 	
 	createMenuActions();
@@ -64,9 +67,14 @@ MainWin::MainWin(QWidget *parent)
 	for (int i = 0, n = 0; i < dsbmixer_getndevs(); i++) {
 		dsbmixer_t *dev = dsbmixer_getmixer(i);
 		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
+
+		connect(mixer, SIGNAL(muteStateChanged()), this,
+		    SLOT(catchMuteStateChanged()));
 		mixers.append(mixer);
+
 		tabs->addTab(mixer, dev->name);
 		tabs->setTabToolTip(n, QString(dev->cardname));
+
 		if (dev->unit == dsbmixer_snd_settings.default_unit)
 			tabs->setCurrentIndex(n);
 		++n;
@@ -84,7 +92,9 @@ MainWin::MainWin(QWidget *parent)
 #endif
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateMixers()));
     	timer->start(200);
-	setWindowIcon(qh_loadIcon("audio-volume-high", NULL));
+	connect(tabs, SIGNAL(currentChanged(int)), this,
+	    SLOT(catchCurrentChanged()));
+	setWindowIcon(hVolIcon);
 	setWindowTitle("DSBMixer");
 	resize(*wWidth, *hHeight);	
 	move(*posX, *posY);
@@ -119,6 +129,8 @@ MainWin::addNewMixer(dsbmixer_t *dev)
 	Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
 	tabs->addTab(mixer, dev->name);
 	mixers.append(mixer);
+	connect(mixer, SIGNAL(muteStateChanged()), this,
+	    SLOT(catchMuteStateChanged()));
 	tabs->setTabToolTip(mixers.count() - 1, QString(dev->cardname));
 	redrawMixers();
 }
@@ -259,9 +271,8 @@ void
 MainWin::createTrayIcon()
 {
 	QMenu *menu = new QMenu(this);
-	QIcon icon = qh_loadIcon("audio-volume-high", NULL);
 
-	trayIcon = new QSystemTrayIcon(icon, this);
+	trayIcon = new QSystemTrayIcon(hVolIcon, this);
 
 	menu->addAction(preferencesAction);
 	menu->addAction(quitAction);
@@ -272,5 +283,28 @@ MainWin::createTrayIcon()
 	    this,
 	    SLOT(trayClicked(QSystemTrayIcon::ActivationReason)));
 	trayIcon->show();
+}
+
+void
+MainWin::catchMuteStateChanged()
+{
+	updateTrayIcon();
+}
+
+void
+MainWin::catchCurrentChanged()
+{
+	updateTrayIcon();
+}
+
+void
+MainWin::updateTrayIcon()
+{
+	int idx = tabs->currentIndex();
+
+	if (mixers.at(idx)->muted)
+		trayIcon->setIcon(muteIcon);
+	else
+		trayIcon->setIcon(hVolIcon);
 }
 

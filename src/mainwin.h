@@ -53,8 +53,11 @@ public slots:
 	void quit();
 private slots:
 	void checkForSysTray();
+	void catchMuteStateChanged();
+	void catchCurrentChanged();
 private:
 	void redrawMixers();
+	void updateTrayIcon();
 	void createMenuActions();
 	void createMainMenu();
 	void createTrayIcon();
@@ -67,7 +70,8 @@ private:
 
 	QAction *quitAction;
 	QAction *preferencesAction;
-
+	QIcon muteIcon;
+	QIcon hVolIcon;
 	QSystemTrayIcon *trayIcon;
 	QMenu *mainMenu;
 	QTimer *traytimer;
