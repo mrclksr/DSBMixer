@@ -57,6 +57,7 @@ private slots:
 	void catchCurrentChanged();
 	void catchMasterVolChanged(int vol);
 private:
+	int  mixerUnitToTabIndex(int unit);
 	void redrawMixers();
 	void updateTrayIcon();
 	void createMenuActions();

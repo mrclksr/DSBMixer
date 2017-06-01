@@ -37,6 +37,7 @@ MainWin::MainWin(QWidget *parent)
 	: QMainWindow(parent) {
 	traytimer     = new QTimer(this);
 	QTimer *timer = new QTimer(this);
+	int dunit     = dsbmixer_snd_settings.default_unit, didx;
 
 	cfg = dsbcfg_read(PROGRAM, "config", vardefs, CFG_NVARS);
 	if (cfg == NULL && errno == ENOENT) {
@@ -63,18 +64,26 @@ MainWin::MainWin(QWidget *parent)
 	for (int i = 0; i < dsbmixer_getndevs(); i++) {
 		dsbmixer_t *dev = dsbmixer_getmixer(i);
 		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
-
 		mixers.append(mixer);
 
-		tabs->addTab(mixer, dev->name);
-		tabs->setTabToolTip(i, QString(dev->cardname));
 		connect(mixer, SIGNAL(muteStateChanged()), this,
 		    SLOT(catchMuteStateChanged()));
 		connect(mixer, SIGNAL(masterVolChanged(int)), this,
 		    SLOT(catchMasterVolChanged(int)));
 	}
+	didx = mixerUnitToTabIndex(dunit);
+
+	for (int i = 0; i < mixers.count(); i++) {
+		dsbmixer_t *dev = mixers.at(i)->getDev();
+
+		QString label(dev->name);
+		if (i == didx)
+			label.append("*");
+		tabs->addTab(mixers.at(i), label);
+		tabs->setTabToolTip(i, QString(dev->cardname));
+	}
 	setCentralWidget(tabs);
-	tabs->setCurrentIndex(dsbmixer_snd_settings.default_unit);
+	tabs->setCurrentIndex(didx == -1 ? 0: didx);
 
 #ifndef WITHOUT_DEVD
 	Thread *thread = new Thread();
@@ -117,7 +126,11 @@ MainWin::redrawMixers()
 		dsbmixer_t *dev = dsbmixer_getmixer(i);
 		Mixer *mixer = new Mixer(dev, *chanMask, *lrView);
 		mixers.append(mixer);
-		tabs->addTab(mixer, dev->name);
+
+		QString label(dev->name);
+		if (i == curIdx)
+			label.append("*");
+		tabs->addTab(mixer, label);
 		tabs->setTabToolTip(i, QString(dev->cardname));
 
 		connect(mixer, SIGNAL(muteStateChanged()), this,
@@ -205,8 +218,19 @@ MainWin::showConfigMenu()
 
 	if (prefs.exec() != QDialog::Accepted)
 		return;
-	if (prefs.defaultUnit != dsbmixer_snd_settings.default_unit)
-		tabs->setCurrentIndex(prefs.defaultUnit);
+	if (prefs.defaultUnit != dsbmixer_snd_settings.default_unit) {
+		int idx = mixerUnitToTabIndex(prefs.defaultUnit);
+		if (idx == -1)
+			return;
+		tabs->setCurrentIndex(idx);
+		/* Update tab labels. */
+		for (int i = 0; i < mixers.count(); i++) {
+			QString label(mixers.at(i)->getDev()->name);
+			if (i == idx)
+				label.append("*");
+			tabs->setTabText(i, label);
+		}
+	}
 	if (*lrView != prefs.lrView || *chanMask != prefs.chanMask) {
 		*lrView   = prefs.lrView;
 		*chanMask = prefs.chanMask;
@@ -360,5 +384,15 @@ MainWin::updateTrayIcon()
 		trayIcon->setIcon(muteIcon);
 	else
 		trayIcon->setIcon(hVolIcon);
+}
+
+int
+MainWin::mixerUnitToTabIndex(int unit)
+{
+	for (int i = 0; i < mixers.count(); i++) {
+		if (mixers.at(i)->getDev()->unit == unit)
+			return (i);
+	}
+	return (-1);
 }
 
