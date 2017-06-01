@@ -64,7 +64,7 @@ MainWin::MainWin(QWidget *parent)
 #ifndef WITHOUT_DEVD
 	Thread *thread = new Thread();
 	connect(thread, SIGNAL(sendNewMixer(dsbmixer_t*)), this,
-	    SLOT(addNewMixer(dsbmixer_t*)));
+	    SLOT(addNewMixer()));
 
 	connect(thread, SIGNAL(sendRemoveMixer(dsbmixer_t*)), this,
 	    SLOT(removeMixer(dsbmixer_t*)));
@@ -105,9 +105,8 @@ MainWin::createMixerList()
 void
 MainWin::createTabs()
 {
-	int dunit = dsbmixer_snd_settings.default_unit, didx;
+	int didx = mixerUnitToTabIndex(dsbmixer_snd_settings.default_unit);
 
-	didx = mixerUnitToTabIndex(dunit);
 	for (int i = 0; i < mixers.count(); i++) {
 		dsbmixer_t *dev = mixers.at(i)->getDev();
 		QString label(dev->name);
@@ -137,15 +136,8 @@ MainWin::redrawMixers()
 
 #ifndef WITHOUT_DEVD
 void
-MainWin::addNewMixer(dsbmixer_t *dev)
+MainWin::addNewMixer()
 {
-	Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
-
-	tabs->addTab(mixer, dev->name);
-	mixers.append(mixer);
-	connect(mixer, SIGNAL(muteStateChanged()), this,
-	    SLOT(catchMuteStateChanged()));
-	tabs->setTabToolTip(mixers.count() - 1, QString(dev->cardname));
 	redrawMixers();
 }
 

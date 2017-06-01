@@ -43,7 +43,7 @@ public:
 
 public slots:
 #ifndef WITHOUT_DEVD
-	void addNewMixer(dsbmixer_t *mixer);
+	void addNewMixer();
 	void removeMixer(dsbmixer_t *mixer);
 #endif
 	void updateMixers();
