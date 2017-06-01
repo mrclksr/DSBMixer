@@ -60,6 +60,8 @@ private:
 	int  mixerUnitToTabIndex(int unit);
 	void redrawMixers();
 	void updateTrayIcon();
+	void createMixerList();
+	void createTabs();
 	void createMenuActions();
 	void createMainMenu();
 	void createTrayIcon();

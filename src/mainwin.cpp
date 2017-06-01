@@ -37,7 +37,7 @@ MainWin::MainWin(QWidget *parent)
 	: QMainWindow(parent) {
 	traytimer     = new QTimer(this);
 	QTimer *timer = new QTimer(this);
-	int dunit     = dsbmixer_snd_settings.default_unit, didx;
+	tabs 	      = new QTabWidget(this);
 
 	cfg = dsbcfg_read(PROGRAM, "config", vardefs, CFG_NVARS);
 	if (cfg == NULL && errno == ENOENT) {
@@ -59,32 +59,8 @@ MainWin::MainWin(QWidget *parent)
 	mVolIcon = qh_loadIcon("audio-volume-medium", NULL);
 	hVolIcon = qh_loadIcon("audio-volume-high", NULL);
 
-	tabs = new QTabWidget(this);
-
-	for (int i = 0; i < dsbmixer_getndevs(); i++) {
-		dsbmixer_t *dev = dsbmixer_getmixer(i);
-		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
-		mixers.append(mixer);
-
-		connect(mixer, SIGNAL(muteStateChanged()), this,
-		    SLOT(catchMuteStateChanged()));
-		connect(mixer, SIGNAL(masterVolChanged(int)), this,
-		    SLOT(catchMasterVolChanged(int)));
-	}
-	didx = mixerUnitToTabIndex(dunit);
-
-	for (int i = 0; i < mixers.count(); i++) {
-		dsbmixer_t *dev = mixers.at(i)->getDev();
-
-		QString label(dev->name);
-		if (i == didx)
-			label.append("*");
-		tabs->addTab(mixers.at(i), label);
-		tabs->setTabToolTip(i, QString(dev->cardname));
-	}
-	setCentralWidget(tabs);
-	tabs->setCurrentIndex(didx == -1 ? 0: didx);
-
+	createMixerList();
+	createTabs();
 #ifndef WITHOUT_DEVD
 	Thread *thread = new Thread();
 	connect(thread, SIGNAL(sendNewMixer(dsbmixer_t*)), this,
@@ -112,33 +88,50 @@ MainWin::MainWin(QWidget *parent)
 }
 
 void
-MainWin::redrawMixers()
+MainWin::createMixerList()
 {
-	int curIdx = tabs->currentIndex();
-
-	for (int i = tabs->count() - 1; i >= 0; i--)
-		tabs->removeTab(0);
-	for (int i = mixers.count() - 1; i >= 0; i--) {
-		delete mixers.at(0);
-		mixers.removeAt(0);
-	}
 	for (int i = 0; i < dsbmixer_getndevs(); i++) {
 		dsbmixer_t *dev = dsbmixer_getmixer(i);
-		Mixer *mixer = new Mixer(dev, *chanMask, *lrView);
+		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
 		mixers.append(mixer);
-
-		QString label(dev->name);
-		if (i == curIdx)
-			label.append("*");
-		tabs->addTab(mixer, label);
-		tabs->setTabToolTip(i, QString(dev->cardname));
 
 		connect(mixer, SIGNAL(muteStateChanged()), this,
 		    SLOT(catchMuteStateChanged()));
 		connect(mixer, SIGNAL(masterVolChanged(int)), this,
 		    SLOT(catchMasterVolChanged(int)));
 	}
-	tabs->setCurrentIndex(curIdx);
+}
+
+void
+MainWin::createTabs()
+{
+	int dunit = dsbmixer_snd_settings.default_unit, didx;
+
+	didx = mixerUnitToTabIndex(dunit);
+	for (int i = 0; i < mixers.count(); i++) {
+		dsbmixer_t *dev = mixers.at(i)->getDev();
+		QString label(dev->name);
+
+		if (i == didx)
+			label.append("*");
+		tabs->addTab(mixers.at(i), label);
+		tabs->setTabToolTip(i, QString(dev->cardname));
+	}
+	setCentralWidget(tabs);
+	tabs->setCurrentIndex(didx == -1 ? 0: didx);
+}
+
+void
+MainWin::redrawMixers()
+{
+	for (int i = tabs->count() - 1; i >= 0; i--)
+		tabs->removeTab(0);
+	for (int i = mixers.count() - 1; i >= 0; i--) {
+		delete mixers.at(0);
+		mixers.removeAt(0);
+	}
+	createMixerList();
+	createTabs();
 	saveGeometry();
 }
 
@@ -303,34 +296,10 @@ MainWin::checkForSysTray()
 void
 MainWin::createTrayIcon()
 {
-	int   vol, idx;
-	QIcon icon;
-
+	trayIcon    = new QSystemTrayIcon(hVolIcon, this);
 	QMenu *menu = new QMenu(this);
 
-	if ((idx = tabs->currentIndex()) > -1) {
-		dsbmixer_t *dev = mixers.at(idx)->getDev();
-		vol = dsbmixer_getvol(dev, DSBMIXER_MASTER);
-		vol = DSBMIXER_CHAN_RIGHT(vol) + DSBMIXER_CHAN_LEFT(vol) / 2;
-		if (vol == 0)
-			icon = muteIcon;
-		else {
-			switch (vol * 3 / 100) {
-			case 0:
-				icon = lVolIcon;
-				break;
-			case 1:
-				icon = mVolIcon;
-				break;
-			case 2:
-			case 3:
-				icon = hVolIcon;
-			}
-		}
-	} else
-		icon = hVolIcon;
-	trayIcon = new QSystemTrayIcon(icon, this);
-
+	updateTrayIcon();
 	menu->addAction(preferencesAction);
 	menu->addAction(quitAction);
 	trayIcon->setContextMenu(menu);
@@ -345,7 +314,7 @@ MainWin::createTrayIcon()
 void
 MainWin::catchMuteStateChanged()
 {
-	updateTrayIcon();
+	catchMasterVolChanged(0);
 }
 
 void
@@ -377,13 +346,36 @@ void
 MainWin::updateTrayIcon()
 {
 	int idx = tabs->currentIndex();
+	QIcon icon;
 
 	if (idx == -1)
 		return;
 	if (mixers.at(idx)->muted)
 		trayIcon->setIcon(muteIcon);
-	else
-		trayIcon->setIcon(hVolIcon);
+	else {
+		int vol;
+		dsbmixer_t *dev = mixers.at(idx)->getDev();
+
+		vol = dsbmixer_getvol(dev, DSBMIXER_MASTER);
+		vol = (DSBMIXER_CHAN_RIGHT(vol) + DSBMIXER_CHAN_LEFT(vol)) >> 1;
+		if (vol == 0)
+			icon = muteIcon;
+		else {
+			switch (vol * 3 / 100) {
+			case 0:
+				icon = lVolIcon;
+				break;
+			case 1:
+				icon = mVolIcon;
+				break;
+			case 2:
+			case 3:
+			default:
+				icon = hVolIcon;
+			}
+		}
+	}
+	trayIcon->setIcon(icon);
 }
 
 int
