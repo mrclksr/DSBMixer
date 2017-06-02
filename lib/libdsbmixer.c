@@ -222,11 +222,11 @@ void
 dsbmixer_setmute(dsbmixer_t *mixer, bool mute)
 {
 	if (!mute && mixer->mute) {
-		set_vol(mixer, 0, mixer->saved_vol);
+		set_vol(mixer, DSBMIXER_MASTER, mixer->saved_vol);
 		mixer->mute = false;
 	} else if (mute && !mixer->mute) {
-		mixer->saved_vol = mixer->chan[0].vol;
-		set_vol(mixer, 0, 0);
+		mixer->saved_vol = mixer->chan[DSBMIXER_MASTER].vol;
+		set_vol(mixer, DSBMIXER_MASTER, 0);
 		mixer->mute = true;	
 	}
 }
@@ -235,7 +235,7 @@ bool
 dsbmixer_getmute(dsbmixer_t *mixer)
 {
 	read_vol(mixer);
-	if (mixer->chan[0].vol != 0)
+	if (mixer->chan[DSBMIXER_MASTER].vol != 0)
 		mixer->mute = false;
 	else
 		mixer->mute = true;
@@ -845,8 +845,8 @@ add_mixer(const char *name)
 	if (mixer.ugen == NULL && (_error & DSBMIXER_ERR_FATAL))
 		ERROR(-1, DSBMIXER_ERR_FATAL, true, "get_cardname(%s)", name);
 	mixer.removed  = false;
-	mixer.mute     = mixer.chan[0].vol == 0 ? true : false;
-	mixer.saved_vol = mixer.chan[0].vol;
+	mixer.mute     = mixer.chan[DSBMIXER_MASTER].vol == 0 ? true : false;
+	mixer.saved_vol = mixer.chan[DSBMIXER_MASTER].vol;
 	mixers = realloc(mixers, (nmixers + 1) * sizeof(dsbmixer_t **));
 	if (mixers == NULL)
 		ERROR(-1, FATAL_SYSERR, false, "realloc()");
@@ -889,7 +889,7 @@ read_vol(dsbmixer_t *mixer)
 		if (mixer->chan[i].vol != vol) {
 			mixer->changemask |= (1 << i);
 			mixer->chan[i].vol = vol;
-			if (i == 0 && vol > 0)
+			if (i == DSBMIXER_MASTER && vol > 0)
 				mixer->mute = false;
 		}
 	}
@@ -916,8 +916,11 @@ set_vol(dsbmixer_t *mixer, int chan, int vol)
 		return;
 	if (DSBMIXER_CHAN_LEFT(vol) > 100 || DSBMIXER_CHAN_RIGHT(vol) > 100)
 		return;
-	if (ioctl(mixer->fd, MIXER_WRITE(chan), &vol) == 0)
+	if (ioctl(mixer->fd, MIXER_WRITE(chan), &vol) == 0) {
 		mixer->chan[chan].vol = vol;
+		if (chan == DSBMIXER_MASTER)
+			mixer->mute = false;
+	}
 }
 
 static int
