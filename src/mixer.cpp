@@ -132,7 +132,6 @@ Mixer::setMute(int state)
 {
 	dsbmixer_setmute(mixer, state == Qt::Checked ? true : false);
 	muted = dsbmixer_getmute(mixer);
-	emit muteStateChanged();
 	update();
 }
 
@@ -141,11 +140,14 @@ Mixer::update()
 {
 	for (int i = 0; i < channel.count(); i++) {
 		int chan = channel.at(i)->id;
+		int vol  = dsbmixer_getvol(mixer, chan);
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 		int uvol = (lvol + rvol) >> 1;
-		if (uvol > 0 && chan == DSBMIXER_MASTER)
+		if (uvol > 0 && chan == DSBMIXER_MASTER) {
 			channel.at(i)->setMute(false);
+			emit masterVolChanged(vol);
+		}
 		if (lrview)
 			channel.at(i)->setVol(lvol, rvol);
 		else

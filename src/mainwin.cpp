@@ -95,8 +95,6 @@ MainWin::createMixerList()
 		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
 		mixers.append(mixer);
 
-		connect(mixer, SIGNAL(muteStateChanged()), this,
-		    SLOT(catchMuteStateChanged()));
 		connect(mixer, SIGNAL(masterVolChanged(int)), this,
 		    SLOT(catchMasterVolChanged(int)));
 	}
@@ -301,12 +299,6 @@ MainWin::createTrayIcon()
 	    this,
 	    SLOT(trayClicked(QSystemTrayIcon::ActivationReason)));
 	trayIcon->show();
-}
-
-void
-MainWin::catchMuteStateChanged()
-{
-	catchMasterVolChanged(0);
 }
 
 void

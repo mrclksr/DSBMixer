@@ -53,7 +53,6 @@ public slots:
 	void quit();
 private slots:
 	void checkForSysTray();
-	void catchMuteStateChanged();
 	void catchCurrentChanged();
 	void catchMasterVolChanged(int vol);
 private:
