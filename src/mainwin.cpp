@@ -358,8 +358,8 @@ MainWin::updateTrayIcon()
 				icon = hVolIcon;
 			}
 		}
+		trayIcon->setIcon(icon);
 	}
-	trayIcon->setIcon(icon);
 }
 
 int
