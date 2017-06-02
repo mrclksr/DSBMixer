@@ -918,8 +918,6 @@ set_vol(dsbmixer_t *mixer, int chan, int vol)
 		return;
 	if (ioctl(mixer->fd, MIXER_WRITE(chan), &vol) == 0) {
 		mixer->chan[chan].vol = vol;
-		if (chan == DSBMIXER_MASTER)
-			mixer->mute = false;
 	}
 }
 
