@@ -49,7 +49,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 		recCB->setToolTip(tr("Set/unset recording source"));
 		layout->addWidget(recCB, 0, Qt::AlignHCenter);
 		connect(recCB, SIGNAL(stateChanged(int)), this,
-		    SLOT(emitStateChanged(int)));
+		    SLOT(emitRecSourceChanged(int)));
 	}
 	slider = new QSlider(Qt::Vertical);
 	slider->setMinimum(0);
@@ -103,7 +103,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 		recCB->setToolTip(tr("Set/unset recording source"));
 		vbox->addWidget(recCB, 0, Qt::AlignHCenter);
 		connect(recCB, SIGNAL(stateChanged(int)), this,
-		    SLOT(emitStateChanged(int)));
+		    SLOT(emitRecSourceChanged(int)));
 	}
 	lslider = new QSlider(Qt::Vertical);
 	rslider = new QSlider(Qt::Vertical);
@@ -174,9 +174,9 @@ ChanSlider::emitRVolumeChanged(int vol)
 }
 
 void
-ChanSlider::emitStateChanged(int state)
+ChanSlider::emitRecSourceChanged(int state)
 {
-	emit stateChanged(this->id, state);
+	emit recSourceChanged(this->id, state);
 }
 
 void

@@ -45,13 +45,13 @@ public:
 	void setMute(bool mute);
 signals:
 	void VolumeChanged(int id, int val);
-	void stateChanged(int id, int state);
+	void recSourceChanged(int id, int state);
 	void lVolumeChanged(int id, int vol);
 	void rVolumeChanged(int id, int vol);
 	void muteChanged(int state);
 private slots:
 	void emitVolumeChanged(int);
-	void emitStateChanged(int);
+	void emitRecSourceChanged(int);
 	void emitLVolumeChanged(int lvol);
 	void emitRVolumeChanged(int rvol);
 	void emitMuteChanged(int state);

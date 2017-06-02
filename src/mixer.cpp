@@ -62,7 +62,7 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 			connect(cs, SIGNAL(VolumeChanged(int, int)), this,
 			    SLOT(setVol(int, int)));
 		}
-		connect(cs, SIGNAL(stateChanged(int, int)), this,
+		connect(cs, SIGNAL(recSourceChanged(int, int)), this,
 		    SLOT(setRecSrc(int, int)));
 		if (chan == DSBMIXER_MASTER) {
 			muted = dsbmixer_getmute(mixer);
@@ -140,13 +140,17 @@ Mixer::update()
 {
 	for (int i = 0; i < channel.count(); i++) {
 		int chan = channel.at(i)->id;
-		int vol  = dsbmixer_getvol(mixer, chan);
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 		int uvol = (lvol + rvol) >> 1;
-		if (uvol > 0 && chan == DSBMIXER_MASTER) {
-			channel.at(i)->setMute(false);
-			emit masterVolChanged(vol);
+		if (chan == DSBMIXER_MASTER) {
+			if (uvol > 0) {
+				channel.at(i)->setMute(false);
+				emit masterVolChanged(uvol);
+			} else {
+				channel.at(i)->setMute(true);
+				emit masterVolChanged(0);
+			}
 		}
 		if (lrview)
 			channel.at(i)->setVol(lvol, rvol);
