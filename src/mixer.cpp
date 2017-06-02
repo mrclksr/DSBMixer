@@ -147,7 +147,7 @@ Mixer::update()
 			if (uvol > 0) {
 				channel.at(i)->setMute(false);
 				emit masterVolChanged(uvol);
-			} else {
+			} else if (muted) {
 				channel.at(i)->setMute(true);
 				emit masterVolChanged(0);
 			}
