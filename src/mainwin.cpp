@@ -103,7 +103,7 @@ MainWin::createMixerList()
 void
 MainWin::createTabs()
 {
-	int didx = mixerUnitToTabIndex(dsbmixer_snd_settings.default_unit);
+	int didx = mixerUnitToTabIndex(dsbmixer_default_unit());
 
 	for (int i = 0; i < mixers.count(); i++) {
 		dsbmixer_t *dev = mixers.at(i)->getDev();
@@ -197,11 +197,11 @@ MainWin::showConfigMenu()
 	Preferences prefs(*chanMask,
 	    dsbmixer_snd_settings.amplify,
 	    dsbmixer_snd_settings.feeder_rate_quality,
-	    dsbmixer_snd_settings.default_unit, *lrView, this);
+	    dsbmixer_default_unit(), *lrView, this);
 
 	if (prefs.exec() != QDialog::Accepted)
 		return;
-	if (prefs.defaultUnit != dsbmixer_snd_settings.default_unit) {
+	if (prefs.defaultUnit != dsbmixer_default_unit()) {
 		int idx = mixerUnitToTabIndex(prefs.defaultUnit);
 		if (idx == -1)
 			return;
@@ -222,7 +222,7 @@ MainWin::showConfigMenu()
 	dsbcfg_write(PROGRAM, "config", cfg);
 
 	if (dsbmixer_snd_settings.amplify != prefs.amplify ||
-	    dsbmixer_snd_settings.default_unit != prefs.defaultUnit ||
+	    dsbmixer_default_unit() != prefs.defaultUnit ||
 	    dsbmixer_snd_settings.feeder_rate_quality !=
 	    prefs.feederRateQuality) {
 		if (dsbmixer_change_settings(prefs.defaultUnit, prefs.amplify,
