@@ -154,6 +154,19 @@ dsbmixer_default_unit()
 	return (dsbmixer_snd_settings.default_unit);
 }
 
+int
+dsbmixer_amplification()
+{
+	return (dsbmixer_snd_settings.amplify);
+}
+
+
+int
+dsbmixer_feeder_rate_quality()
+{
+	return (dsbmixer_snd_settings.feeder_rate_quality);
+}
+
 void
 dsbmixer_setvol(dsbmixer_t *mixer, int chan, int vol)
 {

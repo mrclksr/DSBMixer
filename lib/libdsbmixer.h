@@ -87,6 +87,8 @@ extern int	  dsbmixer_getndevs(void);
 extern int	  dsbmixer_getnchans(dsbmixer_t *mixer);
 extern int	  dsbmixer_getchanid(dsbmixer_t *mixer, int index);
 extern int	  dsbmixer_default_unit(void);
+extern int	  dsbmixer_amplification(void);
+extern int	  dsbmixer_feeder_rate_quality(void);
 extern int	  dsbmixer_getvol(dsbmixer_t *mixer, int chan);
 extern int	  dsbmixer_apply_settings(void);
 extern int	  dsbmixer_change_settings(int dfltunit, int amp, int qual);

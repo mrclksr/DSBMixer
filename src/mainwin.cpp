@@ -194,10 +194,9 @@ MainWin::closeEvent(QCloseEvent *event)
 void
 MainWin::showConfigMenu()
 {
-	Preferences prefs(*chanMask,
-	    dsbmixer_snd_settings.amplify,
-	    dsbmixer_snd_settings.feeder_rate_quality,
-	    dsbmixer_default_unit(), *lrView, this);
+	Preferences prefs(*chanMask, dsbmixer_amplification(),
+	    dsbmixer_feeder_rate_quality(), dsbmixer_default_unit(),
+	    *lrView, this);
 
 	if (prefs.exec() != QDialog::Accepted)
 		return;
@@ -221,10 +220,9 @@ MainWin::showConfigMenu()
 	}
 	dsbcfg_write(PROGRAM, "config", cfg);
 
-	if (dsbmixer_snd_settings.amplify != prefs.amplify ||
+	if (dsbmixer_amplification() != prefs.amplify ||
 	    dsbmixer_default_unit() != prefs.defaultUnit ||
-	    dsbmixer_snd_settings.feeder_rate_quality !=
-	    prefs.feederRateQuality) {
+	    dsbmixer_feeder_rate_quality() != prefs.feederRateQuality) {
 		if (dsbmixer_change_settings(prefs.defaultUnit, prefs.amplify,
 		    prefs.feederRateQuality) == -1)
 			qh_warnx(0, dsbmixer_error());
