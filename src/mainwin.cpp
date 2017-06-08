@@ -277,8 +277,10 @@ MainWin::checkForSysTray()
 	if (QSystemTrayIcon::isSystemTrayAvailable()) {
 		traytimer->stop();
 		createTrayIcon();
-	} else if (tries-- <= 0)
+	} else if (tries-- <= 0) {
 		traytimer->stop();
+		show();
+	}
 }
 
 void
