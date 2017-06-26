@@ -545,6 +545,9 @@ devd_watcher(void *unused)
 	static mqmsg_t msg;
 	static devqueue_item_t item;
 
+	/* Silence warning about unused parameter */
+	(void)unused;
+
 	FD_ZERO(&allset);
        	FD_SET(fileno(devdfp), &allset);
 
