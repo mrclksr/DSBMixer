@@ -1,0 +1,38 @@
+.Dd $Mdocdate$
+.Dt DSBMixer
+.Sh ABOUT
+.Nm DSBMixer
+is a tabbed Qt (GTK+) mixer for FreeBSD®. For each installed mixer
+device,
+.Nm
+opens a tab. It adds a new mixer tab at runtime when you
+plug in an USB sound device.
+.Nm
+allows you set amplification, to select recording sources, and to choose
+your default audio device.
+.Sh INSTALLATION
+In order to save settings, DSBMixer requires DSBWrtSysctl:
+.Bd -literal
+# git clone https://github.com/mrclksr/DSBWrtSysctl.git
+# cd DSBWrtSysctl && make install
+.Ed
+
+Finally:
+.Bd -literal
+# git clone https://github.com/mrclksr/dsbcfg.git
+# git clone https://github.com/mrclksr/DSBMixer.git
+# cd DSBMixer && qmake
+
+# make && make install
+.Ed
+
+or if you don't want devd support:
+.Bd -literal
+# make -DWITHOUT_DEVD && make install
+.Ed
+.Sh USAGE
+.Bd -literal
+Usage: dsbmixer [-hi]
+   -i: Start dsbmixer as tray icon
+.Ed
+
