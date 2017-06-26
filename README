@@ -1,31 +1,32 @@
-				   ABOUT
 
-DSBMixer is a tabbed Qt (GTK+) mixer for FreeBSD®. For each installed mixer
-device, DSBMixer opens a tab. It adds a new mixer tab at runtime when you
-plug in an USB sound device. DSBMixer allows you set amplification, to select
-recording sources, and to choose your default audio device.
+ABOUT
+     DSBMixer is a tabbed Qt (GTK+) mixer for FreeBSD®. For each installed
+     mixer device, DSBMixer opens a tab. It adds a new mixer tab at runtime
+     when you plug in an USB sound device.  DSBMixer allows you set
+     amplification, to select recording sources, and to choose your default
+     audio device.
 
-				INSTALLATION
+INSTALLATION
+     In order to save settings, DSBMixer requires DSBWrtSysctl:
 
-In order to save settings, DSBMixer requires DSBWrtSysctl:
+     # git clone https://github.com/mrclksr/DSBWrtSysctl.git
+     # cd DSBWrtSysctl && make install
 
-# git clone https://github.com/mrclksr/DSBWrtSysctl.git
-# cd DSBWrtSysctl && make install
+     Finally:
 
-or fetch the latest version from https://freeshell.de/~mk/projects/dsbwrtsysctl.html:
+     # git clone https://github.com/mrclksr/dsbcfg.git
+     # git clone https://github.com/mrclksr/DSBMixer.git
+     # cd DSBMixer && qmake
 
-# fetch https://freeshell.de/~mk/download/dsbwrtsysctl-version.tgz
-# tar xf dsbwrtsysctl-version.tgz && cd dsbwrtsysctl-version && make install
+     # make && make install
 
-# qmake
-# make && make install
+     or if you don't want devd support:
 
-or if you don't want devd support:
+     # make -DWITHOUT_DEVD && make install
 
-# make -DWITHOUT_DEVD && make install
+USAGE
+     Usage: dsbmixer [-hi]
+        -i: Start dsbmixer as tray icon
 
-				   USAGE
 
-Usage: dsbmixer [-hi]
-   -i: Start dsbmixer as tray icon
-
+                                 June 27, 2017
