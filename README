@@ -7,15 +7,18 @@ ABOUT
      audio device.
 
 INSTALLATION
-     In order to save settings, DSBMixer requires DSBWrtSysctl:
+   Dependencies
+     DSBMixer depends on devel/qt5-buildtools, devel/qt5-core,
+     devel/qt5-linguisttools, devel/qt5-qmake, x11-toolkits/qt5-gui, and
+     x11-toolkits/qt5-widgets
 
-     # git clone https://github.com/mrclksr/DSBWrtSysctl.git
-     # cd DSBWrtSysctl && make install
+     In order to save settings, DSBMixer requires sysutils/dsbwrtsysctl
 
-     Finally:
-
-     # git clone https://github.com/mrclksr/dsbcfg.git
+   Getting the source code
      # git clone https://github.com/mrclksr/DSBMixer.git
+     # git clone https://github.com/mrclksr/dsbcfg.git
+
+   Building and installation
      # cd DSBMixer && qmake
 
      # make && make install
