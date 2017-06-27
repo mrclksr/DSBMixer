@@ -11,16 +11,23 @@ plug in an USB sound device.
 allows you set amplification, to select recording sources, and to choose
 your default audio device.
 .Sh INSTALLATION
-In order to save settings, DSBMixer requires DSBWrtSysctl:
-.Bd -literal
-# git clone https://github.com/mrclksr/DSBWrtSysctl.git
-# cd DSBWrtSysctl && make install
-.Ed
+.Ss Dependencies
+.Nm
+depends on
+.Em devel/qt5-buildtools , devel/qt5-core , devel/qt5-linguisttools ,
+.Em devel/qt5-qmake , x11-toolkits/qt5-gui ,
+and
+.Em x11-toolkits/qt5-widgets
 
-Finally:
+In order to save settings,
+.Nm
+requires
+.Em sysutils/dsbwrtsysctl
+.Ss Getting the source code
 .Bd -literal
-# git clone https://github.com/mrclksr/dsbcfg.git
 # git clone https://github.com/mrclksr/DSBMixer.git
+# git clone https://github.com/mrclksr/dsbcfg.git
+.Ss Building and installation
 # cd DSBMixer && qmake
 
 # make && make install
