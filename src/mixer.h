@@ -44,6 +44,7 @@ public slots:
 	void setRVol(int chan, int rvol);
 	void setRecSrc(int chan, int state);
 	void setMute(int state);
+	void setTicks(bool on);
 	void update();
 public:
 	int getMasterVol();

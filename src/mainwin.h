@@ -70,6 +70,7 @@ private:
 	int  *wWidth, *hHeight;
 	int  *chanMask;
 	bool *lrView;
+	bool *showTicks;
 
 	QAction *quitAction;
 	QAction *preferencesAction;

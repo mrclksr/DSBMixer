@@ -54,6 +54,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	slider = new QSlider(Qt::Vertical);
 	slider->setMinimum(0);
 	slider->setMaximum(100);
+	slider->setTickPosition(QSlider::TicksLeft);
 	setVol(vol);
 
 	layout->addWidget(slider, 1, Qt::AlignHCenter);
@@ -112,9 +113,11 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	lslider->setMaximum(100);
 	lslider->setValue(lvol);
 
+	lslider->setTickPosition(QSlider::TicksLeft);
 	rslider->setMinimum(0);
 	rslider->setMaximum(100);
 
+	rslider->setTickPosition(QSlider::TicksRight);
 	setVol(lvol, rvol);
 	hbox->addWidget(lslider, 1, Qt::AlignHCenter);
 	hbox->addWidget(rslider, 1, Qt::AlignHCenter);
@@ -239,5 +242,18 @@ ChanSlider::sliderSetToolTip(int lvol, int rvol)
 
 	QString rstr = QString("%1").arg(rvol);
 	rslider->setToolTip(rstr);
+}
+
+void
+ChanSlider::setTicks(bool on)
+{
+	if (lrview) {
+		lslider->setTickPosition(on ? QSlider::TicksLeft  : \
+		    QSlider::NoTicks);
+		rslider->setTickPosition(on ? QSlider::TicksRight : \
+		    QSlider::NoTicks);
+		return;
+	}
+	slider->setTickPosition(on ? QSlider::TicksLeft : QSlider::NoTicks);
 }
 

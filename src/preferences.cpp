@@ -34,13 +34,14 @@
 #include "qt-helper/qt-helper.h"
 
 Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
-	int defaultUnit, bool lrView, QWidget *parent) : QDialog(parent) {
-
+	int defaultUnit, bool lrView, bool showTicks, QWidget *parent)
+	: QDialog(parent) {
 	this->chanMask = chanMask;
 	this->amplify = amplify;
 	this->feederRateQuality = feederRateQuality;
 	this->defaultUnit = defaultUnit;
 	this->lrView = lrView;
+	this->showTicks = showTicks;
 
 	qApp->setQuitOnLastWindowClosed(false);
 
@@ -81,6 +82,7 @@ Preferences::acceptSlot()
 		else
 			chanMask &= ~(1 << i);
 	}
+	showTicks = showTicksCb->checkState() == Qt::Checked ? : false;
 	if (lrViewCb->checkState() == Qt::Checked)
 		lrView = true;
 	else
@@ -130,7 +132,12 @@ Preferences::createViewTab()
 	lrViewCb = new QCheckBox(tr("Show left and right channel"), this);
 	lrViewCb->setCheckState(lrView ? Qt::Checked : Qt::Unchecked);
 
+	showTicksCb = new QCheckBox(tr("Show ticks"), this);
+	showTicksCb->setCheckState(showTicks ? Qt::Checked : Qt::Unchecked);
+
 	vbox->addWidget(lrViewCb);
+	vbox->addWidget(showTicksCb);
+
 	widget->setLayout(vbox);
 
 	return (widget);

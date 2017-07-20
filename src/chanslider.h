@@ -43,6 +43,7 @@ public:
 	void sliderSetToolTip(int vol);
 	void sliderSetToolTip(int lvol, int rvol);
 	void setMute(bool mute);
+	void setTicks(bool on);
 signals:
 	void VolumeChanged(int id, int val);
 	void recSourceChanged(int id, int state);

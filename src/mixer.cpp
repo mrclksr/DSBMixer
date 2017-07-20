@@ -194,3 +194,10 @@ Mixer::getMasterVol()
 	return ((DSBMIXER_CHAN_RIGHT(vol) + DSBMIXER_CHAN_LEFT(vol)) >> 1);
 }
 
+void
+Mixer::setTicks(bool on)
+{
+	for (int i = 0; i < channel.count(); i++)
+		channel.at(i)->setTicks(on);
+}
+

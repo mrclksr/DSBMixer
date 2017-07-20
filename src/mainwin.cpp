@@ -47,11 +47,12 @@ MainWin::MainWin(QWidget *parent)
 	} else if (cfg == NULL)
 		qh_errx(0, EXIT_FAILURE, "%s", dsbcfg_strerror());
 
-	posX	 = &dsbcfg_getval(cfg, CFG_POS_X).integer;
-	posY	 = &dsbcfg_getval(cfg, CFG_POS_Y).integer;
-	wWidth	 = &dsbcfg_getval(cfg, CFG_WIDTH).integer;
-	hHeight	 = &dsbcfg_getval(cfg, CFG_HEIGHT).integer;
-	lrView   = &dsbcfg_getval(cfg, CFG_LRVIEW).boolean;
+	posX	  = &dsbcfg_getval(cfg, CFG_POS_X).integer;
+	posY	  = &dsbcfg_getval(cfg, CFG_POS_Y).integer;
+	wWidth	  = &dsbcfg_getval(cfg, CFG_WIDTH).integer;
+	hHeight	  = &dsbcfg_getval(cfg, CFG_HEIGHT).integer;
+	lrView    = &dsbcfg_getval(cfg, CFG_LRVIEW).boolean;
+	showTicks = &dsbcfg_getval(cfg, CFG_TICKS).boolean;
 	chanMask = &dsbcfg_getval(cfg, CFG_MASK).integer;
 
 	muteIcon = qh_loadIcon("audio-volume-muted", NULL);
@@ -94,7 +95,7 @@ MainWin::createMixerList()
 		dsbmixer_t *dev = dsbmixer_getmixer(i);
 		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
 		mixers.append(mixer);
-
+		mixer->setTicks(*showTicks);
 		connect(mixer, SIGNAL(masterVolChanged(int)), this,
 		    SLOT(catchMasterVolChanged(int)));
 	}
@@ -196,7 +197,7 @@ MainWin::showConfigMenu()
 {
 	Preferences prefs(*chanMask, dsbmixer_amplification(),
 	    dsbmixer_feeder_rate_quality(), dsbmixer_default_unit(),
-	    *lrView, this);
+	    *lrView, *showTicks, this);
 
 	if (prefs.exec() != QDialog::Accepted)
 		return;
@@ -213,9 +214,12 @@ MainWin::showConfigMenu()
 			tabs->setTabText(i, label);
 		}
 	}
-	if (*lrView != prefs.lrView || *chanMask != prefs.chanMask) {
-		*lrView   = prefs.lrView;
-		*chanMask = prefs.chanMask;
+	if (*lrView != prefs.lrView || *chanMask != prefs.chanMask ||
+	    *showTicks != prefs.showTicks) {
+		*lrView    = prefs.lrView;
+		*chanMask  = prefs.chanMask;
+		*showTicks = prefs.showTicks;
+		
 		redrawMixers();
 	}
 	dsbcfg_write(PROGRAM, "config", cfg);
