@@ -27,12 +27,12 @@
 
 #include <QWidget>
 #include <QMainWindow>
-#include <QSystemTrayIcon>
 #include <QCloseEvent>
 #include "mixer.h"
 #include "preferences.h"
 #include "config.h"
 #include "libdsbmixer.h"
+#include "mixertrayicon.h"
 
 class MainWin : public QMainWindow
 {
@@ -74,7 +74,7 @@ private:
 	QAction *quitAction;
 	QAction *preferencesAction;
 	QIcon muteIcon, lVolIcon, mVolIcon, hVolIcon;
-	QSystemTrayIcon *trayIcon;
+	MixerTrayIcon *trayIcon;
 	QMenu *mainMenu;
 	QTimer *traytimer;
 	QTabWidget *tabs;

@@ -24,7 +24,7 @@
 
 #include <QWidget>
 #include "mixer.h"
-#include <iostream>
+//#include <iostream>
 
 Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 	: QWidget(parent)
@@ -65,7 +65,6 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 		connect(cs, SIGNAL(recSourceChanged(int, int)), this,
 		    SLOT(setRecSrc(int, int)));
 		if (chan == DSBMIXER_MASTER) {
-			muted = dsbmixer_getmute(mixer);
 			cs->setMute(muted);
 			connect(cs, SIGNAL(muteChanged(int)), this,
 			    SLOT(setMute(int)));
@@ -84,23 +83,46 @@ Mixer::getDev() const
 	return (mixer);
 }
 
+int
+Mixer::find_idx(int chan)
+{
+	int idx;
+
+	for (idx = 0; idx < channel.count(); idx++) {
+		if (channel.at(idx)->id == chan)
+			return (idx);
+	}
+	return (-1);
+}
+
+
 void
 Mixer::setVol(int chan, int vol)
 {
 	dsbmixer_setvol(this->mixer, chan, DSBMIXER_CHAN_CONCAT(vol, vol));
-
-	if (chan == DSBMIXER_MASTER)
+	if (chan == DSBMIXER_MASTER) {
+		int idx = find_idx(chan);
+		if (idx < 0)
+			return;
+		if (lrview)
+			channel.at(idx)->setVol(vol, vol);
+		else
+			channel.at(idx)->setVol(vol);
 		emit masterVolChanged(vol);
+	}
 }
 
 void
 Mixer::setLVol(int chan, int lvol)
 {
 	dsbmixer_setlvol(this->mixer, chan, lvol);
-
 	if (chan == DSBMIXER_MASTER) {
+		int idx = find_idx(chan);
+		if (idx < 0)
+			return;
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
+		channel.at(idx)->setVol(lvol, rvol);
 		emit masterVolChanged((lvol + rvol) >> 1);
 	}
 }
@@ -110,8 +132,12 @@ Mixer::setRVol(int chan, int rvol)
 {
 	dsbmixer_setrvol(this->mixer, chan, rvol);
 	if (chan == DSBMIXER_MASTER) {
+		int idx = find_idx(chan);
+		if (idx < 0)
+			return;
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
+		channel.at(chan)->setVol(lvol, rvol);
 		emit masterVolChanged((lvol + rvol) >> 1);
 	}
 }
@@ -131,7 +157,6 @@ void
 Mixer::setMute(int state)
 {
 	dsbmixer_setmute(mixer, state == Qt::Checked ? true : false);
-	muted = dsbmixer_getmute(mixer);
 	update();
 }
 
@@ -159,5 +184,13 @@ Mixer::update()
 		if (dsbmixer_canrec(mixer, chan))
 			channel.at(i)->setRecSrc(dsbmixer_getrec(mixer, chan));
 	}
+}
+
+int
+Mixer::getMasterVol()
+{
+	int vol = dsbmixer_getvol(mixer, DSBMIXER_MASTER);
+
+	return ((DSBMIXER_CHAN_RIGHT(vol) + DSBMIXER_CHAN_LEFT(vol)) >> 1);
 }
 

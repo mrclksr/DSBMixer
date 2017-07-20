@@ -286,24 +286,28 @@ MainWin::checkForSysTray()
 void
 MainWin::createTrayIcon()
 {
-	trayIcon    = new QSystemTrayIcon(hVolIcon, this);
+	int   idx   = tabs->currentIndex();
 	QMenu *menu = new QMenu(this);
-
+	trayIcon    = new MixerTrayIcon(idx == -1 ? 0 : mixers.at(idx),
+					hVolIcon, this);
 	updateTrayIcon();
 	menu->addAction(preferencesAction);
 	menu->addAction(quitAction);
 	trayIcon->setContextMenu(menu);
+	trayIcon->show();
 
 	connect(trayIcon,
 	    SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
 	    this,
 	    SLOT(trayClicked(QSystemTrayIcon::ActivationReason)));
-	trayIcon->show();
 }
 
 void
 MainWin::catchCurrentChanged()
 {
+	int idx = tabs->currentIndex();
+
+	trayIcon->setMixer(idx == -1 ? 0 : mixers.at(idx));
 	updateTrayIcon();
 }
 

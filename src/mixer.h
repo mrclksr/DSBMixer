@@ -46,8 +46,11 @@ public slots:
 	void setMute(int state);
 	void update();
 public:
+	int getMasterVol();
 	bool muted;
 private:
+	int find_idx(int chan);
+
 	bool lrview;
 	dsbmixer_t *mixer;
 	QList<ChanSlider *> channel;
