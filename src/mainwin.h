@@ -80,7 +80,7 @@ private:
 	QTimer *traytimer;
 	QTabWidget *tabs;
 	QList<Mixer *>mixers;
-
+	QString trayToolTip;
 	dsbcfg_t *cfg;
 };
 #endif // MAINWIN_H
