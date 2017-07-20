@@ -23,8 +23,11 @@
  */
 
 #include "mixertrayicon.h"
+#include <QWidget>
 
-MixerTrayIcon::MixerTrayIcon(Mixer *mixer, const QIcon &icon, QObject *parent) : QSystemTrayIcon(icon, parent) {
+MixerTrayIcon::MixerTrayIcon(Mixer *mixer, const QIcon &icon,
+    QObject *parent) : QSystemTrayIcon(icon, parent) {
+
 	this->mixer = mixer;
 }
 
