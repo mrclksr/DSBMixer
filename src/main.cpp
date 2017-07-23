@@ -22,11 +22,15 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QTranslator>
 #include <unistd.h>
+#include <signal.h>
+#include <QTranslator>
+
 #include "mainwin.h"
 #include "libdsbmixer.h"
 #include "qt-helper/qt-helper.h"
+
+static dsbcfg_t *cfg;
 
 static void
 usage()
@@ -34,6 +38,19 @@ usage()
 	(void)fprintf(stderr, "Usage: %s [-hi]\n" \
 	    "   -i: Start %s as tray icon\n", PROGRAM, PROGRAM);
 	exit(EXIT_FAILURE);
+}
+
+static void
+save_config(int /* unused */)
+{
+	static sig_atomic_t block = 0;
+
+	if (block == 1)
+		return;
+	block = 1;
+	if (cfg != NULL)
+		dsbcfg_write(PROGRAM, "config", cfg);
+	exit(EXIT_SUCCESS);
 }
 
 int
@@ -57,6 +74,11 @@ main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
+	(void)signal(SIGINT, save_config);
+	(void)signal(SIGTERM, save_config);
+	(void)signal(SIGQUIT, save_config);
+	(void)signal(SIGHUP, save_config);
+
 	QApplication app(argc, argv);
 	QTranslator translator;
 
@@ -64,12 +86,20 @@ main(int argc, char *argv[])
 	    QLatin1String("_"), QLatin1String(LOCALE_PATH)))
 		app.installTranslator(&translator);
 
+	cfg = dsbcfg_read(PROGRAM, "config", vardefs, CFG_NVARS);
+	if (cfg == NULL && errno == ENOENT) {
+		cfg = dsbcfg_new(NULL, vardefs, CFG_NVARS);
+		if (cfg == NULL)
+			qh_errx(0, EXIT_FAILURE, "%s", dsbcfg_strerror());
+	} else if (cfg == NULL)
+		qh_errx(0, EXIT_FAILURE, "%s", dsbcfg_strerror());
+
 	if (dsbmixer_init() == -1) {
 		char const *r;
 		dsbmixer_geterr(&r);
 		qh_err(0, EXIT_FAILURE, r);
 	}
-	MainWin w;
+	MainWin w(cfg);
 	if (!iflag)
 		w.show();
 	return (app.exec());
