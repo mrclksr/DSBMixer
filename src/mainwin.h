@@ -38,7 +38,7 @@ class MainWin : public QMainWindow
 {
 	Q_OBJECT
 public:
-	MainWin(QWidget *parent = 0);
+	MainWin(dsbcfg_t *cfg, QWidget *parent = 0);
 	QMenu *menu();
 
 public slots:
@@ -80,7 +80,6 @@ private:
 	QTimer *traytimer;
 	QTabWidget *tabs;
 	QList<Mixer *>mixers;
-	QString trayToolTip;
 	dsbcfg_t *cfg;
 };
 #endif // MAINWIN_H
