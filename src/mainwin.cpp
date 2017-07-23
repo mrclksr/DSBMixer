@@ -27,33 +27,27 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <unistd.h>
+#include <stdlib.h>
 #include "mainwin.h"
 #include "thread.h"
 #include "mixer.h"
 #include "preferences.h"
 #include "qt-helper/qt-helper.h"
 
-MainWin::MainWin(QWidget *parent)
+MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	: QMainWindow(parent) {
 	traytimer     = new QTimer(this);
 	QTimer *timer = new QTimer(this);
 	tabs 	      = new QTabWidget(this);
 
-	cfg = dsbcfg_read(PROGRAM, "config", vardefs, CFG_NVARS);
-	if (cfg == NULL && errno == ENOENT) {
-		cfg = dsbcfg_new(NULL, vardefs, CFG_NVARS);
-		if (cfg == NULL)
-			qh_errx(0, EXIT_FAILURE, "%s", dsbcfg_strerror());
-	} else if (cfg == NULL)
-		qh_errx(0, EXIT_FAILURE, "%s", dsbcfg_strerror());
-
+	this->cfg = cfg;
 	posX	  = &dsbcfg_getval(cfg, CFG_POS_X).integer;
 	posY	  = &dsbcfg_getval(cfg, CFG_POS_Y).integer;
 	wWidth	  = &dsbcfg_getval(cfg, CFG_WIDTH).integer;
 	hHeight	  = &dsbcfg_getval(cfg, CFG_HEIGHT).integer;
 	lrView    = &dsbcfg_getval(cfg, CFG_LRVIEW).boolean;
 	showTicks = &dsbcfg_getval(cfg, CFG_TICKS).boolean;
-	chanMask = &dsbcfg_getval(cfg, CFG_MASK).integer;
+	chanMask  = &dsbcfg_getval(cfg, CFG_MASK).integer;
 
 	muteIcon = qh_loadIcon("audio-volume-muted", NULL);
 	lVolIcon = qh_loadIcon("audio-volume-low", NULL);
@@ -318,7 +312,7 @@ MainWin::catchCurrentChanged()
 void
 MainWin::catchMasterVolChanged(int vol)
 {
-	trayToolTip = QString("Vol %1%").arg(vol);
+	QString trayToolTip = QString("Vol %1%").arg(vol);
 	trayIcon->setToolTip(trayToolTip);
 
 	if (vol == 0) {
@@ -373,7 +367,7 @@ MainWin::updateTrayIcon()
 		}
 		trayIcon->setIcon(icon);
 	}
-	trayToolTip = QString("Vol %1%").arg(vol);
+	QString trayToolTip = QString("Vol %1%").arg(vol);
 	trayIcon->setToolTip(trayToolTip);
 
 }
