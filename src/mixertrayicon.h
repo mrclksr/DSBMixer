@@ -50,6 +50,8 @@ public:
 					vol = 0;
 			} else if ((vol += 3) > 100)
 				vol = 100;
+			if (mixer->muted)
+				return (true);
 			mixer->setVol(DSBMIXER_MASTER, vol);
 			return (true);
 		}
