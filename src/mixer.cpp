@@ -156,7 +156,8 @@ Mixer::setRecSrc(int chan, int state)
 void
 Mixer::setMute(int state)
 {
-	dsbmixer_setmute(mixer, state == Qt::Checked ? true : false);
+	muted = state == Qt::Checked ? true : false;
+	dsbmixer_setmute(mixer, muted);
 	update();
 }
 
