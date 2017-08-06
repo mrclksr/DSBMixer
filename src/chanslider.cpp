@@ -149,8 +149,10 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 void
 ChanSlider::emitVolumeChanged(int val)
 {
-	if (muteCB != 0 && mute)
+	if (muteCB != 0 && mute) {
+		slider->setValue(vol);
 		return;
+	}
 	this->vol = val;
 	sliderSetToolTip(val);
 	emit VolumeChanged(this->id, val);
@@ -159,8 +161,10 @@ ChanSlider::emitVolumeChanged(int val)
 void
 ChanSlider::emitLVolumeChanged(int vol)
 {
-	if (muteCB != 0 && mute)
+	if (muteCB != 0 && mute) {
+		lslider->setValue(lvol);
 		return;
+	}
 	this->lvol = vol;
 	sliderSetToolTip(this->lvol, this->rvol);
 	emit lVolumeChanged(this->id, vol);
@@ -169,8 +173,10 @@ ChanSlider::emitLVolumeChanged(int vol)
 void
 ChanSlider::emitRVolumeChanged(int vol)
 {
-	if (muteCB != 0 && mute)
+	if (muteCB != 0 && mute) {
+		rslider->setValue(rvol);
 		return;
+	}
 	this->rvol = vol;
 	sliderSetToolTip(this->lvol, this->rvol);
 	emit rVolumeChanged(this->id, vol);
@@ -195,6 +201,8 @@ ChanSlider::emitMuteChanged(int state)
 void
 ChanSlider::setVol(int vol)
 {
+	if (mute)
+		return;
 	if (vol > 100 || vol < 0)
 		return;
 	slider->setValue(vol);
@@ -204,6 +212,8 @@ ChanSlider::setVol(int vol)
 void
 ChanSlider::setVol(int lvol, int rvol)
 {
+	if (mute)
+		return;
 	if (lvol > 100 || lvol < 0)
 		return;
 	if (rvol > 100 || rvol < 0)
