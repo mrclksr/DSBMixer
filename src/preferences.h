@@ -30,6 +30,7 @@
 #include <QCheckBox>
 #include <QList>
 #include <QDialog>
+
 #include "mixer.h"
 
 class Preferences : public QDialog
@@ -49,10 +50,10 @@ public:
 	bool lrView;
 	bool showTicks;
 private:
-	QWidget *createViewTab();
-	QWidget *createDefaultDeviceTab();
-	QWidget *createAdvancedTab();
-
+	QWidget	  *createViewTab();
+	QWidget	  *createDefaultDeviceTab();
+	QWidget	  *createAdvancedTab();
+private:
 	QSpinBox  *amplifySb;
 	QSpinBox  *feederRateQualitySb;
 	QSpinBox  *pVchansSb;
