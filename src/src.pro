@@ -4,6 +4,7 @@ TEMPLATE    = app
 TARGET 	    = ../dsbmixer 
 DEPENDPATH  += . qt-helper ../lib ../lib/backend
 INCLUDEPATH += . qt-helper ../lib
+RESOURCES += ../resources.qrc
 QT += widgets
 
 # Input
