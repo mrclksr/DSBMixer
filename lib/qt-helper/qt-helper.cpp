@@ -33,39 +33,7 @@
 #include "qt-helper.h"
 
 static char msgbuf[1024];
-static bool themeNameSet = false;
-static QString themeFiles[2] = { ".gtkrc.mine", ".gtkrc-2.0" };
-
 enum Icon { WarningIcon, ErrorIcon };
-
-static void
-setThemeName()
-{
-	QRegExp rx("^gtk-icon-theme-name\\s*=\\s*\"{1,1}(\\S+)\"{1,1}");
-	struct passwd *pw;
-
-	themeNameSet = true;
-	pw = getpwuid(getuid()); endpwent();
-	if (pw == NULL)
-		return;
-	for (int i = 0; i < 2; i++) {
-		QString line;
-		QString path = QString("%1/%2").arg(pw->pw_dir, themeFiles[i]);
-		QFile file(path);
-	
-		if (!file.open(QFile::ReadOnly))
-			return;
-		QTextStream in(&file);
-		in.setCodec("UTF-8");
-		do {
-			line = in.readLine();
-			if (rx.indexIn(line) != -1) {
-				QIcon::setThemeName(rx.cap(1));
-				return;
-			}
-		} while (!line.isNull());
-	}
-}
 
 QIcon
 qh_loadStockIcon(QStyle::StandardPixmap pm, QWidget *parent)
@@ -74,27 +42,21 @@ qh_loadStockIcon(QStyle::StandardPixmap pm, QWidget *parent)
 }
 
 QIcon
-qh_loadThemeIcon(const QString &name)
-{
-	if (!themeNameSet)
-		setThemeName();
-	return (QIcon::fromTheme(name));
-}
-
-QIcon
 qh_loadIcon(const char *name, ...)
 {
-	QIcon	   icon;
 	va_list	   ap;
 	const char *s;
 
-	if (!themeNameSet)
-		setThemeName();
 	va_start(ap, name);
 	for (s = name; s != NULL || (s = va_arg(ap, char *)); s = NULL) {
-		icon = QIcon::fromTheme(s);
-		if (!icon.isNull())
-			return (icon);
+		if (!QIcon::hasThemeIcon(s))
+			continue;
+		QIcon icon = QIcon::fromTheme(s);
+		if (icon.isNull())
+			continue;
+		if (icon.name().isEmpty() || icon.name().length() < 1)
+			continue;
+		return (icon);
 	}
 	return (QIcon());
 }

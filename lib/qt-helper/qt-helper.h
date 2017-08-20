@@ -35,7 +35,6 @@ extern void  qh_warn(QWidget *, const char *fmt, ...);
 extern void  qh_warnx(QWidget *, const char *fmt, ...);
 extern void  qh_err(QWidget *, int eval, const char *fmt, ...);
 extern void  qh_errx(QWidget *, int eval, const char *fmt, ...);
-extern QIcon qh_loadThemeIcon(const QString &name);
 extern QIcon qh_loadStockIcon(QStyle::StandardPixmap pm, QWidget *parent = 0);
 extern QIcon qh_loadIcon(const char *name, ...);
 #endif // !_QT_HELPER_H_
