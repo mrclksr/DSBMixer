@@ -49,11 +49,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	showTicks = &dsbcfg_getval(cfg, CFG_TICKS).boolean;
 	chanMask  = &dsbcfg_getval(cfg, CFG_MASK).integer;
 
-	muteIcon = qh_loadIcon("audio-volume-muted", NULL);
-	lVolIcon = qh_loadIcon("audio-volume-low", NULL);
-	mVolIcon = qh_loadIcon("audio-volume-medium", NULL);
-	hVolIcon = qh_loadIcon("audio-volume-high", NULL);
-
+	loadIcons();
 	createMixerList();
 	createTabs();
 #ifndef WITHOUT_DEVD
@@ -80,6 +76,22 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	setWindowTitle("DSBMixer");
 	resize(*wWidth, *hHeight);	
 	move(*posX, *posY);
+}
+
+void
+MainWin::loadIcons()
+{
+	muteIcon  = qh_loadIcon("audio-volume-muted", NULL);
+	lVolIcon  = qh_loadIcon("audio-volume-low", NULL);
+	mVolIcon  = qh_loadIcon("audio-volume-medium", NULL);
+	hVolIcon  = qh_loadIcon("audio-volume-high", NULL);
+	quitIcon  = qh_loadIcon("application-exit", NULL); 
+	prefsIcon = qh_loadIcon("preferences-desktop-multimedia", NULL);
+
+	if (quitIcon.isNull())
+		quitIcon = qh_loadStockIcon(QStyle::SP_DialogCloseButton);
+	if (prefsIcon.isNull())
+		prefsIcon = qh_loadStockIcon(QStyle::SP_FileIcon);
 }
 
 void
@@ -190,9 +202,8 @@ void
 MainWin::showConfigMenu()
 {
 	Preferences prefs(*chanMask, dsbmixer_amplification(),
-	    dsbmixer_feeder_rate_quality(), dsbmixer_default_unit(),
-	    *lrView, *showTicks, this);
-
+			   dsbmixer_feeder_rate_quality(),
+			   dsbmixer_default_unit(), *lrView, *showTicks, this);
 	if (prefs.exec() != QDialog::Accepted)
 		return;
 	if (prefs.defaultUnit != dsbmixer_default_unit()) {
@@ -208,7 +219,7 @@ MainWin::showConfigMenu()
 			tabs->setTabText(i, label);
 		}
 	}
-	if (*lrView != prefs.lrView || *chanMask != prefs.chanMask ||
+	if (*lrView    != prefs.lrView || *chanMask != prefs.chanMask ||
 	    *showTicks != prefs.showTicks) {
 		*lrView    = prefs.lrView;
 		*chanMask  = prefs.chanMask;
@@ -248,8 +259,6 @@ MainWin::saveGeometry()
 void
 MainWin::createMenuActions()
 {
-	QIcon quitIcon = qh_loadIcon("application-exit", NULL); 
-	QIcon prefsIcon = qh_loadIcon("preferences-desktop-multimedia", NULL);
 
 	quitAction = new QAction(quitIcon, tr("&Quit"), this);
 	preferencesAction = new QAction(prefsIcon, tr("&Preferences"), this);

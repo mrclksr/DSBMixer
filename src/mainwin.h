@@ -28,6 +28,7 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <QCloseEvent>
+
 #include "mixer.h"
 #include "preferences.h"
 #include "config.h"
@@ -57,6 +58,7 @@ private slots:
 	void catchMasterVolChanged(int vol);
 private:
 	int  mixerUnitToTabIndex(int unit);
+	void loadIcons();
 	void redrawMixers();
 	void updateTrayIcon();
 	void createMixerList();
@@ -65,21 +67,27 @@ private:
 	void createMainMenu();
 	void createTrayIcon();
 	void saveGeometry();
-
-	int  *posX, *posY;
-	int  *wWidth, *hHeight;
-	int  *chanMask;
-	bool *lrView;
-	bool *showTicks;
-
-	QAction *quitAction;
-	QAction *preferencesAction;
-	QIcon muteIcon, lVolIcon, mVolIcon, hVolIcon;
+private:
+	int	      *posX;
+	int	      *posY;
+	int	      *wWidth;
+	int	      *hHeight;
+	int	      *chanMask;
+	bool	      *lrView;
+	bool	      *showTicks;
+	QIcon	      muteIcon;
+	QIcon	      lVolIcon;
+	QIcon	      mVolIcon;
+	QIcon	      hVolIcon;
+	QIcon	      quitIcon;
+	QIcon	      prefsIcon;
+	QMenu	      *mainMenu;
+	QTimer	      *traytimer;
+	QAction	      *quitAction;
+	QAction	      *preferencesAction;
+	dsbcfg_t      *cfg;
+	QTabWidget    *tabs;
 	MixerTrayIcon *trayIcon;
-	QMenu *mainMenu;
-	QTimer *traytimer;
-	QTabWidget *tabs;
 	QList<Mixer *>mixers;
-	dsbcfg_t *cfg;
 };
 #endif // MAINWIN_H
