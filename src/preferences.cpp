@@ -30,6 +30,7 @@
 #include <QGridLayout>
 #include <QCloseEvent>
 #include <QBoxLayout>
+
 #include "preferences.h"
 #include "qt-helper/qt-helper.h"
 
@@ -50,11 +51,11 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 
 	QTabWidget *tabs = new QTabWidget(this);
 
-	QIcon icon = qh_loadIcon("document-save", NULL);
-	QPushButton *apply = new QPushButton(icon, tr("&Apply"));
+	QIcon icon = qh_loadStockIcon(QStyle::SP_DialogOkButton);
+	QPushButton *apply = new QPushButton(icon, tr("&Ok"));
 	connect(apply, SIGNAL(clicked()), this, SLOT(acceptSlot()));
 
-	icon = qh_loadIcon("cancel", "window-close", NULL);
+	icon = qh_loadStockIcon(QStyle::SP_DialogCancelButton);
 	QPushButton *close = new QPushButton(icon, tr("&Cancel"));
 	connect(close, SIGNAL(clicked()), this, SLOT(rejectSlot()));
 
@@ -69,6 +70,8 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	this->setLayout(vbox);
 
 	icon = qh_loadIcon("preferences-desktop-multimedia", NULL);
+	if (icon.isNull())
+		icon = QIcon(":/icons/preferences-desktop-multimedia.png");
 	setWindowIcon(icon);
 	setWindowTitle(tr("Preferences"));
 }
