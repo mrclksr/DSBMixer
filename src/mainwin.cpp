@@ -91,7 +91,15 @@ MainWin::loadIcons()
 	if (quitIcon.isNull())
 		quitIcon = qh_loadStockIcon(QStyle::SP_DialogCloseButton);
 	if (prefsIcon.isNull())
-		prefsIcon = qh_loadStockIcon(QStyle::SP_FileIcon);
+		prefsIcon = QIcon(":/icons/preferences-desktop-multimedia.png");
+	if (muteIcon.isNull())
+		muteIcon = QIcon(":/icons/audio-volume-muted.png");
+	if (lVolIcon.isNull())
+		lVolIcon = QIcon(":/icons/audio-volume-low.png");
+	if (mVolIcon.isNull())
+		mVolIcon = QIcon(":/icons/audio-volume-medium.png");
+	if (hVolIcon.isNull())
+		hVolIcon = QIcon(":/icons/audio-volume-high.png");
 }
 
 void
