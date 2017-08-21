@@ -329,7 +329,13 @@ MainWin::catchCurrentChanged()
 void
 MainWin::catchMasterVolChanged(int vol)
 {
-	QString trayToolTip = QString("Vol %1%").arg(vol);
+	int	idx = tabs->currentIndex();
+	QString trayToolTip;
+
+	if (mixers.at(idx)->muted)
+		trayToolTip = QString(tr("Muted"));
+	else
+		trayToolTip = QString("Vol %1%").arg(vol);
 	trayIcon->setToolTip(trayToolTip);
 
 	if (vol == 0) {
@@ -351,20 +357,24 @@ MainWin::catchMasterVolChanged(int vol)
 void
 MainWin::updateTrayIcon()
 {
-	int vol;
-	int idx = tabs->currentIndex();
-	QIcon icon;
+	int	vol;
+	int	idx = tabs->currentIndex();
+	QIcon	icon;
+	QString trayToolTip;
 
 	if (idx == -1)
 		return;
 	if (mixers.at(idx)->muted) {
 		vol = 0;
+		trayToolTip = QString(tr("Muted"));
 		trayIcon->setIcon(muteIcon);
 	} else {
 		dsbmixer_t *dev = mixers.at(idx)->getDev();
 
 		vol = dsbmixer_getvol(dev, DSBMIXER_MASTER);
 		vol = (DSBMIXER_CHAN_RIGHT(vol) + DSBMIXER_CHAN_LEFT(vol)) >> 1;
+
+		trayToolTip = QString("Vol %1%").arg(vol);
 
 		if (vol == 0)
 			icon = muteIcon;
@@ -384,9 +394,7 @@ MainWin::updateTrayIcon()
 		}
 		trayIcon->setIcon(icon);
 	}
-	QString trayToolTip = QString("Vol %1%").arg(vol);
 	trayIcon->setToolTip(trayToolTip);
-
 }
 
 int
