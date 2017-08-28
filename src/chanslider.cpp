@@ -195,6 +195,11 @@ ChanSlider::emitMuteChanged(int state)
 		mute = false;
 	else
 		mute = true;
+	if (lrview) {
+		lslider->setEnabled(!mute);
+		rslider->setEnabled(!mute);
+	} else
+		slider->setEnabled(!mute);
 	emit muteChanged(state);
 }
 
