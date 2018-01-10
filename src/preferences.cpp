@@ -67,6 +67,7 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	hbox->addWidget(apply, 1, Qt::AlignRight);
 	hbox->addWidget(close, 0, Qt::AlignRight);
 	vbox->addLayout(hbox);
+	vbox->setContentsMargins(15, 15, 15, 15);
 	this->setLayout(vbox);
 
 	icon = qh_loadIcon("preferences-desktop-multimedia", NULL);
