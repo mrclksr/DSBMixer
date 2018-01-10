@@ -26,8 +26,10 @@
 #include <QTimer>
 #include <QMenu>
 #include <QMenuBar>
+#include <QStatusBar>
 #include <unistd.h>
 #include <stdlib.h>
+
 #include "mainwin.h"
 #include "thread.h"
 #include "mixer.h"
@@ -76,6 +78,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	setWindowTitle("DSBMixer");
 	resize(*wWidth, *hHeight);	
 	move(*posX, *posY);
+	statusBar()->setSizeGripEnabled(true);
 }
 
 void
