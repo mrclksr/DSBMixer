@@ -35,12 +35,16 @@
 #include "qt-helper/qt-helper.h"
 
 Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
-	int defaultUnit, bool lrView, bool showTicks, QWidget *parent)
-	: QDialog(parent) {
+	int defaultUnit, int maxAutoVchans, int latency, bool bypassMixer,
+	bool lrView, bool showTicks, QWidget *parent) : QDialog(parent) {
+
 	this->chanMask = chanMask;
 	this->amplify = amplify;
 	this->feederRateQuality = feederRateQuality;
 	this->defaultUnit = defaultUnit;
+	this->maxAutoVchans = maxAutoVchans;
+	this->latency = latency;
+	this->bypassMixer = bypassMixer;
 	this->lrView = lrView;
 	this->showTicks = showTicks;
 
@@ -86,7 +90,7 @@ Preferences::acceptSlot()
 		else
 			chanMask &= ~(1 << i);
 	}
-	showTicks = showTicksCb->checkState() == Qt::Checked ? : false;
+	showTicks = showTicksCb->checkState() == Qt::Checked ? true : false;
 	if (lrViewCb->checkState() == Qt::Checked)
 		lrView = true;
 	else
@@ -97,6 +101,10 @@ Preferences::acceptSlot()
 	}
 	feederRateQuality = feederRateQualitySb->value();
 	amplify = amplifySb->value();
+	maxAutoVchans = maxAutoVchansSb->value();
+	latency = latencySb->value();
+	bypassMixer = bypassMixerCb->checkState() == Qt::Checked ? \
+	    true : false;
 	this->accept();
 }
 
@@ -184,17 +192,24 @@ Preferences::createAdvancedTab()
 
 	amplifySb	    = new QSpinBox(this);
 	feederRateQualitySb = new QSpinBox(this);
-	pVchansSb	    = new QSpinBox(this);
-	rVchansSb	    = new QSpinBox(this);
-	
-	pVchansSb->setRange(0, 16);
-	rVchansSb->setRange(0, 16);
+	maxAutoVchansSb	    = new QSpinBox(this);
+	latencySb	    = new QSpinBox(this);
+	bypassMixerCb	    = new QCheckBox(tr("Bypass mixer"));
+
+	maxAutoVchansSb->setRange(0, 256);
+	maxAutoVchansSb->setValue(maxAutoVchans);
+
+	latencySb->setRange(0, 10);
+	latencySb->setValue(latency);
 
 	amplifySb->setRange(0, 100);
 	amplifySb->setValue(amplify);
 
 	feederRateQualitySb->setRange(1, 4);
 	feederRateQualitySb->setValue(feederRateQuality);
+
+	bypassMixerCb->setCheckState(bypassMixer ? Qt::Checked : \
+	    Qt::Unchecked);
 
 	label = new QLabel(tr("Amplification:"));
 	grid->addWidget(label, 0, 0);
@@ -206,14 +221,16 @@ Preferences::createAdvancedTab()
 	grid->addWidget(label, 1, 0);
 	grid->addWidget(feederRateQualitySb, 1, 1);
 
-	QString s = QString(tr("Vchans for playback (pcm%1):")).arg(defaultUnit);
-	label = new QLabel(s);
+	label = new QLabel(tr("Max. auto VCHANS:"));
 	grid->addWidget(label, 2, 0);
-	grid->addWidget(pVchansSb, 2, 1);
+	grid->addWidget(maxAutoVchansSb, 2, 1);
 	
-	label = new QLabel(tr("Vchans for recording:"));
+	label = new QLabel(tr("Latency (0 low, 10 high):"));
 	grid->addWidget(label, 3, 0);
-	grid->addWidget(rVchansSb, 3, 1);
+	grid->addWidget(latencySb, 3, 1);
+
+	grid->addWidget(new QLabel(""), 4, 0);
+	grid->addWidget(bypassMixerCb, 5, 0);
 	
 	vbox->addLayout(grid);
 	vbox->addStretch(1);	

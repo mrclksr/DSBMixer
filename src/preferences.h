@@ -38,7 +38,9 @@ class Preferences : public QDialog
 	Q_OBJECT
 public:
 	Preferences(int chanMask, int amplify, int feederRateQuality,
-	    int defaultUnit, bool lrView, bool showTicks, QWidget *parent = 0);
+		int defaultUnit, int maxAutoVchans, int latency,
+		bool bypassMixer, bool lrView, bool showTicks,
+		QWidget *parent = 0);
 public slots:
 	void acceptSlot();
 	void rejectSlot();
@@ -47,6 +49,9 @@ public:
 	int  amplify;
 	int  feederRateQuality;
 	int  defaultUnit;
+	int  maxAutoVchans;
+	int  latency;
+	bool bypassMixer;
 	bool lrView;
 	bool showTicks;
 private:
@@ -56,11 +61,12 @@ private:
 private:
 	QSpinBox  *amplifySb;
 	QSpinBox  *feederRateQualitySb;
-	QSpinBox  *pVchansSb;
-	QSpinBox  *rVchansSb;
+	QSpinBox  *maxAutoVchansSb;
+	QSpinBox  *latencySb;
 	QCheckBox *viewTabCb[DSBMIXER_MAX_CHANNELS];
 	QCheckBox *lrViewCb;
 	QCheckBox *showTicksCb;
+	QCheckBox *bypassMixerCb;
 	QList<QRadioButton *> defaultDeviceRb;
 };
 #endif // PREFERENCES_H
