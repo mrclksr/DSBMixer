@@ -34,6 +34,9 @@
 #define OID_FEEDER_RATE_QUALITY "hw.snd.feeder_rate_quality"
 #define OID_PLAY_VCHANS		"dev.pcm.%d.play.vchans"
 #define OID_REC_VCHANS		"dev.pcm.%d.rec.vchans"
+#define OID_MAX_AUTO_VCHANS	"hw.snd.maxautovchans"
+#define OID_LATENCY		"hw.snd.latency"
+#define OID_BYPASS_MIXER	"hw.snd.vpc_mixer_bypass"
 
 enum VAR_TYPE { TYPE_INT, TYPE_STRING };
 
@@ -85,29 +88,41 @@ usage()
 int
 main(int argc, char *argv[])
 {
-	int   ch, aflag, dflag, pflag, rflag, qflag, uflag;
-	char *unit, *vol, *quality, *pvchans, *rvchans, oid[512];
+	int   ch, aflag, bflag, dflag, pflag, rflag;
+	int   qflag, uflag, lflag, vflag;
+	char *unit, *vol, *quality, *pvchans, *rvchans, *max_auto_vchans;
+	char *latency, *bypass_mixer, oid[512];
 
-	aflag = dflag = pflag = qflag = rflag = uflag = 0;
-	while ((ch = getopt(argc, argv, "a:u:p:q:r:d")) != -1) {
+	aflag = bflag = dflag = lflag = pflag = 0;
+	qflag = rflag = uflag = vflag = 0;
+	while ((ch = getopt(argc, argv, "a:b:dl:p:q:r:u:v:")) != -1) {
 		switch (ch) {
-		case 'u':
-			uflag++; unit = optarg;
+		case 'a':
+			aflag++; vol = optarg;
+			break;
+		case 'b':
+			bflag++; bypass_mixer = optarg;
 			break;
 		case 'd':
 			dflag++;
 			break;
-		case 'a':
-			aflag++; vol = optarg;
+		case 'l':
+			lflag++; latency = optarg;
 			break;
 		case 'p':
 			pflag++; pvchans = optarg;
 			break;
+		case 'q':
+			qflag++; quality = optarg;
+			break;
 		case 'r':
 			rflag++; rvchans = optarg;
 			break;
-		case 'q':
-			qflag++; quality = optarg;
+		case 'u':
+			uflag++; unit = optarg;
+			break;
+		case 'v':
+			vflag++; max_auto_vchans = optarg;
 			break;
 		case '?':
 		default:
@@ -126,12 +141,18 @@ main(int argc, char *argv[])
 		    (int)strtol(unit, NULL, 10));
 		setoid(oid, rvchans, TYPE_INT);
 	}
-	if (dflag)
-		setoid(OID_DEFAULT_UNIT, unit, TYPE_INT);
-	if (qflag)
-		setoid(OID_FEEDER_RATE_QUALITY, quality, TYPE_INT);
 	if (aflag)
 		setoid(OID_AMPLIFY, vol, TYPE_INT);
+	if (bflag)
+		setoid(OID_BYPASS_MIXER, bypass_mixer, TYPE_INT);
+	if (dflag)
+		setoid(OID_DEFAULT_UNIT, unit, TYPE_INT);
+	if (lflag)
+		setoid(OID_LATENCY, latency, TYPE_INT);
+	if (qflag)
+		setoid(OID_FEEDER_RATE_QUALITY, quality, TYPE_INT);
+	if (vflag)
+		setoid(OID_MAX_AUTO_VCHANS, max_auto_vchans, TYPE_INT);
 	return (EXIT_SUCCESS);
 }
 

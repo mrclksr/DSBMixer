@@ -214,7 +214,9 @@ MainWin::showConfigMenu()
 {
 	Preferences prefs(*chanMask, dsbmixer_amplification(),
 			   dsbmixer_feeder_rate_quality(),
-			   dsbmixer_default_unit(), *lrView, *showTicks, this);
+			   dsbmixer_default_unit(), dsbmixer_maxautovchans(),
+			   dsbmixer_latency(), dsbmixer_bypass_mixer(),
+			   *lrView, *showTicks, this);
 	if (prefs.exec() != QDialog::Accepted)
 		return;
 	if (prefs.defaultUnit != dsbmixer_default_unit()) {
@@ -242,9 +244,13 @@ MainWin::showConfigMenu()
 
 	if (dsbmixer_amplification() != prefs.amplify ||
 	    dsbmixer_default_unit() != prefs.defaultUnit ||
-	    dsbmixer_feeder_rate_quality() != prefs.feederRateQuality) {
+	    dsbmixer_feeder_rate_quality() != prefs.feederRateQuality ||
+	    dsbmixer_latency() != prefs.latency ||
+	    dsbmixer_maxautovchans() != prefs.maxAutoVchans ||
+	    dsbmixer_bypass_mixer() != prefs.bypassMixer) {
 		if (dsbmixer_change_settings(prefs.defaultUnit, prefs.amplify,
-		    prefs.feederRateQuality) == -1)
+		    prefs.feederRateQuality, prefs.latency,
+		    prefs.maxAutoVchans, prefs.bypassMixer) == -1)
 			qh_warnx(0, dsbmixer_error());
 	}
 }

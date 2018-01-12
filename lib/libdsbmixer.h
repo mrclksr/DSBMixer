@@ -71,13 +71,17 @@ typedef struct mixer_s {
 } dsbmixer_t;
 
 /*
- * General sound settings. man sound(9)
+ * General sound settings. man sound(4)
  */
 struct dsbmixer_snd_settings_s {
-	int default_unit;
-	int amplify;
-	int feeder_rate_quality;
+	int  default_unit;
+	int  amplify;
+	int  feeder_rate_quality;
+	int  maxautovchans;
+	int  latency;
+	bool mixer_bypass;
 };
+
 extern struct dsbmixer_snd_settings_s dsbmixer_snd_settings;
 
 extern int	  dsbmixer_geterr(char const **errmsg);
@@ -89,10 +93,13 @@ extern int	  dsbmixer_getchanid(dsbmixer_t *mixer, int index);
 extern int	  dsbmixer_default_unit(void);
 extern int	  dsbmixer_amplification(void);
 extern int	  dsbmixer_feeder_rate_quality(void);
+extern int	  dsbmixer_maxautovchans(void);
+extern int	  dsbmixer_latency(void);
 extern int	  dsbmixer_getvol(dsbmixer_t *mixer, int chan);
 extern int	  dsbmixer_apply_settings(void);
-extern int	  dsbmixer_change_settings(int dfltunit, int amp, int qual);
+extern int	  dsbmixer_change_settings(int, int, int, int, int, bool);
 extern void	  dsbmixer_setmute(dsbmixer_t *mixer, bool mute);
+extern bool	  dsbmixer_bypass_mixer(void);
 extern bool	  dsbmixer_getmute(dsbmixer_t *mixer);
 extern bool	  dsbmixer_canrec(dsbmixer_t *mixer, int chan);
 extern bool	  dsbmixer_getrec(dsbmixer_t *mixer, int chan);

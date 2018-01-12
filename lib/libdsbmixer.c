@@ -167,6 +167,24 @@ dsbmixer_feeder_rate_quality()
 	return (dsbmixer_snd_settings.feeder_rate_quality);
 }
 
+int
+dsbmixer_maxautovchans()
+{
+	return (dsbmixer_snd_settings.maxautovchans);
+}
+
+int
+dsbmixer_latency()
+{
+	return (dsbmixer_snd_settings.latency);
+}
+
+bool
+dsbmixer_bypass_mixer()
+{
+	return (dsbmixer_snd_settings.mixer_bypass);
+}
+
 void
 dsbmixer_setvol(dsbmixer_t *mixer, int chan, int vol)
 {
@@ -409,13 +427,16 @@ dsbmixer_querydevlist(int *state, bool block)
 #endif /* !WITHOUT_DEVD */
 
 int
-dsbmixer_change_settings(int dfltunit, int amp, int qual)
+dsbmixer_change_settings(int dfltunit, int amp, int qual, int latency,
+	int max_auto_vchans, bool bypass_mixer)
 {
 	int  error = 0;
 	char cmd[512], *output;
 
-	(void)snprintf(cmd, sizeof(cmd), "%s -u %d -d -a %d -q %d",
-	    PATH_BACKEND, dfltunit, amp, qual);
+	(void)snprintf(cmd, sizeof(cmd),
+	    "%s -u %d -d -a %d -q %d -l %d -v %d -b %d",
+	    PATH_BACKEND, dfltunit, amp, qual, latency, max_auto_vchans,
+	    bypass_mixer);
 	if ((output = exec_backend(cmd, &error)) == NULL) {
 		set_error(0, true, "exec_backend(%s)", cmd);
 		free(output);
@@ -426,9 +447,7 @@ dsbmixer_change_settings(int dfltunit, int amp, int qual)
 		free(output);
 		return (-1);
 	}
-	dsbmixer_snd_settings.default_unit = dfltunit;
-	dsbmixer_snd_settings.amplify = amp;
-	dsbmixer_snd_settings.feeder_rate_quality = qual;
+	get_snd_settings();
 
 	return (0);
 }
@@ -491,22 +510,28 @@ dsbmixer_error()
 	return (errormsg);
 }
 
+#define EXPAND(F) dsbmixer_snd_settings.F
+
 static void
 get_snd_settings()
 {
-	size_t sz;
-
-	sz = sizeof(int);
-	(void)sysctlbyname("hw.snd.default_unit",
-	    &dsbmixer_snd_settings.default_unit, &sz, NULL, 0);
-
-	sz = sizeof(int);
-	(void)sysctlbyname("hw.snd.vpc_0db", &dsbmixer_snd_settings.amplify,
-	    &sz, NULL, 0);
-
-	sz = sizeof(int);
-	(void)sysctlbyname("hw.snd.feeder_rate_quality",
-	    &dsbmixer_snd_settings.feeder_rate_quality, &sz, NULL, 0);
+	size_t sz, i;
+	struct oid_s {
+		const char *oid;
+		void *val;
+	} oids[] = {
+	    { "hw.snd.default_unit",	    &EXPAND(default_unit)	 },
+	    { "hw.snd.vpc_0db",		    &EXPAND(amplify)		 },
+	    { "hw.snd.feeder_rate_quality", &EXPAND(feeder_rate_quality) },
+	    { "hw.snd.vpc_mixer_bypass",    &EXPAND(mixer_bypass)	 },
+	    { "hw.snd.maxautovchans",	    &EXPAND(maxautovchans)	 },
+	    { "hw.snd.latency",		    &EXPAND(latency)		 }
+	};
+	for (i = 0; i < sizeof(oids) / sizeof(struct oid_s); i++) {
+		sz = sizeof(int);
+		if (sysctlbyname(oids[i].oid, oids[i].val, &sz, NULL, 0))
+			warn("sysctl(%s)", oids[i].oid);
+	}
 }
 
 #ifndef WITHOUT_DEVD
