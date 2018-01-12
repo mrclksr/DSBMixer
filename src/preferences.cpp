@@ -196,6 +196,10 @@ Preferences::createAdvancedTab()
 	latencySb	    = new QSpinBox(this);
 	bypassMixerCb	    = new QCheckBox(tr("Bypass mixer"));
 
+	bypassMixerCb->setToolTip(tr(
+		"Enable this to allow applications to use\n"   \
+		"their own existing mixer logic to control\n" \
+		"their own channel volume."));
 	maxAutoVchansSb->setRange(0, 256);
 	maxAutoVchansSb->setValue(maxAutoVchans);
 
