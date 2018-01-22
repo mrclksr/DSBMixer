@@ -26,6 +26,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QString>
+#include "qt-helper/qt-helper.h"
 
 ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
     bool muteable, QWidget *parent)
@@ -35,16 +36,16 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	this->id     = id;
 	this->vol    = vol;
 	this->lrview = false;
+	layout	     = new QVBoxLayout(parent);
+	recCB	     = new QCheckBox;
 
-	layout = new QVBoxLayout(parent);
-	recCB  = new QCheckBox();
 	if (!rec) {
 		/* Padding space */
-		QLabel *l = new QLabel("");
-		l->resize(recCB->width(), recCB->height());
-		layout->addWidget(l, 0, Qt::AlignHCenter);
-		delete recCB;
-		recCB = 0;
+		QSizePolicy sp;
+		sp.setRetainSizeWhenHidden(true);
+		recCB->setSizePolicy(sp);
+		recCB->hide();
+		layout->addWidget(recCB, 0, Qt::AlignHCenter);
 	} else {
 		recCB->setToolTip(tr("Set/unset recording source"));
 		layout->addWidget(recCB, 0, Qt::AlignHCenter);
@@ -59,17 +60,17 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 
 	layout->addWidget(slider, 1, Qt::AlignHCenter);
 
-	muteCB = new QCheckBox();
+	muteCB = new QCheckBox;
 	if (!muteable) {
 		/* Padding space */
-		QLabel *l = new QLabel("");
-		l->resize(muteCB->width(), muteCB->height());
-		layout->addWidget(l, 0, Qt::AlignHCenter);
-		delete muteCB;
-		muteCB = 0;
+		QSizePolicy sp;
+		sp.setRetainSizeWhenHidden(true);
+		muteCB->setSizePolicy(sp);
+		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
+		muteCB->hide();
 	} else {
 		muteCB->setToolTip(tr("Mute"));
-		layout->addWidget(muteCB, 1, Qt::AlignHCenter);
+		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 		connect(muteCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitMuteChanged(int)));
 	}
@@ -92,14 +93,14 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	QVBoxLayout *vbox = new QVBoxLayout(parent);
 	QHBoxLayout *hbox = new QHBoxLayout(parent);
 
-	recCB = new QCheckBox();
+	recCB = new QCheckBox;
 	if (!rec) {
 		/* Padding space */
-		QLabel *l = new QLabel("");
-		l->resize(recCB->width(), recCB->height());
-		vbox->addWidget(l, 0, Qt::AlignHCenter);
-		delete recCB;
-		recCB = 0;
+		QSizePolicy sp;
+		sp.setRetainSizeWhenHidden(true);
+		recCB->setSizePolicy(sp);
+		recCB->hide();
+		vbox->addWidget(recCB, 0, Qt::AlignHCenter);
 	} else {
 		recCB->setToolTip(tr("Set/unset recording source"));
 		vbox->addWidget(recCB, 0, Qt::AlignHCenter);
@@ -124,14 +125,14 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 
 	vbox->addLayout(hbox, 0);
 
-	muteCB = new QCheckBox();
+	muteCB = new QCheckBox;
 	if (!muteable) {
 		/* Padding space */
-		QLabel *l = new QLabel("");
-		l->resize(muteCB->width(), muteCB->height());
-		vbox->addWidget(l, 0, Qt::AlignHCenter);
-		delete muteCB;
-		muteCB = 0;
+		QSizePolicy sp;
+		sp.setRetainSizeWhenHidden(true);
+		muteCB->setSizePolicy(sp);
+		vbox->addWidget(muteCB, 0, Qt::AlignHCenter);
+		muteCB->hide();
 	} else {
 		muteCB->setToolTip(tr("Mute"));
 		vbox->addWidget(muteCB, 0, Qt::AlignHCenter);
