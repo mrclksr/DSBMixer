@@ -51,6 +51,8 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	showTicks = &dsbcfg_getval(cfg, CFG_TICKS).boolean;
 	chanMask  = &dsbcfg_getval(cfg, CFG_MASK).integer;
 
+	trayAvailable = false;
+
 	loadIcons();
 	createMixerList();
 	createTabs();
@@ -301,8 +303,10 @@ MainWin::checkForSysTray()
 	if (QSystemTrayIcon::isSystemTrayAvailable()) {
 		traytimer->stop();
 		createTrayIcon();
+		trayAvailable = true;
 	} else if (tries-- <= 0) {
 		traytimer->stop();
+		trayAvailable = false;
 		show();
 	}
 }
@@ -331,6 +335,8 @@ MainWin::catchCurrentChanged()
 {
 	int idx = tabs->currentIndex();
 
+	if (!trayAvailable)
+		return;
 	trayIcon->setMixer(idx == -1 ? 0 : mixers.at(idx));
 	updateTrayIcon();
 }
@@ -341,6 +347,8 @@ MainWin::catchMasterVolChanged(int vol)
 	int	idx = tabs->currentIndex();
 	QString trayToolTip;
 
+	if (!trayAvailable)
+		return;
 	if (mixers.at(idx)->muted)
 		trayToolTip = QString(tr("Muted"));
 	else

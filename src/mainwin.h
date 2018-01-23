@@ -75,6 +75,7 @@ private:
 	int	      *chanMask;
 	bool	      *lrView;
 	bool	      *showTicks;
+	bool	      trayAvailable;
 	QIcon	      muteIcon;
 	QIcon	      lVolIcon;
 	QIcon	      mVolIcon;
