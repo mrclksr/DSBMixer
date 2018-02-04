@@ -212,6 +212,20 @@ MainWin::closeEvent(QCloseEvent *event)
 }
 
 void
+MainWin::moveEvent(QMoveEvent *event)
+{
+	saveGeometry();
+	event->accept();
+}
+
+void
+MainWin::resizeEvent(QResizeEvent *event)
+{
+	saveGeometry();
+	event->accept();
+}
+
+void
 MainWin::showConfigMenu()
 {
 	Preferences prefs(*chanMask, dsbmixer_amplification(),

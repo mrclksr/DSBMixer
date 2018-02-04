@@ -28,6 +28,7 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <QCloseEvent>
+#include <QMoveEvent>
 
 #include "mixer.h"
 #include "preferences.h"
@@ -50,6 +51,8 @@ public slots:
 	void updateMixers();
 	void trayClicked(QSystemTrayIcon::ActivationReason reason);
 	void closeEvent(QCloseEvent *event);
+	void moveEvent(QMoveEvent *event);
+	void resizeEvent(QResizeEvent *event);
 	void showConfigMenu();
 	void quit();
 private slots:
