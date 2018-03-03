@@ -286,6 +286,7 @@ MainWin::saveGeometry()
 	if (isVisible()) {
 		*posX = this->x(); *posY = this->y();
 		*wWidth = this->width(); *hHeight = this->height();
+		 dsbcfg_write(PROGRAM, "config", cfg);
 	}
 }
 
