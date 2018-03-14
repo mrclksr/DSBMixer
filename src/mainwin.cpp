@@ -212,6 +212,20 @@ MainWin::closeEvent(QCloseEvent *event)
 }
 
 void
+MainWin::moveEvent(QMoveEvent *event)
+{
+	saveGeometry();
+	event->accept();
+}
+
+void
+MainWin::resizeEvent(QResizeEvent *event)
+{
+	saveGeometry();
+	event->accept();
+}
+
+void
 MainWin::showConfigMenu()
 {
 	Preferences prefs(*chanMask, dsbmixer_amplification(),
@@ -272,6 +286,7 @@ MainWin::saveGeometry()
 	if (isVisible()) {
 		*posX = this->x(); *posY = this->y();
 		*wWidth = this->width(); *hHeight = this->height();
+		 dsbcfg_write(PROGRAM, "config", cfg);
 	}
 }
 
