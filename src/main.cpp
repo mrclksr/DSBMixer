@@ -71,8 +71,6 @@ main(int argc, char *argv[])
 			usage();
 		}
 	}
-	argc -= optind;
-	argv += optind;
 
 	(void)signal(SIGINT, save_config);
 	(void)signal(SIGTERM, save_config);
