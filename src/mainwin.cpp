@@ -66,7 +66,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	thread->start();
 #endif
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateMixers()));
-    	timer->start(200);
+	timer->start(250);
 
 	connect(tabs, SIGNAL(currentChanged(int)), this,
 	    SLOT(catchCurrentChanged()));
@@ -139,6 +139,22 @@ MainWin::createTabs()
 }
 
 void
+MainWin::setDefaultTab(int unit)
+{
+	int idx = mixerUnitToTabIndex(unit);
+	if (idx == -1)
+		return;
+	tabs->setCurrentIndex(idx);
+	/* Update tab labels. */
+	for (int i = 0; i < mixers.count(); i++) {
+		QString label(mixers.at(i)->getDev()->name);
+		if (i == idx)
+			label.append("*");
+		tabs->setTabText(i, label);
+	}
+}
+
+void
 MainWin::redrawMixers()
 {
 	for (int i = tabs->count() - 1; i >= 0; i--)
@@ -177,8 +193,19 @@ MainWin::removeMixer(dsbmixer_t *mixer)
 void
 MainWin::updateMixers()
 {
-	dsbmixer_t *mixer = dsbmixer_pollmixers();
+	int	   unit;
+	static int prev_unit = 0;
+	static int cnt = 0;
+	dsbmixer_t *mixer;
 
+	if (cnt++ % 5 == 0) {
+		unit = dsbmixer_poll_default_unit();
+		if (prev_unit != unit) {
+			setDefaultTab(unit);
+			prev_unit = unit;
+		}
+	}
+	mixer = dsbmixer_pollmixers();
 	if (mixer == NULL)
 		return;
 	for (int i = 0; i < mixers.count(); i++) {
@@ -235,19 +262,8 @@ MainWin::showConfigMenu()
 			   *lrView, *showTicks, this);
 	if (prefs.exec() != QDialog::Accepted)
 		return;
-	if (prefs.defaultUnit != dsbmixer_default_unit()) {
-		int idx = mixerUnitToTabIndex(prefs.defaultUnit);
-		if (idx == -1)
-			return;
-		tabs->setCurrentIndex(idx);
-		/* Update tab labels. */
-		for (int i = 0; i < mixers.count(); i++) {
-			QString label(mixers.at(i)->getDev()->name);
-			if (i == idx)
-				label.append("*");
-			tabs->setTabText(i, label);
-		}
-	}
+	if (prefs.defaultUnit != dsbmixer_default_unit())
+		setDefaultTab(prefs.defaultUnit);
 	if (*lrView    != prefs.lrView || *chanMask != prefs.chanMask ||
 	    *showTicks != prefs.showTicks) {
 		*lrView    = prefs.lrView;

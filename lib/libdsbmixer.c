@@ -427,6 +427,18 @@ dsbmixer_querydevlist(int *state, bool block)
 #endif /* !WITHOUT_DEVD */
 
 int
+dsbmixer_poll_default_unit(void)
+{
+	int    unit;
+	size_t sz = sizeof(int);
+
+	unit = 0;
+	if (sysctlbyname("hw.snd.default_unit", &unit, &sz, NULL, 0))
+		warn("sysctl(hw.snd.default_unit)");
+	return (unit);
+}
+
+int
 dsbmixer_change_settings(int dfltunit, int amp, int qual, int latency,
 	int max_auto_vchans, bool bypass_mixer)
 {

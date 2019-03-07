@@ -98,6 +98,7 @@ extern int	  dsbmixer_latency(void);
 extern int	  dsbmixer_getvol(dsbmixer_t *mixer, int chan);
 extern int	  dsbmixer_apply_settings(void);
 extern int	  dsbmixer_change_settings(int, int, int, int, int, bool);
+extern int	  dsbmixer_poll_default_unit(void);
 extern void	  dsbmixer_setmute(dsbmixer_t *mixer, bool mute);
 extern bool	  dsbmixer_bypass_mixer(void);
 extern bool	  dsbmixer_getmute(dsbmixer_t *mixer);

@@ -66,6 +66,7 @@ private:
 	void updateTrayIcon();
 	void createMixerList();
 	void createTabs();
+	void setDefaultTab(int);
 	void createMenuActions();
 	void createMainMenu();
 	void createTrayIcon();
