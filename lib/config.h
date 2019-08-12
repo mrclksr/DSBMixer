@@ -29,7 +29,7 @@
  */
 enum { 
 	CFG_POS_X = 0, CFG_POS_Y, CFG_WIDTH, CFG_HEIGHT, CFG_MASK, CFG_LRVIEW,
-	CFG_TICKS, CFG_POLL_DELAY, CFG_NVARS
+	CFG_TICKS, CFG_POLL_IVAL, CFG_NVARS
 };
 
 extern dsbcfg_vardef_t vardefs[];

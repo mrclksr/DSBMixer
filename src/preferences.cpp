@@ -36,7 +36,7 @@
 
 Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	int defaultUnit, int maxAutoVchans, int latency, bool bypassMixer,
-	bool lrView, bool showTicks, int pollDelay, QWidget *parent)
+	bool lrView, bool showTicks, int pollIval, QWidget *parent)
 	: QDialog(parent) {
 
 	this->chanMask = chanMask;
@@ -48,7 +48,7 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	this->bypassMixer = bypassMixer;
 	this->lrView = lrView;
 	this->showTicks = showTicks;
-	this->pollDelay = pollDelay;
+	this->pollIval = pollIval;
 
 	qApp->setQuitOnLastWindowClosed(false);
 
@@ -107,7 +107,7 @@ Preferences::acceptSlot()
 	latency = latencySb->value();
 	bypassMixer = bypassMixerCb->checkState() == Qt::Checked ? \
 	    true : false;
-	pollDelay = pollDelaySb->value();
+	pollIval = pollIvalSb->value();
 	this->accept();
 }
 
@@ -197,7 +197,7 @@ Preferences::createAdvancedTab()
 	feederRateQualitySb = new QSpinBox(this);
 	maxAutoVchansSb	    = new QSpinBox(this);
 	latencySb	    = new QSpinBox(this);
-	pollDelaySb	    = new QSpinBox(this);
+	pollIvalSb	    = new QSpinBox(this);
 	bypassMixerCb	    = new QCheckBox(tr("Bypass mixer"));
 
 	bypassMixerCb->setToolTip(tr(
@@ -217,9 +217,9 @@ Preferences::createAdvancedTab()
 	feederRateQualitySb->setRange(1, 4);
 	feederRateQualitySb->setValue(feederRateQuality);
 
-	pollDelaySb->setRange(10, 10000);
-	pollDelaySb->setValue(pollDelay);
-	pollDelaySb->setSuffix(" ms");
+	pollIvalSb->setRange(10, 10000);
+	pollIvalSb->setValue(pollIval);
+	pollIvalSb->setSuffix(" ms");
 
 	bypassMixerCb->setCheckState(bypassMixer ? Qt::Checked : \
 	    Qt::Unchecked);
@@ -240,9 +240,9 @@ Preferences::createAdvancedTab()
 	grid->addWidget(label, 3, 0);
 	grid->addWidget(latencySb, 3, 1);
 
-	label = new QLabel(tr("Poll delay:"));
+	label = new QLabel(tr("Poll mixers every"));
 	grid->addWidget(label, 4, 0);
-	grid->addWidget(pollDelaySb, 4, 1);
+	grid->addWidget(pollIvalSb, 4, 1);
 
 	grid->addWidget(new QLabel(""), 5, 0);
 	grid->addWidget(bypassMixerCb, 6, 0);

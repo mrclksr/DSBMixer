@@ -78,7 +78,7 @@ private:
 	int	      *wWidth;
 	int	      *hHeight;
 	int	      *chanMask;
-	int	      *pollDelay;
+	int	      *pollIval;
 	bool	      *lrView;
 	bool	      *showTicks;
 	bool	      trayAvailable;

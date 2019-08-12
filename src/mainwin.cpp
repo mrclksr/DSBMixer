@@ -52,7 +52,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	lrView    = &dsbcfg_getval(cfg, CFG_LRVIEW).boolean;
 	showTicks = &dsbcfg_getval(cfg, CFG_TICKS).boolean;
 	chanMask  = &dsbcfg_getval(cfg, CFG_MASK).integer;
-	pollDelay = &dsbcfg_getval(cfg, CFG_POLL_DELAY).integer;
+	pollIval = &dsbcfg_getval(cfg, CFG_POLL_IVAL).integer;
 
 	trayAvailable = false;
 
@@ -69,7 +69,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	thread->start();
 #endif
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateMixers()));
-	timer->start(*pollDelay);
+	timer->start(*pollIval);
 
 	connect(tabs, SIGNAL(currentChanged(int)), this,
 	    SLOT(catchCurrentChanged()));
@@ -277,7 +277,7 @@ MainWin::showConfigMenu()
 			   dsbmixer_feeder_rate_quality(),
 			   dsbmixer_default_unit(), dsbmixer_maxautovchans(),
 			   dsbmixer_latency(), dsbmixer_bypass_mixer(),
-			   *lrView, *showTicks, *pollDelay, this);
+			   *lrView, *showTicks, *pollIval, this);
 	if (prefs.exec() != QDialog::Accepted)
 		return;
 	if (prefs.defaultUnit != dsbmixer_default_unit())
@@ -290,9 +290,9 @@ MainWin::showConfigMenu()
 		
 		redrawMixers();
 	}
-	if (*pollDelay != prefs.pollDelay) {
-		timer->start(prefs.pollDelay);
-		*pollDelay = prefs.pollDelay;
+	if (*pollIval != prefs.pollIval) {
+		timer->start(prefs.pollIval);
+		*pollIval = prefs.pollIval;
 	}
 	dsbcfg_write(PROGRAM, "config", cfg);
 
