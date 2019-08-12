@@ -29,6 +29,8 @@
 #include <QStatusBar>
 #include <unistd.h>
 #include <stdlib.h>
+#include <QRect>
+#include <QScreen>
 
 #include "mainwin.h"
 #include "thread.h"
@@ -73,7 +75,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	    SLOT(catchCurrentChanged()));
 
 	connect(traytimer, SIGNAL(timeout()), this, SLOT(checkForSysTray()));
-	traytimer->start(300);
+	traytimer->start(500);
 
 	createMenuActions();
 	createMainMenu();
@@ -82,6 +84,21 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	resize(*wWidth, *hHeight);	
 	move(*posX, *posY);
 	statusBar()->setSizeGripEnabled(true);
+
+	connect(QGuiApplication::primaryScreen(),
+	    SIGNAL(geometryChanged(const QRect &)), this,
+	    SLOT(scrGeomChanged(const QRect &)));
+}
+
+void
+MainWin::scrGeomChanged(const QRect &g)
+{
+	Q_UNUSED(g);
+	if (trayAvailable) {
+		trayAvailable = false;
+		delete trayIcon;
+		traytimer->start(500);
+	}
 }
 
 void
@@ -336,23 +353,17 @@ MainWin::checkForSysTray()
 {
 	static int tries = 60;
 
-	if (!trayAvailable) {
-		if (QSystemTrayIcon::isSystemTrayAvailable()) {
-			createTrayIcon();
-			trayAvailable = true;
-			tries = 60;
-#ifndef SYSTRAY_HACK
-			traytimer->stop();
-#endif
-		} else if (tries-- <= 0) {
-			traytimer->stop();
-			trayAvailable = false;
-			show();
-		}
-	} else if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-		// System tray became unavailable
+	if (trayAvailable)
+		return;
+	if (QSystemTrayIcon::isSystemTrayAvailable()) {
+		createTrayIcon();
+		trayAvailable = true;
+		tries = 60;
+		traytimer->stop();
+	} else if (tries-- <= 0) {
+		traytimer->stop();
 		trayAvailable = false;
-		delete trayIcon;
+		show();
 	}
 }
 

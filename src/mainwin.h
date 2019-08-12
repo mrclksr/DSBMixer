@@ -59,6 +59,7 @@ private slots:
 	void checkForSysTray();
 	void catchCurrentChanged();
 	void catchMasterVolChanged(int vol);
+	void scrGeomChanged(const QRect &);
 private:
 	int  mixerUnitToTabIndex(int unit);
 	void loadIcons();
