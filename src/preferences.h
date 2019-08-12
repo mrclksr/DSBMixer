@@ -39,7 +39,7 @@ class Preferences : public QDialog
 public:
 	Preferences(int chanMask, int amplify, int feederRateQuality,
 		int defaultUnit, int maxAutoVchans, int latency,
-		bool bypassMixer, bool lrView, bool showTicks,
+		bool bypassMixer, bool lrView, bool showTicks, int pollDelay,
 		QWidget *parent = 0);
 public slots:
 	void acceptSlot();
@@ -51,6 +51,7 @@ public:
 	int  defaultUnit;
 	int  maxAutoVchans;
 	int  latency;
+	int  pollDelay;
 	bool bypassMixer;
 	bool lrView;
 	bool showTicks;
@@ -63,6 +64,7 @@ private:
 	QSpinBox  *feederRateQualitySb;
 	QSpinBox  *maxAutoVchansSb;
 	QSpinBox  *latencySb;
+	QSpinBox  *pollDelaySb;
 	QCheckBox *viewTabCb[DSBMIXER_MAX_CHANNELS];
 	QCheckBox *lrViewCb;
 	QCheckBox *showTicksCb;

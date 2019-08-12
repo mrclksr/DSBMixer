@@ -36,7 +36,8 @@
 
 Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	int defaultUnit, int maxAutoVchans, int latency, bool bypassMixer,
-	bool lrView, bool showTicks, QWidget *parent) : QDialog(parent) {
+	bool lrView, bool showTicks, int pollDelay, QWidget *parent)
+	: QDialog(parent) {
 
 	this->chanMask = chanMask;
 	this->amplify = amplify;
@@ -47,6 +48,7 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	this->bypassMixer = bypassMixer;
 	this->lrView = lrView;
 	this->showTicks = showTicks;
+	this->pollDelay = pollDelay;
 
 	qApp->setQuitOnLastWindowClosed(false);
 
@@ -105,6 +107,7 @@ Preferences::acceptSlot()
 	latency = latencySb->value();
 	bypassMixer = bypassMixerCb->checkState() == Qt::Checked ? \
 	    true : false;
+	pollDelay = pollDelaySb->value();
 	this->accept();
 }
 
@@ -194,6 +197,7 @@ Preferences::createAdvancedTab()
 	feederRateQualitySb = new QSpinBox(this);
 	maxAutoVchansSb	    = new QSpinBox(this);
 	latencySb	    = new QSpinBox(this);
+	pollDelaySb	    = new QSpinBox(this);
 	bypassMixerCb	    = new QCheckBox(tr("Bypass mixer"));
 
 	bypassMixerCb->setToolTip(tr(
@@ -208,9 +212,14 @@ Preferences::createAdvancedTab()
 
 	amplifySb->setRange(0, 100);
 	amplifySb->setValue(amplify);
+	amplifySb->setSuffix(" dB");
 
 	feederRateQualitySb->setRange(1, 4);
 	feederRateQualitySb->setValue(feederRateQuality);
+
+	pollDelaySb->setRange(10, 10000);
+	pollDelaySb->setValue(pollDelay);
+	pollDelaySb->setSuffix(" ms");
 
 	bypassMixerCb->setCheckState(bypassMixer ? Qt::Checked : \
 	    Qt::Unchecked);
@@ -218,9 +227,7 @@ Preferences::createAdvancedTab()
 	label = new QLabel(tr("Amplification:"));
 	grid->addWidget(label, 0, 0);
 	grid->addWidget(amplifySb, 0, 1);
-	label = new QLabel("dB");
-	grid->addWidget(label, 0, 2);
-	
+
 	label = new QLabel(tr("Feeder rate quality:"));
 	grid->addWidget(label, 1, 0);
 	grid->addWidget(feederRateQualitySb, 1, 1);
@@ -228,14 +235,18 @@ Preferences::createAdvancedTab()
 	label = new QLabel(tr("Max. auto VCHANS:"));
 	grid->addWidget(label, 2, 0);
 	grid->addWidget(maxAutoVchansSb, 2, 1);
-	
+
 	label = new QLabel(tr("Latency (0 low, 10 high):"));
 	grid->addWidget(label, 3, 0);
 	grid->addWidget(latencySb, 3, 1);
 
-	grid->addWidget(new QLabel(""), 4, 0);
-	grid->addWidget(bypassMixerCb, 5, 0);
-	
+	label = new QLabel(tr("Poll delay:"));
+	grid->addWidget(label, 4, 0);
+	grid->addWidget(pollDelaySb, 4, 1);
+
+	grid->addWidget(new QLabel(""), 5, 0);
+	grid->addWidget(bypassMixerCb, 6, 0);
+
 	vbox->addLayout(grid);
 	vbox->addStretch(1);	
 	widget->setLayout(vbox);

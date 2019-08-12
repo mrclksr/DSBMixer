@@ -77,6 +77,7 @@ private:
 	int	      *wWidth;
 	int	      *hHeight;
 	int	      *chanMask;
+	int	      *pollDelay;
 	bool	      *lrView;
 	bool	      *showTicks;
 	bool	      trayAvailable;
@@ -88,6 +89,7 @@ private:
 	QIcon	      prefsIcon;
 	QMenu	      *mainMenu;
 	QTimer	      *traytimer;
+	QTimer	      *timer;
 	QAction	      *quitAction;
 	QAction	      *preferencesAction;
 	dsbcfg_t      *cfg;
