@@ -331,14 +331,23 @@ MainWin::checkForSysTray()
 {
 	static int tries = 60;
 
-	if (QSystemTrayIcon::isSystemTrayAvailable()) {
-		traytimer->stop();
-		createTrayIcon();
-		trayAvailable = true;
-	} else if (tries-- <= 0) {
-		traytimer->stop();
+	if (!trayAvailable) {
+		if (QSystemTrayIcon::isSystemTrayAvailable()) {
+			createTrayIcon();
+			trayAvailable = true;
+			tries = 60;
+#ifndef SYSTRAY_HACK
+			traytimer->stop();
+#endif
+		} else if (tries-- <= 0) {
+			traytimer->stop();
+			trayAvailable = false;
+			show();
+		}
+	} else if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+		// System tray became unavailable
 		trayAvailable = false;
-		show();
+		delete trayIcon;
 	}
 }
 
