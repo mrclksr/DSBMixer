@@ -5,5 +5,5 @@ Icon=audio-volume-high
 Terminal=false
 StartupNotify=false
 Type=Application
-Categories=AudioVideo;Utility;System;Application
+Categories=Audio;AudioVideo;
 
