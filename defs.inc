@@ -1,5 +1,6 @@
 PROGRAM = dsbmixer
 BACKEND = $${PROGRAM}_backend
+SYSTRAY_HACK = 1
 
 isEmpty(PREFIX) {
 	PREFIX=/usr/local
@@ -19,3 +20,7 @@ INSTALL_SETUID	    = install -s -g wheel -m 4750 -o root
 DEFINES += PATH_BACKEND=\\\"$${PATH_BACKEND}\\\"
 DEFINES += PROGRAM=\\\"$${PROGRAM}\\\"
 DEFINES += LOCALE_PATH=\\\"$${DATADIR}\\\"
+!isEmpty(SYSTRAY_HACK)|defined(SYSTRAY_HACK) {
+	DEFINES += SYSTRAY_HACK=1
+}
+
