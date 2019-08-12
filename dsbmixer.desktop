@@ -5,5 +5,5 @@ Icon=audio-volume-high
 Terminal=false
 StartupNotify=false
 Type=Application
-Categories=Audio;AudioVideo;
+Categories=Audio;AudioVideo;Mixer;
 
