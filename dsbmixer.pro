@@ -3,7 +3,7 @@ include(defs.inc)
 QT += widgets
 TEMPLATE  = subdirs
 SUBDIRS	 += src lib/backend
-LANGUAGES = de
+TRANSLATIONS = locale/$${PROGRAM}_de.ts
 INSTALLS  = target dtfile locales
 QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd
 
@@ -28,13 +28,11 @@ readmemd.commands = mandoc -mdoc -Tmarkdown readme.mdoc | \
 locales.path = $${DATADIR}
 
 qtPrepareTool(LRELEASE, lrelease)
-for(a, LANGUAGES) {
-	in = locale/$${PROGRAM}_$${a}.ts
-	out = locale/$${PROGRAM}_$${a}.qm
-	locales.files += $$out
-	cmd = $$LRELEASE $$in -qm $$out
+for(a, TRANSLATIONS) {
+	cmd = $$LRELEASE $${a}
 	system($$cmd)
 }
+locales.files += locale/*.qm
 cleanqm.commands  = rm -f $${locales.files}
 distclean.depends = cleanqm
 
