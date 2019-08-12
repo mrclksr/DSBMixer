@@ -94,11 +94,7 @@ void
 MainWin::scrGeomChanged(const QRect &g)
 {
 	Q_UNUSED(g);
-	if (trayAvailable) {
-		trayAvailable = false;
-		delete trayIcon;
-		traytimer->start(500);
-	}
+	traytimer->start(500);
 }
 
 void
@@ -353,8 +349,11 @@ MainWin::checkForSysTray()
 {
 	static int tries = 60;
 
-	if (trayAvailable)
-		return;
+	if (trayAvailable) {
+		tries = 60;
+		delete trayIcon;
+		trayAvailable = false;
+	}
 	if (QSystemTrayIcon::isSystemTrayAvailable()) {
 		createTrayIcon();
 		trayAvailable = true;
