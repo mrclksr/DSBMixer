@@ -100,10 +100,14 @@ MainWin::scrGeomChanged(const QRect &g)
 void
 MainWin::loadIcons()
 {
-	muteIcon  = qh_loadIcon("audio-volume-muted", NULL);
-	lVolIcon  = qh_loadIcon("audio-volume-low", NULL);
-	mVolIcon  = qh_loadIcon("audio-volume-medium", NULL);
-	hVolIcon  = qh_loadIcon("audio-volume-high", NULL);
+	muteIcon  = qh_loadIcon("audio-volume-muted-panel",
+				"audio-volume-muted", NULL);
+	lVolIcon  = qh_loadIcon("audio-volume-low-panel",
+				"audio-volume-low", NULL);
+	mVolIcon  = qh_loadIcon("audio-volume-medium-panel",
+				"audio-volume-medium", NULL);
+	hVolIcon  = qh_loadIcon("audio-volume-high-panel",
+				"audio-volume-high", NULL);
 	quitIcon  = qh_loadIcon("application-exit", NULL); 
 	prefsIcon = qh_loadIcon("preferences-desktop-multimedia", NULL);
 
