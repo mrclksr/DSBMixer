@@ -435,6 +435,8 @@ dsbmixer_poll_default_unit(void)
 	unit = 0;
 	if (sysctlbyname("hw.snd.default_unit", &unit, &sz, NULL, 0))
 		warn("sysctl(hw.snd.default_unit)");
+	dsbmixer_snd_settings.default_unit = unit;
+
 	return (unit);
 }
 
