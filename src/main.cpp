@@ -80,6 +80,10 @@ main(int argc, char *argv[])
 	QApplication app(argc, argv);
 	QTranslator translator;
 
+	/* Set application name and RESOURCE_NAME env to set WM_CLASS */
+	QApplication::setApplicationName(PROGRAM);
+	(void)qputenv("RESOURCE_NAME", PROGRAM);
+
 	if (translator.load(QLocale(), QLatin1String(PROGRAM),
 	    QLatin1String("_"), QLatin1String(LOCALE_PATH)))
 		app.installTranslator(&translator);
