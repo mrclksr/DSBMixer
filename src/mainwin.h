@@ -54,6 +54,7 @@ public slots:
 	void moveEvent(QMoveEvent *event);
 	void resizeEvent(QResizeEvent *event);
 	void showConfigMenu();
+	void toggleWin();
 	void quit();
 private slots:
 	void checkForSysTray();
@@ -94,6 +95,7 @@ private:
 	QTimer	      *timer;
 	QAction	      *quitAction;
 	QAction	      *preferencesAction;
+	QAction	      *toggleAction;
 	dsbcfg_t      *cfg;
 	QTabWidget    *tabs;
 	MixerTrayIcon *trayIcon;

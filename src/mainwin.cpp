@@ -330,6 +330,15 @@ MainWin::showConfigMenu()
 }
 
 void
+MainWin::toggleWin()
+{
+	if (isVisible())
+		hide();
+	else
+		show();
+}
+
+void
 MainWin::quit()
 {
 	saveGeometry();
@@ -354,7 +363,9 @@ MainWin::createMenuActions()
 
 	quitAction = new QAction(quitIcon, tr("&Quit"), this);
 	preferencesAction = new QAction(prefsIcon, tr("&Preferences"), this);
+	toggleAction = new QAction(hVolIcon, tr("Show/hide window"), this);
 
+	connect(toggleAction, SIGNAL(triggered()), this, SLOT(toggleWin()));
 	connect(quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 	connect(preferencesAction, SIGNAL(triggered()), this,
 	    SLOT(showConfigMenu()));
@@ -398,8 +409,11 @@ MainWin::createTrayIcon()
 	trayIcon    = new MixerTrayIcon(idx == -1 ? 0 : mixers.at(idx),
 					hVolIcon, this);
 	updateTrayIcon();
+	menu->addAction(toggleAction);
 	menu->addAction(preferencesAction);
 	menu->addAction(quitAction);
+
+
 	trayIcon->setContextMenu(menu);
 	trayIcon->show();
 
