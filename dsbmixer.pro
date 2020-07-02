@@ -1,6 +1,5 @@
 include(defs.inc)
 
-QT += widgets
 TEMPLATE  = subdirs
 SUBDIRS	 += src lib/backend
 TRANSLATIONS = locale/$${PROGRAM}_de.ts \
