@@ -79,6 +79,7 @@ private:
 	int	      *hHeight;
 	int	      *chanMask;
 	int	      *pollIval;
+	char	      **playCmd;
 	bool	      *lrView;
 	bool	      *showTicks;
 	bool	      trayAvailable;

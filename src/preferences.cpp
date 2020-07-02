@@ -36,8 +36,8 @@
 
 Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	int defaultUnit, int maxAutoVchans, int latency, bool bypassMixer,
-	bool lrView, bool showTicks, int pollIval, QWidget *parent)
-	: QDialog(parent) {
+	bool lrView, bool showTicks, int pollIval, const char *playCmd,
+	QWidget *parent) : QDialog(parent) {
 
 	this->chanMask = chanMask;
 	this->amplify = amplify;
@@ -49,6 +49,7 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	this->lrView = lrView;
 	this->showTicks = showTicks;
 	this->pollIval = pollIval;
+	this->playCmd = QString(playCmd);
 
 	qApp->setQuitOnLastWindowClosed(false);
 
@@ -108,12 +109,16 @@ Preferences::acceptSlot()
 	bypassMixer = bypassMixerCb->checkState() == Qt::Checked ? \
 	    true : false;
 	pollIval = pollIvalSb->value();
+	if (testSoundPlaying)
+		stopSound();
 	this->accept();
 }
 
 void
 Preferences::rejectSlot()
 {
+	if (testSoundPlaying)
+		stopSound();
 	this->reject();
 }
 
@@ -161,9 +166,16 @@ Preferences::createViewTab()
 QWidget *
 Preferences::createDefaultDeviceTab()
 {
-	QWidget *widget = new QWidget();
-	QVBoxLayout *vbox = new QVBoxLayout();
-	QLabel *label = new QLabel(tr("Select default sound device\n"));
+	QWidget	    *widget = new QWidget(this);
+	QVBoxLayout *vbox   = new QVBoxLayout();
+	QHBoxLayout *hbox   = new QHBoxLayout();
+	QLabel	    *label  = new QLabel(tr("Select default sound device\n"));
+	testBt		    = new QPushButton(tr("Test sound"));
+	commandEdit	    = new QLineEdit;
+	soundPlayer	    = new QProcess(this);
+
+	testSoundPlaying = false;
+
 	label->setStyleSheet("font-weight: bold;");
 	vbox->addWidget(label, 0, Qt::AlignCenter);
 
@@ -176,17 +188,100 @@ Preferences::createDefaultDeviceTab()
 			rb->setChecked(true);
 		vbox->addWidget(rb);
 	}
-	widget->setLayout(vbox);
+	commandEdit->setText(playCmd);
+	commandEdit->setToolTip(tr("Enter a command which plays a sound"));
 
+	hbox->addWidget(commandEdit);
+	hbox->addWidget(testBt, 0, Qt::AlignRight);
+	vbox->addLayout(hbox);
+
+	widget->setLayout(vbox);
+	connect(testBt, SIGNAL(clicked()), this, SLOT(toggleTestSound()));
+	connect(commandEdit, SIGNAL(textEdited(const QString &)), this,
+	    SLOT(commandChanged(const QString &)));
 	return (widget);
+}
+
+void
+Preferences::toggleTestSound()
+{
+	if (testSoundPlaying) {
+		stopSound();
+		return;
+	}
+	for (int i = 0; i < dsbmixer_getndevs(); i++) {
+		QRadioButton *rb = defaultDeviceRb.at(i);
+		if (rb->isChecked()) {
+			playSound(i);
+			return;
+		}
+	}
+}
+
+void
+Preferences::playSound(int unit)
+{
+	if (testSoundPlaying)
+		return;
+	if (dsbmixer_set_default_unit(unit) == -1) {
+		qh_warn(this, "Couldn't set default sound unit to %d", unit);
+		return;
+	}
+	soundPlayer->start(playCmd);
+	soundPlayer->closeReadChannel(QProcess::StandardOutput);
+	soundPlayer->closeReadChannel(QProcess::StandardError);
+	soundPlayer->waitForStarted(-1);
+
+	if (soundPlayer->state() == QProcess::NotRunning) {
+		qh_warnx(this, "Couldn't execute '%s': %s",
+		    playCmd.toLocal8Bit().data(),
+		    soundPlayer->errorString().toLocal8Bit().data());
+		return;
+        }
+	connect(soundPlayer, SIGNAL(finished(int, QProcess::ExitStatus)),
+	    this, SLOT(soundPlayerFinished(int, QProcess::ExitStatus)));
+	testBt->setText(tr("Stop"));
+	testSoundPlaying = true;
+}
+
+void
+Preferences::stopSound()
+{
+	if (!testSoundPlaying)
+		return;
+	disconnect(soundPlayer,
+	    SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+	soundPlayer->close();
+	testSoundPlaying = false;
+	testBt->setText(tr("Test sound"));
+	if (dsbmixer_set_default_unit(defaultUnit) == -1) {
+		qh_warn(this, "Couldn't reset default sound unit to %d",
+		    defaultUnit);
+	}
+}
+
+void
+Preferences::soundPlayerFinished(int exitCode, QProcess::ExitStatus status)
+{
+	if (status == QProcess::CrashExit)
+		qh_warnx(this, "Command crashed");
+	else if (exitCode != 0)
+		qh_warnx(this, "Command returned with exit code %d", exitCode);
+	stopSound();
+}
+
+void
+Preferences::commandChanged(const QString &text)
+{
+	playCmd = text;
 }
 
 QWidget *
 Preferences::createAdvancedTab()
 {
 	QWidget	    *widget = new QWidget(this);
-	QVBoxLayout *vbox = new QVBoxLayout();
-	QGridLayout *grid = new QGridLayout();
+	QVBoxLayout *vbox   = new QVBoxLayout();
+	QGridLayout *grid   = new QGridLayout();
 
 	QLabel *label = new QLabel(tr("Advanced settings\n"));
 	label->setStyleSheet("font-weight: bold;");

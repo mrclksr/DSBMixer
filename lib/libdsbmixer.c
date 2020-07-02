@@ -441,6 +441,19 @@ dsbmixer_poll_default_unit(void)
 }
 
 int
+dsbmixer_set_default_unit(int unit)
+{
+	if (sysctlbyname("hw.snd.default_unit", NULL, NULL,
+	    &unit, sizeof(unit)) != 0) {
+		warn("Couldn't set hw.snd.default_unit");
+		return (-1);
+	}
+	dsbmixer_snd_settings.default_unit = unit;
+
+	return (0);
+}
+
+int
 dsbmixer_change_settings(int dfltunit, int amp, int qual, int latency,
 	int max_auto_vchans, bool bypass_mixer)
 {

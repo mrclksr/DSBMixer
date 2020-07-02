@@ -85,6 +85,7 @@ struct dsbmixer_snd_settings_s {
 extern struct dsbmixer_snd_settings_s dsbmixer_snd_settings;
 
 extern int	  dsbmixer_geterr(char const **errmsg);
+extern int	  dsbmixer_set_default_unit(int unit);
 extern int	  dsbmixer_setrec(dsbmixer_t *mixer, int chan, bool on);
 extern int	  dsbmixer_init(void);
 extern int	  dsbmixer_getndevs(void);

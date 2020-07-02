@@ -27,6 +27,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QTextCodec>
 #include <unistd.h>
 #include <stdlib.h>
 #include <QRect>
@@ -52,8 +53,8 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	lrView    = &dsbcfg_getval(cfg, CFG_LRVIEW).boolean;
 	showTicks = &dsbcfg_getval(cfg, CFG_TICKS).boolean;
 	chanMask  = &dsbcfg_getval(cfg, CFG_MASK).integer;
-	pollIval = &dsbcfg_getval(cfg, CFG_POLL_IVAL).integer;
-
+	pollIval  = &dsbcfg_getval(cfg, CFG_POLL_IVAL).integer;
+	playCmd   = &dsbcfg_getval(cfg, CFG_PLAY_CMD).string;
 	trayAvailable = false;
 
 	loadIcons();
@@ -277,9 +278,15 @@ MainWin::showConfigMenu()
 			   dsbmixer_feeder_rate_quality(),
 			   dsbmixer_default_unit(), dsbmixer_maxautovchans(),
 			   dsbmixer_latency(), dsbmixer_bypass_mixer(),
-			   *lrView, *showTicks, *pollIval, this);
-	if (prefs.exec() != QDialog::Accepted)
+			   *lrView, *showTicks, *pollIval, *playCmd, this);
+
+	/* No need to poll the mixers while the config menu is showing */
+	timer->stop();
+	if (prefs.exec() != QDialog::Accepted) {
+		timer->start(*pollIval);
 		return;
+	}
+
 	if (prefs.defaultUnit != dsbmixer_default_unit())
 		setDefaultTab(prefs.defaultUnit);
 	if (*lrView    != prefs.lrView || *chanMask != prefs.chanMask ||
@@ -294,6 +301,18 @@ MainWin::showConfigMenu()
 		timer->start(prefs.pollIval);
 		*pollIval = prefs.pollIval;
 	}
+	QTextCodec *codec = QTextCodec::codecForLocale();
+	QByteArray encstr = codec->fromUnicode(prefs.playCmd);
+
+	if (encstr.data() == NULL || strcmp(encstr.data(), *playCmd) != 0) {
+		free(*playCmd);
+		if (encstr.data() == NULL)
+			*playCmd = strdup("");
+		else
+			*playCmd = strdup(encstr.data());
+		if (*playCmd == NULL)
+			qh_err(this, EXIT_FAILURE, "strdup()");
+	}
 	dsbcfg_write(PROGRAM, "config", cfg);
 
 	if (dsbmixer_amplification() != prefs.amplify ||
@@ -307,6 +326,7 @@ MainWin::showConfigMenu()
 		    prefs.maxAutoVchans, prefs.bypassMixer) == -1)
 			qh_warnx(0, dsbmixer_error());
 	}
+	timer->start(*pollIval);
 }
 
 void
