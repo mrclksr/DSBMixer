@@ -30,6 +30,7 @@
 #include <QGridLayout>
 #include <QCloseEvent>
 #include <QBoxLayout>
+#include <paths.h>
 
 #include "preferences.h"
 #include "qt-helper/qt-helper.h"
@@ -227,7 +228,7 @@ Preferences::playSound(int unit)
 		qh_warn(this, "Couldn't set default sound unit to %d", unit);
 		return;
 	}
-	soundPlayer->start(playCmd);
+	soundPlayer->start(_PATH_BSHELL, QStringList() << "-c" << playCmd);
 	soundPlayer->closeReadChannel(QProcess::StandardOutput);
 	soundPlayer->closeReadChannel(QProcess::StandardError);
 	soundPlayer->waitForStarted(-1);
