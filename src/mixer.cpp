@@ -24,7 +24,6 @@
 
 #include <QWidget>
 #include "mixer.h"
-//#include <iostream>
 
 Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 	: QWidget(parent)
@@ -34,6 +33,12 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 
 	if (mixer == NULL)
 		return;
+	QStringList tokens = QString(mixer->cardname).split(QRegExp("[<>]+"),
+	    Qt::SkipEmptyParts);
+	if (tokens.size() > 1)
+		this->cardname = tokens[0] + tokens[1];
+	else
+		this->cardname = QString(mixer->cardname);
 	this->mixer  = mixer;
 	this->lrview = lrview;
 	muted = false;

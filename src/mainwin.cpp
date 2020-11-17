@@ -146,7 +146,7 @@ MainWin::createTabs()
 
 	for (int i = 0; i < mixers.count(); i++) {
 		dsbmixer_t *dev = mixers.at(i)->getDev();
-		QString label(dev->cardname);
+		QString label(mixers.at(i)->cardname);
 
 		if (i == didx)
 			label.append("*");
@@ -166,7 +166,7 @@ MainWin::setDefaultTab(int unit)
 	tabs->setCurrentIndex(idx);
 	/* Update tab labels. */
 	for (int i = 0; i < mixers.count(); i++) {
-		QString label(mixers.at(i)->getDev()->cardname);
+		QString label(mixers.at(i)->cardname);
 		if (i == idx)
 			label.append("*");
 		tabs->setTabText(i, label);

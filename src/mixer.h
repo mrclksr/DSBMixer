@@ -49,6 +49,8 @@ public slots:
 public:
 	int getMasterVol();
 	bool muted;
+public:
+	QString cardname;
 private:
 	int find_idx(int chan);
 
