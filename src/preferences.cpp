@@ -324,7 +324,7 @@ Preferences::createAdvancedTab()
 	grid->addWidget(label, 0, 0);
 	grid->addWidget(amplifySb, 0, 1);
 
-	label = new QLabel(tr("Feeder rate quality:"));
+	label = new QLabel(tr("Sample rate converter quality:"));
 	grid->addWidget(label, 1, 0);
 	grid->addWidget(feederRateQualitySb, 1, 1);
 
