@@ -302,21 +302,38 @@ Preferences::createAdvancedTab()
 		"their own channel volume."));
 	maxAutoVchansSb->setRange(0, 256);
 	maxAutoVchansSb->setValue(maxAutoVchans);
+	maxAutoVchansSb->setToolTip(tr(
+		"Defines the max. number of virtual playback\n" \
+		"and recording channels that can be created.\n" \
+		"Virtual channels allow programs to use more playback\n" \
+		"and recording channels than the physical hardware\n" \
+		"provides."));
 
 	latencySb->setRange(0, 10);
 	latencySb->setValue(latency);
-
+	latencySb->setToolTip(tr(
+		"Lower values mean less buffering and latency."));
 	amplifySb->setRange(0, 100);
 	amplifySb->setValue(amplify);
 	amplifySb->setSuffix(" dB");
-
+	amplifySb->setToolTip(tr(
+		"Lower values mean more amplification, but can\n" \
+		"produce sound clipping when chosen too low.\n" \
+		"Higher values mean finer volume control."));
 	feederRateQualitySb->setRange(1, 4);
 	feederRateQualitySb->setValue(feederRateQuality);
+	feederRateQualitySb->setToolTip(tr(
+		"Higher values mean better sample rate conversion,\n" \
+		"but more memory and CPU usage."));
 
 	pollIvalSb->setRange(10, 10000);
 	pollIvalSb->setValue(pollIval);
 	pollIvalSb->setSuffix(" ms");
-
+	pollIvalSb->setToolTip(tr(
+		"Defines the time interval in milliseconds  mixer\n" \
+		"devices are polled. Higher values mean less CPU usage.\n" \
+		"Lower values mean less latency when showing the\n" \
+		"current volume changed by other programs."));
 	bypassMixerCb->setCheckState(bypassMixer ? Qt::Checked : \
 	    Qt::Unchecked);
 
