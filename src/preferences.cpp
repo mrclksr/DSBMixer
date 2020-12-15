@@ -330,7 +330,7 @@ Preferences::createAdvancedTab()
 	pollIvalSb->setValue(pollIval);
 	pollIvalSb->setSuffix(" ms");
 	pollIvalSb->setToolTip(tr(
-		"Defines the time interval in milliseconds  mixer\n" \
+		"Defines the time interval in milliseconds mixer\n" \
 		"devices are polled. Higher values mean less CPU usage.\n" \
 		"Lower values mean less latency when showing the\n" \
 		"current volume changed by other programs."));
