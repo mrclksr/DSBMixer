@@ -1,0 +1,13 @@
+#!/bin/sh
+
+pulseaudio --kill
+n=0
+while [ $n -lt 5 ]; do
+	pulseaudio --start
+	sleep 1
+	if pgrep -U $(id -ru) -q pulseaudio; then
+		exit 0
+	fi
+	n=$((n + 1))
+done
+
