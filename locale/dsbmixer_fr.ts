@@ -19,28 +19,28 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="364"/>
+        <location filename="../src/mainwin.cpp" line="374"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="365"/>
+        <location filename="../src/mainwin.cpp" line="375"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Préférences</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="366"/>
+        <location filename="../src/mainwin.cpp" line="376"/>
         <source>Show/hide window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="377"/>
+        <location filename="../src/mainwin.cpp" line="387"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="446"/>
-        <location filename="../src/mainwin.cpp" line="479"/>
+        <location filename="../src/mainwin.cpp" line="456"/>
+        <location filename="../src/mainwin.cpp" line="489"/>
         <source>Muted</source>
         <translation>Muet</translation>
     </message>
@@ -197,6 +197,34 @@ current volume changed by other programs.</source>
         <location filename="../src/preferences.cpp" line="356"/>
         <source>Poll mixers every</source>
         <translation>Sonder les mélangeurs toutes les</translation>
+    </message>
+</context>
+<context>
+    <name>RestartApps</name>
+    <message>
+        <location filename="../src/restartapps.cpp" line="40"/>
+        <source>&lt;b&gt;Default audio device changed&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="41"/>
+        <source>Restart audio applications:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="45"/>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Cancel</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="46"/>
+        <source>&amp;Restart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="51"/>
+        <source>DSBMixer - Restart audio applications</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
