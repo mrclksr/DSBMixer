@@ -82,6 +82,12 @@ struct dsbmixer_snd_settings_s {
 	bool mixer_bypass;
 };
 
+typedef struct dsbmixer_audio_proc_s {
+	char	   cmd[64];
+	pid_t	   pid;
+	const char *restart;
+} dsbmixer_audio_proc_t;
+
 extern struct dsbmixer_snd_settings_s dsbmixer_snd_settings;
 
 extern int	  dsbmixer_geterr(char const **errmsg);
@@ -100,6 +106,7 @@ extern int	  dsbmixer_getvol(dsbmixer_t *mixer, int chan);
 extern int	  dsbmixer_apply_settings(void);
 extern int	  dsbmixer_change_settings(int, int, int, int, int, bool);
 extern int	  dsbmixer_poll_default_unit(void);
+extern int	  dsbmixer_restart_audio_proc(dsbmixer_audio_proc_t *);
 extern void	  dsbmixer_setmute(dsbmixer_t *mixer, bool mute);
 extern bool	  dsbmixer_bypass_mixer(void);
 extern bool	  dsbmixer_getmute(dsbmixer_t *mixer);
@@ -120,7 +127,7 @@ extern dsbmixer_t *dsbmixer_querydevlist(int *, bool);
 extern dsbmixer_t *dsbmixer_pollmixers(void);
 extern dsbmixer_t *dsbmixer_getmixer(int mixer);
 extern dsbmixer_channel_t *dsbmixer_getchan(dsbmixer_t *, int);
-extern int dsbmixer_change_settings1(char *name, ...);
+extern dsbmixer_audio_proc_t *dsbmixer_get_audio_procs(size_t *_nprocs);
 #ifdef __cplusplus
 }
 #endif	/* __cplusplus */

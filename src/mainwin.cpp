@@ -36,6 +36,7 @@
 #include "mainwin.h"
 #include "thread.h"
 #include "mixer.h"
+#include "restartapps.h"
 #include "preferences.h"
 #include "qt-helper/qt-helper.h"
 
@@ -213,14 +214,23 @@ void
 MainWin::updateMixers()
 {
 	int	   unit;
-	static int prev_unit = 0;
+	size_t	   nap = 0;
+	static int prev_unit = -1;
 	static int cnt = 0;
 	dsbmixer_t *mixer;
+	dsbmixer_audio_proc_t *ap;
 
 	if (cnt++ % 5 == 0) {
 		unit = dsbmixer_poll_default_unit();
 		if (prev_unit != unit) {
 			setDefaultTab(unit);
+			if (prev_unit != -1) {
+				ap = dsbmixer_get_audio_procs(&nap);
+				if (ap != NULL) {
+					RestartApps raWin(ap, nap, this);
+					(void)raWin.exec();
+				}
+			}
 			prev_unit = unit;
 		}
 	}

@@ -14,6 +14,7 @@ HEADERS += chanslider.h \
 	   preferences.h \
 	   thread.h \
 	   mixertrayicon.h \
+	   restartapps.h \
 	   ../lib/qt-helper/qt-helper.h
 SOURCES += chanslider.cpp \
 	   main.cpp \
@@ -22,6 +23,7 @@ SOURCES += chanslider.cpp \
 	   preferences.cpp \
 	   thread.cpp \
 	   mixertrayicon.cpp \
+	   restartapps.cpp \
 	   ../lib/qt-helper/qt-helper.cpp \
 	   ../lib/libdsbmixer.c \
 	   ../lib/config.c \

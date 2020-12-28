@@ -1,10 +1,10 @@
 include(defs.inc)
 
-TEMPLATE  = subdirs
-SUBDIRS	 += src lib/backend
+TEMPLATE     = subdirs
+SUBDIRS	    += src lib/backend
 TRANSLATIONS = locale/$${PROGRAM}_de.ts \
                locale/$${PROGRAM}_fr.ts
-INSTALLS  = target dtfile locales
+INSTALLS     = target dtfile locales scripts
 QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd
 
 target.path  = $${PREFIX}/bin
@@ -24,6 +24,10 @@ readmemd.target = readmemd
 readmemd.files = readme.mdoc
 readmemd.commands = mandoc -mdoc -Tmarkdown readme.mdoc | \
 			sed -e \'1,1d; \$$,\$$d\' > README.md
+
+scripts.files += scripts/$${RESTART_PA}
+scripts.path   = $${SCRIPTS_DIR}
+scripts.CONFIG = nostrip
 
 locales.path = $${DATADIR}
 

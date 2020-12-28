@@ -48,12 +48,19 @@
 #include <unistd.h>
 #include <pwd.h>
 #include <limits.h>
+#include <regex.h>
+
 #include "libdsbmixer.h"
 
 #define FATAL_SYSERR	   (DSBMIXER_ERR_SYS|DSBMIXER_ERR_FATAL)
 #define PATH_SNDSTAT	   "/dev/sndstat"
 #define PATH_DEVDSOCKET	   "/var/run/devd.pipe"
 #define PATH_DEFAULT_MIXER "/dev/mixer"
+#define PATH_FSTAT	   "/usr/bin/fstat"
+
+#define RE_STR \
+	"([^[:blank:]]+)[[:space:]]+([^[:space:]]+)" \
+	"[[:space:]]+([0-9]+).*dsp[0-9].*"
 
 #define ERROR(ret, error, prepend, fmt, ...) \
 	do { \
@@ -86,6 +93,14 @@ typedef struct mqmsg_s {
 } mqmsg_t;
 #endif
 
+static struct restart_cmd_s {
+	const char *cmd;
+	const char *restart;
+} restart_cmds[] = {
+	{ "pulseaudio", PATH_RESTART_PA },
+	{ "sndiod",     "kill -HUP %p"  }
+};
+
 static int  get_unit(const char *mixer);
 static int  get_mixers(void);
 static int  add_mixer(const char *name);
@@ -112,6 +127,7 @@ static FILE	  *devdfp;
 static char 	  errormsg[_POSIX2_LINE_MAX];
 static dsbmixer_t **mixers = NULL;
 static const char *channel_names[] = SOUND_DEVICE_LABELS;
+static const char *lookup_restart_cmd(const char *);
 
 int
 dsbmixer_init()
@@ -477,6 +493,94 @@ dsbmixer_change_settings(int dfltunit, int amp, int qual, int latency,
 	get_snd_settings();
 
 	return (0);
+}
+
+int
+dsbmixer_restart_audio_proc(dsbmixer_audio_proc_t *proc)
+{
+	int	   error;
+	char	   *cmd, *q;
+	size_t	   n, len;
+	const char *p;
+
+	_error = 0;
+	len = strlen(proc->restart);
+	for (p = proc->restart; *p != '\0'; p++) {
+		if (*p == '%')
+			len += 16;
+	}
+	if ((cmd = malloc(len)) == NULL)
+		ERROR(-1, FATAL_SYSERR, false, "malloc()");
+	for (p = proc->restart, q = cmd; *p != '\0'; p++) {
+		if (*p == '%') {
+			if (p[1] == '%') {
+				*q++ = '%';
+			} else if (p[1] == 'p') {
+				n = snprintf(q, len - (q - cmd), "%d",
+				    proc->pid);
+				q += n;
+			}
+			p++;
+		} else
+			*q++ = *p;
+	}
+	*q = '\0';
+	error = system(cmd);
+	free(cmd);
+
+	return (error);
+}
+
+dsbmixer_audio_proc_t *
+dsbmixer_get_audio_procs(size_t *_nprocs)
+{
+	FILE	      *fp;
+	char	      buf[_POSIX2_LINE_MAX], pwdbuf[512], *cmd, *pid, *usr;
+	size_t	      nap, nprocs;
+	regex_t	      re;
+	regmatch_t    pmatch[4];
+	const char    *rcmd;
+	struct passwd *pwdres, pwd;
+	dsbmixer_audio_proc_t *ap;
+
+	_error = 0;
+	if (getpwuid_r(getuid(), &pwd, pwdbuf, sizeof(pwdbuf), &pwdres) != 0)
+		ERROR(NULL, FATAL_SYSERR, false, "getpwuid_r()");
+	endpwent();
+	if (regcomp(&re, RE_STR, REG_EXTENDED) != 0) {
+		warn("regcomp()");
+		return (NULL);
+	}
+	if ((fp = popen(PATH_FSTAT, "r")) == NULL)
+		ERROR(NULL, FATAL_SYSERR, false, "popen(%s)", PATH_FSTAT);
+	ap = NULL;
+	nap = nprocs = 0;
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		if (regexec(&re, buf, 4, pmatch, 0) != 0)
+			continue;
+		buf[pmatch[1].rm_eo] = '\0'; usr = buf + pmatch[1].rm_so;
+		buf[pmatch[2].rm_eo] = '\0'; cmd = buf + pmatch[2].rm_so;
+		buf[pmatch[3].rm_eo] = '\0'; pid = buf + pmatch[3].rm_so;
+		if (strcmp(usr, pwd.pw_name) != 0)
+			continue;
+		if ((rcmd = lookup_restart_cmd(cmd)) == NULL)
+			continue;
+		if (++nprocs >= nap) {
+			nap += 5;
+			ap = realloc(ap, nap * sizeof(dsbmixer_audio_proc_t));
+			if (ap == NULL)
+				ERROR(NULL, FATAL_SYSERR, false, "realloc()");
+		}
+		(void)strncpy(ap[nprocs - 1].cmd, cmd,
+		    sizeof(ap[nprocs - 1].cmd));
+		ap[nprocs - 1].pid = strtol(pid, NULL, 10);
+		ap[nprocs - 1].restart = rcmd;
+	}
+	*_nprocs = nprocs;
+	regfree(&re);
+	(void)pclose(fp);
+
+	return (ap);
 }
 
 static void
@@ -1076,3 +1180,14 @@ exec_backend(const char *cmd, int *ret)
 	return (*ret == -1 ? NULL : buf);
 }
 
+static const char *
+lookup_restart_cmd(const char *cmd)
+{
+	size_t i;
+
+	for (i = 0; i < sizeof(restart_cmds) / sizeof(restart_cmds[0]); i++) {
+		if (strcmp(cmd, restart_cmds[i].cmd) == 0)
+			return (restart_cmds[i].restart);
+	}
+	return (NULL);
+}
