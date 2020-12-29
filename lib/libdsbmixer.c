@@ -56,11 +56,12 @@
 #define PATH_SNDSTAT	   "/dev/sndstat"
 #define PATH_DEVDSOCKET	   "/var/run/devd.pipe"
 #define PATH_DEFAULT_MIXER "/dev/mixer"
-#define PATH_FSTAT	   "/usr/bin/fstat"
+#define PATH_PS		   "/bin/ps"
 
 #define RE_STR \
-	"([^[:blank:]]+)[[:space:]]+([^[:space:]]+)" \
-	"[[:space:]]+([0-9]+).*dsp[0-9].*"
+	"([0-9]+)[[:space:]]+([^[:space:]]+)[[:space:]]+" \
+	"([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+" \
+	"([^[:space:]]+).*"
 
 #define ERROR(ret, error, prepend, fmt, ...) \
 	do { \
@@ -535,10 +536,10 @@ dsbmixer_audio_proc_t *
 dsbmixer_get_audio_procs(size_t *_nprocs)
 {
 	FILE	      *fp;
-	char	      buf[_POSIX2_LINE_MAX], pwdbuf[512], *cmd, *pid, *usr;
+	char	      buf[_POSIX2_LINE_MAX], pwdbuf[512], *cmd, *pid;
 	size_t	      nap, nprocs;
 	regex_t	      re;
-	regmatch_t    pmatch[4];
+	regmatch_t    pmatch[6];
 	const char    *rcmd;
 	struct passwd *pwdres, pwd;
 	dsbmixer_audio_proc_t *ap;
@@ -551,18 +552,16 @@ dsbmixer_get_audio_procs(size_t *_nprocs)
 		warn("regcomp()");
 		return (NULL);
 	}
-	if ((fp = popen(PATH_FSTAT, "r")) == NULL)
-		ERROR(NULL, FATAL_SYSERR, false, "popen(%s)", PATH_FSTAT);
+	(void)snprintf(buf, sizeof(buf), "%s -U %s -x", PATH_PS, pwd.pw_name);
+	if ((fp = popen(buf, "r")) == NULL)
+		ERROR(NULL, FATAL_SYSERR, false, "popen(%s)", buf);
 	ap = NULL;
 	nap = nprocs = 0;
 	while (fgets(buf, sizeof(buf), fp) != NULL) {
-		if (regexec(&re, buf, 4, pmatch, 0) != 0)
+		if (regexec(&re, buf, 6, pmatch, 0) != 0)
 			continue;
-		buf[pmatch[1].rm_eo] = '\0'; usr = buf + pmatch[1].rm_so;
-		buf[pmatch[2].rm_eo] = '\0'; cmd = buf + pmatch[2].rm_so;
-		buf[pmatch[3].rm_eo] = '\0'; pid = buf + pmatch[3].rm_so;
-		if (strcmp(usr, pwd.pw_name) != 0)
-			continue;
+		buf[pmatch[1].rm_eo] = '\0'; pid = buf + pmatch[1].rm_so;
+		buf[pmatch[5].rm_eo] = '\0'; cmd = buf + pmatch[5].rm_so;
 		if ((rcmd = lookup_restart_cmd(cmd)) == NULL)
 			continue;
 		if (++nprocs >= nap) {
