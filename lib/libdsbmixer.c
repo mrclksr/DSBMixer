@@ -49,6 +49,7 @@
 #include <pwd.h>
 #include <limits.h>
 #include <regex.h>
+#include <libgen.h>
 
 #include "libdsbmixer.h"
 
@@ -562,6 +563,7 @@ dsbmixer_get_audio_procs(size_t *_nprocs)
 			continue;
 		buf[pmatch[1].rm_eo] = '\0'; pid = buf + pmatch[1].rm_so;
 		buf[pmatch[5].rm_eo] = '\0'; cmd = buf + pmatch[5].rm_so;
+		cmd = basename(cmd);
 		if ((rcmd = lookup_restart_cmd(cmd)) == NULL)
 			continue;
 		if (++nprocs >= nap) {
