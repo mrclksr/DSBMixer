@@ -22,8 +22,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mixertrayicon.h"
 #include <QWidget>
+#include <QScreen>
+
+#include "mixertrayicon.h"
 
 MixerTrayIcon::MixerTrayIcon(Mixer *mixer, const QIcon &icon,
     QObject *parent) : QSystemTrayIcon(icon, parent) {
@@ -37,3 +39,44 @@ MixerTrayIcon::setMixer(Mixer *mixer)
 	this->mixer = mixer;
 }
 
+void
+MixerTrayIcon::showSlider(int vol)
+{
+	int   sx, sy;
+	QRect rect = geometry();
+
+	if (slider == 0)
+		initSlider(vol);
+	QSize scrsize = slider->screen()->availableSize();
+	slider->setVol(vol);
+	slider_timer->start(1000);
+	if (!slider->isVisible()) {
+		sx = rect.x() - slider->width() / 2 + rect.width() / 2;
+		if (rect.y() < scrsize.height() - rect.y())
+			sy = rect.y() + rect.height();
+		else
+			sy = rect.y() - slider->size().height();
+		slider->move(sx, sy);
+		slider->show();
+	}
+}
+
+void
+MixerTrayIcon::initSlider(int vol)
+{
+	slider = new ChanSlider(QString("Vol"), DSBMIXER_MASTER, vol);
+	slider->setWindowFlags(Qt::ToolTip);
+	slider_timer = new QTimer(this);
+	connect(slider_timer, SIGNAL(timeout()), this, SLOT(hideSlider()));
+	slider->show();
+	slider->hide();
+}
+
+void
+MixerTrayIcon::hideSlider()
+{
+	if (slider == 0)
+		return;
+	slider->hide();
+	slider_timer->stop();
+}

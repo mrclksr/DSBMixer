@@ -27,7 +27,10 @@
 #include <QSystemTrayIcon>
 #include <QWheelEvent>
 #include <QWidget>
+#include <QTimer>
+#include <QDebug>
 #include "mixer.h"
+#include "chanslider.h"
 
 class MixerTrayIcon : public QSystemTrayIcon
 {
@@ -50,6 +53,7 @@ public:
 					vol = 0;
 			} else if ((vol += 3) > 100)
 				vol = 100;
+			showSlider(vol);
 			if (mixer->muted)
 				return (true);
 			mixer->setVol(DSBMIXER_MASTER, vol);
@@ -58,7 +62,13 @@ public:
 		return (QSystemTrayIcon::event(ev));
 	}
 
+private slots:
+	void initSlider(int vol);
+	void showSlider(int vol);
+	void hideSlider(void);
+
 private:
 	Mixer *mixer;
+	ChanSlider *slider = 0;
+	QTimer *slider_timer = 0;
 };
-

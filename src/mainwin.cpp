@@ -144,6 +144,8 @@ void
 MainWin::createTabs()
 {
 	int didx = mixerUnitToTabIndex(dsbmixer_default_unit());
+	QWidget	    *container = new QWidget(this);
+	QVBoxLayout *vbox      = new QVBoxLayout(container);
 
 	for (int i = 0; i < mixers.count(); i++) {
 		dsbmixer_t *dev = mixers.at(i)->getDev();
@@ -154,7 +156,9 @@ MainWin::createTabs()
 		tabs->addTab(mixers.at(i), label);
 		tabs->setTabToolTip(i, QString(dev->name));
 	}
-	setCentralWidget(tabs);
+	vbox->addWidget(tabs);
+	vbox->setContentsMargins(15, 5, 15, 0);
+	setCentralWidget(container);
 	tabs->setCurrentIndex(didx == -1 ? 0: didx);
 }
 

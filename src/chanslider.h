@@ -29,6 +29,7 @@
 #include <QWidget>
 #include <QCheckBox>
 #include <QSlider>
+#include <QLabel>
 
 class ChanSlider : public QGroupBox {
 	Q_OBJECT
@@ -37,6 +38,7 @@ public:
 	    bool muteable, QWidget *parent = 0);
 	ChanSlider(const QString &name, int id, int lvol, int rvol, bool rec,
 	    bool muteable, QWidget *parent = 0);
+	ChanSlider(const QString &name, int id, int vol, QWidget *parent = 0);
 	void setVol(int vol);
 	void setVol(int lvol, int rvol);
 	void setRecSrc(bool state);
@@ -66,6 +68,9 @@ private:
 	QCheckBox *recCB, *muteCB;
 	QSlider *slider, *rslider, *lslider;;
 	QVBoxLayout *layout;
+	QLabel *volabel;
+	QLabel *volabell;
+	QLabel *volabelr;
 };
 #endif
 

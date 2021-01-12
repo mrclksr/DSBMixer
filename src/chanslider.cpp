@@ -38,6 +38,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	this->lrview = false;
 	layout	     = new QVBoxLayout(parent);
 	recCB	     = new QCheckBox;
+	volabel	     = new QLabel;
 
 	if (!rec) {
 		/* Padding space */
@@ -52,13 +53,16 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 		connect(recCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitRecSourceChanged(int)));
 	}
+	volabel->setText(QString("100%"));
+	layout->addWidget(volabel, 0, Qt::AlignHCenter);
+
 	slider = new QSlider(Qt::Vertical);
 	slider->setMinimum(0);
 	slider->setMaximum(100);
 	slider->setTickPosition(QSlider::TicksLeft);
 	setVol(vol);
 
-	layout->addWidget(slider, 1, Qt::AlignHCenter);
+	layout->addWidget(slider, 0, Qt::AlignHCenter);
 
 	muteCB = new QCheckBox;
 	if (!muteable) {
@@ -89,9 +93,13 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	this->id   = id;
 	this->lvol = lvol;
 	this->rvol = rvol;
+	volabell   = new QLabel;
+	volabelr   = new QLabel;
 
-	QVBoxLayout *vbox = new QVBoxLayout(parent);
-	QHBoxLayout *hbox = new QHBoxLayout(parent);
+	QVBoxLayout *vboxl  = new QVBoxLayout(parent);
+	QVBoxLayout *vboxr  = new QVBoxLayout(parent);
+	QVBoxLayout *layout = new QVBoxLayout(parent);
+	QHBoxLayout *hbox   = new QHBoxLayout(parent);
 
 	recCB = new QCheckBox;
 	if (!rec) {
@@ -100,10 +108,10 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 		sp.setRetainSizeWhenHidden(true);
 		recCB->setSizePolicy(sp);
 		recCB->hide();
-		vbox->addWidget(recCB, 0, Qt::AlignHCenter);
+		layout->addWidget(recCB, 0, Qt::AlignHCenter);
 	} else {
 		recCB->setToolTip(tr("Set/unset recording source"));
-		vbox->addWidget(recCB, 0, Qt::AlignHCenter);
+		layout->addWidget(recCB, 0, Qt::AlignHCenter);
 		connect(recCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitRecSourceChanged(int)));
 	}
@@ -113,17 +121,21 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	lslider->setMinimum(0);
 	lslider->setMaximum(100);
 	lslider->setValue(lvol);
-
 	lslider->setTickPosition(QSlider::TicksLeft);
+	vboxl->addWidget(volabell);
+	vboxl->addWidget(lslider);
+
 	rslider->setMinimum(0);
 	rslider->setMaximum(100);
-
 	rslider->setTickPosition(QSlider::TicksRight);
-	setVol(lvol, rvol);
-	hbox->addWidget(lslider, 1, Qt::AlignHCenter);
-	hbox->addWidget(rslider, 1, Qt::AlignHCenter);
+	vboxr->addWidget(volabelr, 0, Qt::AlignHCenter);
+	vboxr->addWidget(rslider, 0, Qt::AlignHCenter);
 
-	vbox->addLayout(hbox, 0);
+	setVol(lvol, rvol);
+	hbox->addLayout(vboxl);
+	hbox->addLayout(vboxr);
+
+	layout->addLayout(hbox, 0);
 
 	muteCB = new QCheckBox;
 	if (!muteable) {
@@ -131,20 +143,47 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 		QSizePolicy sp;
 		sp.setRetainSizeWhenHidden(true);
 		muteCB->setSizePolicy(sp);
-		vbox->addWidget(muteCB, 0, Qt::AlignHCenter);
+		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 		muteCB->hide();
 	} else {
 		muteCB->setToolTip(tr("Mute"));
-		vbox->addWidget(muteCB, 0, Qt::AlignHCenter);
+		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 		connect(muteCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitMuteChanged(int)));
 	}
-	setLayout(vbox);
+	volabell->setText(QString("%1%").arg(lvol));
+	volabelr->setText(QString("%1%").arg(rvol));
+
+	setLayout(layout);
 
 	connect(lslider, SIGNAL(valueChanged(int)), this,
 	    SLOT(emitLVolumeChanged(int)));
 	connect(rslider, SIGNAL(valueChanged(int)), this,
 	    SLOT(emitRVolumeChanged(int)));
+}
+
+
+ChanSlider::ChanSlider(const QString &name, int id, int vol, QWidget *parent)
+	: QGroupBox(name, parent)
+{
+	mute	     = false;
+	this->id     = id;
+	this->vol    = vol;
+	this->lrview = false;
+	layout	     = new QVBoxLayout(parent);
+	volabel	     = new QLabel;
+
+	volabel->setText(QString("%1%").arg(vol));
+	slider = new QSlider(Qt::Vertical);
+	slider->setMinimum(0);
+	slider->setMaximum(100);
+	slider->setTickPosition(QSlider::TicksLeft);
+	setVol(vol);
+	layout->addWidget(volabel, 0, Qt::AlignHCenter);
+	layout->addWidget(slider, 1, Qt::AlignHCenter);
+	setLayout(layout);
+	connect(slider, SIGNAL(valueChanged(int)), this,
+	    SLOT(emitVolumeChanged(int)));
 }
 
 void
@@ -168,6 +207,7 @@ ChanSlider::emitLVolumeChanged(int vol)
 	}
 	this->lvol = vol;
 	sliderSetToolTip(this->lvol, this->rvol);
+	volabell->setText(QString("%1%").arg(this->lvol));
 	emit lVolumeChanged(this->id, vol);
 }
 
@@ -180,6 +220,7 @@ ChanSlider::emitRVolumeChanged(int vol)
 	}
 	this->rvol = vol;
 	sliderSetToolTip(this->lvol, this->rvol);
+	volabelr->setText(QString("%1%").arg(this->rvol));
 	emit rVolumeChanged(this->id, vol);
 }
 
@@ -213,6 +254,7 @@ ChanSlider::setVol(int vol)
 		return;
 	slider->setValue(vol);
 	sliderSetToolTip(vol);
+	volabel->setText(QString("%1%").arg(vol));
 }
 
 void
@@ -246,17 +288,17 @@ ChanSlider::setMute(bool state)
 void
 ChanSlider::sliderSetToolTip(int vol)
 {
-	QString str = QString("%1").arg(vol);
+	QString str = QString("%1%").arg(vol);
 	slider->setToolTip(str);
 }
 
 void
 ChanSlider::sliderSetToolTip(int lvol, int rvol)
 {
-	QString lstr = QString("%1").arg(lvol);
+	QString lstr = QString("%1%").arg(lvol);
 	lslider->setToolTip(lstr);
 
-	QString rstr = QString("%1").arg(rvol);
+	QString rstr = QString("%1%").arg(rvol);
 	rslider->setToolTip(rstr);
 }
 
