@@ -291,8 +291,11 @@ ChanSlider::setVol(int lvol, int rvol)
 void
 ChanSlider::setRecSrc(bool state)
 {
-	if (recCB)
+	if (recCB) {
+		recCB->blockSignals(true);
 		recCB->setCheckState(state ? Qt::Checked : Qt::Unchecked);
+		recCB->blockSignals(false);
+	}
 }
 
 void

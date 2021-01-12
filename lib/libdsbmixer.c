@@ -252,10 +252,11 @@ dsbmixer_setrec(dsbmixer_t *mixer, int chan, bool on)
 
 	if (mixer == NULL || mixer->removed)
 		return (-1);
+	mask = mixer->recsrc;
 	if (on)
-		mask = (1 << chan);
+		mask |= (1 << chan);
 	else
-		mask =~(1 << chan);
+		mask &=~(1 << chan);
 	return (set_recsrc(mixer, mask));
 }
 
