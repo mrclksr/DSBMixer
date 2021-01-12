@@ -108,6 +108,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	lslider		     = new QSlider(Qt::Vertical);
 	rslider		     = new QSlider(Qt::Vertical);
 	recCB		     = new QCheckBox;
+	muteCB		     = new QCheckBox;
 	QHBoxLayout *micHbox = new QHBoxLayout;
 	QLabel 	    *micPic  = new QLabel;
 	QWidget	    *recElem = new QWidget(this);
@@ -154,7 +155,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 
 	layout->addLayout(hbox, 0);
 
-	muteCB = new QCheckBox;
 	if (!muteable) {
 		/* Padding space */
 		QSizePolicy sp;
