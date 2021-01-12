@@ -36,27 +36,38 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	this->id     = id;
 	this->vol    = vol;
 	this->lrview = false;
-	layout	     = new QVBoxLayout(parent);
-	recCB	     = new QCheckBox;
-	volabel	     = new QLabel;
+	layout		     = new QVBoxLayout(parent);
+	recCB		     = new QCheckBox;
+	volabel		     = new QLabel;
+	recCB		     = new QCheckBox;
+	muteCB		     = new QCheckBox;
+	slider		     = new QSlider(Qt::Vertical);
+	QLabel	    *micPic  = new QLabel;
+	QWidget	    *recElem = new QWidget(this);
+	QHBoxLayout *micHbox = new QHBoxLayout;
+	QIcon       micIcon  = qh_loadIcon("audio-input-microphone-high", NULL);
+
+	micPic->setPixmap(micIcon.pixmap(16));
+	micHbox->addWidget(micPic);
+	micHbox->addWidget(recCB);
+	recElem->setLayout(micHbox);
 
 	if (!rec) {
 		/* Padding space */
 		QSizePolicy sp;
 		sp.setRetainSizeWhenHidden(true);
-		recCB->setSizePolicy(sp);
-		recCB->hide();
-		layout->addWidget(recCB, 0, Qt::AlignHCenter);
+		recElem->setSizePolicy(sp);
+		recElem->hide();
+		layout->addWidget(recElem, 0, Qt::AlignHCenter);
 	} else {
 		recCB->setToolTip(tr("Set/unset recording source"));
-		layout->addWidget(recCB, 0, Qt::AlignHCenter);
+		layout->addWidget(recElem, 0, Qt::AlignHCenter);
 		connect(recCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitRecSourceChanged(int)));
 	}
 	volabel->setText(QString("100%"));
 	layout->addWidget(volabel, 0, Qt::AlignHCenter);
 
-	slider = new QSlider(Qt::Vertical);
 	slider->setMinimum(0);
 	slider->setMaximum(100);
 	slider->setTickPosition(QSlider::TicksLeft);
@@ -64,7 +75,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 
 	layout->addWidget(slider, 0, Qt::AlignHCenter);
 
-	muteCB = new QCheckBox;
 	if (!muteable) {
 		/* Padding space */
 		QSizePolicy sp;
@@ -93,31 +103,38 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	this->id   = id;
 	this->lvol = lvol;
 	this->rvol = rvol;
-	volabell   = new QLabel;
-	volabelr   = new QLabel;
+	volabell	     = new QLabel;
+	volabelr	     = new QLabel;
+	lslider		     = new QSlider(Qt::Vertical);
+	rslider		     = new QSlider(Qt::Vertical);
+	recCB		     = new QCheckBox;
+	QHBoxLayout *micHbox = new QHBoxLayout;
+	QLabel 	    *micPic  = new QLabel;
+	QWidget	    *recElem = new QWidget(this);
+	QVBoxLayout *vboxl   = new QVBoxLayout(parent);
+	QVBoxLayout *vboxr   = new QVBoxLayout(parent);
+	QVBoxLayout *layout  = new QVBoxLayout(parent);
+	QHBoxLayout *hbox    = new QHBoxLayout(parent);
+	QIcon micIcon	     = qh_loadIcon("audio-input-microphone-high", NULL);
 
-	QVBoxLayout *vboxl  = new QVBoxLayout(parent);
-	QVBoxLayout *vboxr  = new QVBoxLayout(parent);
-	QVBoxLayout *layout = new QVBoxLayout(parent);
-	QHBoxLayout *hbox   = new QHBoxLayout(parent);
+	micPic->setPixmap(micIcon.pixmap(16));
+	micHbox->addWidget(micPic);
+	micHbox->addWidget(recCB);
+	recElem->setLayout(micHbox);
 
-	recCB = new QCheckBox;
 	if (!rec) {
 		/* Padding space */
 		QSizePolicy sp;
 		sp.setRetainSizeWhenHidden(true);
-		recCB->setSizePolicy(sp);
-		recCB->hide();
-		layout->addWidget(recCB, 0, Qt::AlignHCenter);
+		recElem->setSizePolicy(sp);
+		recElem->hide();
+		layout->addWidget(recElem, 0, Qt::AlignHCenter);
 	} else {
 		recCB->setToolTip(tr("Set/unset recording source"));
-		layout->addWidget(recCB, 0, Qt::AlignHCenter);
+		layout->addWidget(recElem, 0, Qt::AlignHCenter);
 		connect(recCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitRecSourceChanged(int)));
 	}
-	lslider = new QSlider(Qt::Vertical);
-	rslider = new QSlider(Qt::Vertical);
-
 	lslider->setMinimum(0);
 	lslider->setMaximum(100);
 	lslider->setValue(lvol);
