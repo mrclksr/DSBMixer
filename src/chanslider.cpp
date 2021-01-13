@@ -41,7 +41,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	recCB		     = new QCheckBox;
 	volabel		     = new QLabel;
 	recCB		     = new QCheckBox;
-	muteCB		     = new QCheckBox;
+	muteCB		     = new QCheckBox(tr("mute"));
 	slider		     = new QSlider(Qt::Vertical);
 	QLabel	    *micPic  = new QLabel;
 	QWidget	    *recElem = new QWidget(this);
@@ -89,7 +89,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 		muteCB->hide();
 	} else {
-		muteCB->setToolTip(tr("Mute"));
 		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 		connect(muteCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitMuteChanged(int)));
@@ -114,7 +113,7 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	lslider		     = new QSlider(Qt::Vertical);
 	rslider		     = new QSlider(Qt::Vertical);
 	recCB		     = new QCheckBox;
-	muteCB		     = new QCheckBox;
+	muteCB		     = new QCheckBox(tr("mute"));
 	QHBoxLayout *micHbox = new QHBoxLayout;
 	QLabel 	    *micPic  = new QLabel;
 	QWidget	    *recElem = new QWidget(this);
@@ -182,7 +181,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 		muteCB->hide();
 	} else {
-		muteCB->setToolTip(tr("Mute"));
 		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 		connect(muteCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitMuteChanged(int)));
