@@ -50,9 +50,6 @@ public slots:
 #endif
 	void updateMixers();
 	void trayClicked(QSystemTrayIcon::ActivationReason reason);
-	void closeEvent(QCloseEvent *event);
-	void moveEvent(QMoveEvent *event);
-	void resizeEvent(QResizeEvent *event);
 	void showConfigMenu();
 	void toggleWin();
 	void quit();
@@ -61,6 +58,11 @@ private slots:
 	void catchCurrentChanged();
 	void catchMasterVolChanged(int vol);
 	void scrGeomChanged(const QRect &);
+protected:
+	void keyPressEvent(QKeyEvent *event);
+	void closeEvent(QCloseEvent *event);
+	void moveEvent(QMoveEvent *event);
+	void resizeEvent(QResizeEvent *event);
 private:
 	int  mixerUnitToTabIndex(int unit);
 	void loadIcons();

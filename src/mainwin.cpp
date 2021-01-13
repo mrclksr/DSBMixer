@@ -286,6 +286,29 @@ MainWin::resizeEvent(QResizeEvent *event)
 }
 
 void
+MainWin::keyPressEvent(QKeyEvent *e)
+{
+	switch (e->text().toLocal8Bit().data()[0]) {
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+	case '8':
+	case '9':
+		int tabno = e->text().toInt();
+		if (e->modifiers() == Qt::AltModifier) {
+			if (tabno == 0)
+				tabno = tabs->count();
+			tabs->setCurrentIndex(tabno - 1);
+		}
+	}
+}
+
+void
 MainWin::showConfigMenu()
 {
 	Preferences prefs(*chanMask, dsbmixer_amplification(),
