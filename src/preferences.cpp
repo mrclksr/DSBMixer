@@ -370,6 +370,10 @@ Preferences::createAdvancedTab()
 void
 Preferences::keyPressEvent(QKeyEvent *e)
 {
+	if (e->key() == Qt::Key_Escape) {
+		rejectSlot();
+		return;
+	}
 	switch (e->text().toLocal8Bit().data()[0]) {
 	case '0':
 	case '1':
