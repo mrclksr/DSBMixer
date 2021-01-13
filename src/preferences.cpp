@@ -370,21 +370,20 @@ Preferences::createAdvancedTab()
 void
 Preferences::keyPressEvent(QKeyEvent *e)
 {
-	if (e->key() == Qt::Key_Escape) {
+	switch (e->key()) {
+	case Qt::Key_Escape:
 		rejectSlot();
-		return;
-	}
-	switch (e->text().toLocal8Bit().data()[0]) {
-	case '0':
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
+		break;
+	case Qt::Key_0:
+	case Qt::Key_1:
+	case Qt::Key_2:
+	case Qt::Key_3:
+	case Qt::Key_4:
+	case Qt::Key_5:
+	case Qt::Key_6:
+	case Qt::Key_7:
+	case Qt::Key_8:
+	case Qt::Key_9:
 		int tabno = e->text().toInt();
 		if (e->modifiers() == Qt::AltModifier) {
 			if (tabno == 0)
