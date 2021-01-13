@@ -172,7 +172,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	volabelr->setText(QString("%1%").arg(rvol));
 
 	setLayout(layout);
-
 	connect(lslider, SIGNAL(valueChanged(int)), this,
 	    SLOT(emitLVolumeChanged(int)));
 	connect(rslider, SIGNAL(valueChanged(int)), this,
@@ -207,11 +206,12 @@ void
 ChanSlider::emitVolumeChanged(int val)
 {
 	if (muteCB != 0 && mute) {
-		slider->setValue(vol);
+		slider->setValue(val);
 		return;
 	}
 	this->vol = val;
 	sliderSetToolTip(val);
+	volabel->setText(QString("%1%").arg(val));
 	emit VolumeChanged(this->id, val);
 }
 
