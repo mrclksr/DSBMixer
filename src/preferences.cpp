@@ -57,7 +57,7 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	QVBoxLayout *vbox = new QVBoxLayout();
 	QHBoxLayout *hbox = new QHBoxLayout();
 
-	QTabWidget *tabs = new QTabWidget(this);
+	tabs = new QTabWidget(this);
 
 	QIcon icon = qh_loadStockIcon(QStyle::SP_DialogOkButton);
 	QPushButton *apply = new QPushButton(icon, tr("&Ok"));
@@ -367,3 +367,25 @@ Preferences::createAdvancedTab()
 	return (widget);
 }
 
+void
+Preferences::keyPressEvent(QKeyEvent *e)
+{
+	switch (e->text().toLocal8Bit().data()[0]) {
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+	case '8':
+	case '9':
+		int tabno = e->text().toInt();
+		if (e->modifiers() == Qt::AltModifier) {
+			if (tabno == 0)
+				tabno = tabs->count();
+			tabs->setCurrentIndex(tabno - 1);
+		}
+	}
+}

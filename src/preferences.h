@@ -29,6 +29,7 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QList>
+#include <QTabWidget>
 #include <QDialog>
 #include <QProcess>
 #include <QLineEdit>
@@ -67,6 +68,8 @@ private:
 	QWidget	    *createViewTab();
 	QWidget	    *createDefaultDeviceTab();
 	QWidget	    *createAdvancedTab();
+protected:
+	void keyPressEvent(QKeyEvent *event);
 private:
 	bool	    testSoundPlaying;
 	QProcess    *soundPlayer;
@@ -80,6 +83,7 @@ private:
 	QCheckBox   *lrViewCb;
 	QCheckBox   *showTicksCb;
 	QCheckBox   *bypassMixerCb;
+	QTabWidget  *tabs;
 	QPushButton *testBt;
 	QList<QRadioButton *> defaultDeviceRb;
 };
