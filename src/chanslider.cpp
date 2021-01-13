@@ -26,6 +26,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QString>
+
 #include "qt-helper/qt-helper.h"
 
 ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
@@ -47,6 +48,12 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 	QHBoxLayout *micHbox = new QHBoxLayout;
 	QIcon       micIcon  = qh_loadIcon("audio-input-microphone-high", NULL);
 
+	volabel->setText(QString("100%"));
+	QSize sz = volabel->sizeHint();
+
+	volabel->setMinimumWidth(sz.width());
+	volabel->setMaximumWidth(sz.width());
+
 	micPic->setPixmap(micIcon.pixmap(16));
 	micHbox->addWidget(micPic);
 	micHbox->addWidget(recCB);
@@ -65,7 +72,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
 		connect(recCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitRecSourceChanged(int)));
 	}
-	volabel->setText(QString("100%"));
 	layout->addWidget(volabel, 0, Qt::AlignHCenter);
 
 	slider->setMinimum(0);
@@ -118,6 +124,19 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	QHBoxLayout *hbox    = new QHBoxLayout(parent);
 	QIcon micIcon	     = qh_loadIcon("audio-input-microphone-high", NULL);
 
+	volabell->setText(QString("100%"));
+	volabelr->setText(QString("100%"));
+
+	QSize sz = volabell->sizeHint();
+
+	volabell->setMinimumWidth(sz.width());
+	volabelr->setMinimumWidth(sz.width());
+	volabell->setMaximumWidth(sz.width());
+	volabelr->setMaximumWidth(sz.width());
+
+	volabell->setText(QString("%1%").arg(lvol));
+	volabelr->setText(QString("%1%").arg(rvol));
+
 	micPic->setPixmap(micIcon.pixmap(16));
 	micHbox->addWidget(micPic);
 	micHbox->addWidget(recCB);
@@ -168,8 +187,6 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 		connect(muteCB, SIGNAL(stateChanged(int)), this,
 		    SLOT(emitMuteChanged(int)));
 	}
-	volabell->setText(QString("%1%").arg(lvol));
-	volabelr->setText(QString("%1%").arg(rvol));
 
 	setLayout(layout);
 	connect(lslider, SIGNAL(valueChanged(int)), this,
@@ -188,6 +205,12 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, QWidget *parent)
 	this->lrview = false;
 	layout	     = new QVBoxLayout(parent);
 	volabel	     = new QLabel;
+
+	volabel->setText(QString("100%"));
+	QSize sz = volabel->sizeHint();
+
+	volabel->setMinimumWidth(sz.width());
+	volabel->setMaximumWidth(sz.width());
 
 	volabel->setText(QString("%1%").arg(vol));
 	slider = new QSlider(Qt::Vertical);
