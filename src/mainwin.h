@@ -56,7 +56,7 @@ public slots:
 private slots:
 	void checkForSysTray();
 	void catchCurrentChanged();
-	void catchMasterVolChanged(int vol);
+	void catchMasterVolChanged(int lvol, int rvol);
 	void scrGeomChanged(const QRect &);
 protected:
 	void keyPressEvent(QKeyEvent *event);

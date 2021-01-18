@@ -135,8 +135,8 @@ MainWin::createMixerList()
 		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
 		mixers.append(mixer);
 		mixer->setTicks(*showTicks);
-		connect(mixer, SIGNAL(masterVolChanged(int)), this,
-		    SLOT(catchMasterVolChanged(int)));
+		connect(mixer, SIGNAL(masterVolChanged(int, int)), this,
+		    SLOT(catchMasterVolChanged(int, int)));
 	}
 }
 
@@ -190,6 +190,8 @@ MainWin::redrawMixers()
 	createMixerList();
 	createTabs();
 	saveGeometry();
+	if (trayIcon != 0)
+		updateTrayIcon();
 }
 
 #ifndef WITHOUT_DEVD
@@ -450,7 +452,6 @@ MainWin::createTrayIcon()
 	menu->addAction(preferencesAction);
 	menu->addAction(quitAction);
 
-
 	trayIcon->setContextMenu(menu);
 	trayIcon->show();
 
@@ -472,7 +473,7 @@ MainWin::catchCurrentChanged()
 }
 
 void
-MainWin::catchMasterVolChanged(int vol)
+MainWin::catchMasterVolChanged(int lvol, int rvol)
 {
 	int	idx = tabs->currentIndex();
 	QString trayToolTip;
@@ -481,15 +482,19 @@ MainWin::catchMasterVolChanged(int vol)
 		return;
 	if (mixers.at(idx)->muted)
 		trayToolTip = QString(tr("Muted"));
-	else
-		trayToolTip = QString("Vol %1%").arg(vol);
+	else {
+		if (*lrView)
+			trayToolTip = QString("Vol %1:%2").arg(lvol).arg(rvol);
+		else
+			trayToolTip = QString("Vol %1%").arg((lvol + rvol) >> 1);
+	}
 	trayIcon->setToolTip(trayToolTip);
 
-	if (vol == 0) {
+	if (lvol + rvol == 0) {
 		trayIcon->setIcon(muteIcon);
 		return;
 	}
-	switch (vol * 3 / 100) {
+	switch (((lvol + rvol) >> 1) * 3 / 100) {
 	case 0:
 		trayIcon->setIcon(lVolIcon);
 		break;
@@ -504,25 +509,24 @@ MainWin::catchMasterVolChanged(int vol)
 void
 MainWin::updateTrayIcon()
 {
-	int	vol;
+	int	lvol, rvol, vol;
 	int	idx = tabs->currentIndex();
 	QIcon	icon;
 	QString trayToolTip;
 
 	if (idx == -1)
 		return;
+	trayIcon->setMixer(mixers.at(idx));
 	if (mixers.at(idx)->muted) {
-		vol = 0;
 		trayToolTip = QString(tr("Muted"));
 		trayIcon->setIcon(muteIcon);
 	} else {
-		dsbmixer_t *dev = mixers.at(idx)->getDev();
-
-		vol = dsbmixer_getvol(dev, DSBMIXER_MASTER);
-		vol = (DSBMIXER_CHAN_RIGHT(vol) + DSBMIXER_CHAN_LEFT(vol)) >> 1;
-
-		trayToolTip = QString("Vol %1%").arg(vol);
-
+		mixers.at(idx)->getMasterVol(&lvol, &rvol);
+		vol = (lvol + rvol) >> 1;
+		if (*lrView)
+			trayToolTip = QString("Vol %1:%2").arg(lvol).arg(rvol);
+		else
+			trayToolTip = QString("Vol %1%").arg(vol);
 		if (vol == 0)
 			icon = muteIcon;
 		else {

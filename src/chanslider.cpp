@@ -29,91 +29,38 @@
 
 #include "qt-helper/qt-helper.h"
 
-ChanSlider::ChanSlider(const QString &name, int id, int vol, bool rec,
-    bool muteable, QWidget *parent)
-	: QGroupBox(name, parent)
-{
-	mute	     = false;
-	this->id     = id;
-	this->vol    = vol;
-	this->lrview = false;
-	layout		     = new QVBoxLayout(parent);
-	recCB		     = new QCheckBox;
-	volabel		     = new QLabel;
-	recCB		     = new QCheckBox;
-	muteCB		     = new QCheckBox(tr("mute"));
-	slider		     = new QSlider(Qt::Vertical);
-	QLabel	    *micPic  = new QLabel;
-	QWidget	    *recElem = new QWidget(this);
-	QHBoxLayout *micHbox = new QHBoxLayout;
-	QIcon       micIcon  = qh_loadIcon("audio-input-microphone-high", NULL);
-
-	volabel->setText(QString("100%"));
-	QSize sz = volabel->sizeHint();
-
-	volabel->setMinimumWidth(sz.width());
-	volabel->setMaximumWidth(sz.width());
-
-	micPic->setPixmap(micIcon.pixmap(16));
-	micHbox->addWidget(micPic);
-	micHbox->addWidget(recCB);
-	recElem->setLayout(micHbox);
-
-	if (!rec) {
-		/* Padding space */
-		QSizePolicy sp;
-		sp.setRetainSizeWhenHidden(true);
-		recElem->setSizePolicy(sp);
-		recElem->hide();
-		layout->addWidget(recElem, 0, Qt::AlignHCenter);
-	} else {
-		recCB->setToolTip(tr("Set/unset recording source"));
-		layout->addWidget(recElem, 0, Qt::AlignHCenter);
-		connect(recCB, SIGNAL(stateChanged(int)), this,
-		    SLOT(emitRecSourceChanged(int)));
-	}
-	layout->addWidget(volabel, 0, Qt::AlignHCenter);
-
-	slider->setMinimum(0);
-	slider->setMaximum(100);
-	slider->setTickPosition(QSlider::TicksLeft);
-	setVol(vol);
-
-	layout->addWidget(slider, 0, Qt::AlignHCenter);
-
-	if (!muteable) {
-		/* Padding space */
-		QSizePolicy sp;
-		sp.setRetainSizeWhenHidden(true);
-		muteCB->setSizePolicy(sp);
-		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
-		muteCB->hide();
-	} else {
-		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
-		connect(muteCB, SIGNAL(stateChanged(int)), this,
-		    SLOT(emitMuteChanged(int)));
-	}
-	setLayout(layout);
-
-	connect(slider, SIGNAL(valueChanged(int)), this,
-	    SLOT(emitVolumeChanged(int)));
-}
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
+#define MAX(A, B) ((A) > (B) ? (A) : (B))
 
 ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
-    bool rec, bool muteable, QWidget *parent)
+    bool rec, bool muteable, bool lrview, bool tray, QWidget *parent)
 	: QGroupBox(name, parent)
 {
-	mute	   = false;
-	lrview	   = true;
-	this->id   = id;
-	this->lvol = lvol;
-	this->rvol = rvol;
+	this->tray	= tray;
+	this->lrview	= lrview;
+	this->mute	= false;
+	this->muteable	= muteable;
+	this->rec	= rec;
+	this->id	= id;
+	this->lvol	= lvol;
+	this->rvol	= rvol;
+	this->vol	= (lvol + rvol) >> 1;
+	if (lrview)
+		initLRView(parent);
+	else
+		initUView(parent);
+}
+
+void
+ChanSlider::initLRView(QWidget *parent)
+{
 	volabell	     = new QLabel;
 	volabelr	     = new QLabel;
 	lslider		     = new QSlider(Qt::Vertical);
 	rslider		     = new QSlider(Qt::Vertical);
 	recCB		     = new QCheckBox;
 	muteCB		     = new QCheckBox(tr("mute"));
+	lockCB		     = new QCheckBox("🔒");
 	QHBoxLayout *micHbox = new QHBoxLayout;
 	QLabel 	    *micPic  = new QLabel;
 	QWidget	    *recElem = new QWidget(this);
@@ -136,23 +83,25 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	volabell->setText(QString("%1%").arg(lvol));
 	volabelr->setText(QString("%1%").arg(rvol));
 
-	micPic->setPixmap(micIcon.pixmap(16));
-	micHbox->addWidget(micPic);
-	micHbox->addWidget(recCB);
-	recElem->setLayout(micHbox);
+	if (!tray) {
+		micPic->setPixmap(micIcon.pixmap(16));
+		micHbox->addWidget(micPic);
+		micHbox->addWidget(recCB);
+		recElem->setLayout(micHbox);
 
-	if (!rec) {
-		/* Padding space */
-		QSizePolicy sp;
-		sp.setRetainSizeWhenHidden(true);
-		recElem->setSizePolicy(sp);
-		recElem->hide();
-		layout->addWidget(recElem, 0, Qt::AlignHCenter);
-	} else {
-		recCB->setToolTip(tr("Set/unset recording source"));
-		layout->addWidget(recElem, 0, Qt::AlignHCenter);
-		connect(recCB, SIGNAL(stateChanged(int)), this,
-		    SLOT(emitRecSourceChanged(int)));
+		if (!rec) {
+			/* Padding space */
+			QSizePolicy sp;
+			sp.setRetainSizeWhenHidden(true);
+			recElem->setSizePolicy(sp);
+			recElem->hide();
+			layout->addWidget(recElem, 0, Qt::AlignHCenter);
+		} else {
+			recCB->setToolTip(tr("Set/unset recording source"));
+			layout->addWidget(recElem, 0, Qt::AlignHCenter);
+			connect(recCB, SIGNAL(stateChanged(int)), this,
+				SLOT(emitRecSourceChanged(int)));
+		}
 	}
 	lslider->setMinimum(0);
 	lslider->setMaximum(100);
@@ -166,43 +115,48 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 	rslider->setTickPosition(QSlider::TicksRight);
 	vboxr->addWidget(volabelr, 0, Qt::AlignHCenter);
 	vboxr->addWidget(rslider, 0, Qt::AlignHCenter);
-
 	setVol(lvol, rvol);
 	hbox->addLayout(vboxl);
 	hbox->addLayout(vboxr);
 
 	layout->addLayout(hbox, 0);
-
-	if (!muteable) {
-		/* Padding space */
-		QSizePolicy sp;
-		sp.setRetainSizeWhenHidden(true);
-		muteCB->setSizePolicy(sp);
-		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
-		muteCB->hide();
-	} else {
-		layout->addWidget(muteCB, 0, Qt::AlignHCenter);
-		connect(muteCB, SIGNAL(stateChanged(int)), this,
-		    SLOT(emitMuteChanged(int)));
+	if (!tray) {
+		layout->addWidget(lockCB, 0, Qt::AlignCenter);
+		if (!muteable) {
+			/* Padding space */
+			QSizePolicy sp;
+			sp.setRetainSizeWhenHidden(true);
+			muteCB->setSizePolicy(sp);
+			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
+			muteCB->hide();
+		} else {
+			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
+			connect(muteCB, SIGNAL(stateChanged(int)), this,
+			    SLOT(emitMuteChanged(int)));
+		}
 	}
-
 	setLayout(layout);
 	connect(lslider, SIGNAL(valueChanged(int)), this,
 	    SLOT(emitLVolumeChanged(int)));
 	connect(rslider, SIGNAL(valueChanged(int)), this,
 	    SLOT(emitRVolumeChanged(int)));
+	connect(lockCB, SIGNAL(stateChanged(int)), this,
+	    SLOT(emitLockChanged(int)));
 }
 
-
-ChanSlider::ChanSlider(const QString &name, int id, int vol, QWidget *parent)
-	: QGroupBox(name, parent)
+void
+ChanSlider::initUView(QWidget *parent)
 {
-	mute	     = false;
-	this->id     = id;
-	this->vol    = vol;
-	this->lrview = false;
-	layout	     = new QVBoxLayout(parent);
-	volabel	     = new QLabel;
+	layout		     = new QVBoxLayout(parent);
+	recCB		     = new QCheckBox;
+	volabel		     = new QLabel;
+	recCB		     = new QCheckBox;
+	muteCB		     = new QCheckBox(tr("mute"));
+	slider		     = new QSlider(Qt::Vertical);
+	QLabel	    *micPic  = new QLabel;
+	QWidget	    *recElem = new QWidget(this);
+	QHBoxLayout *micHbox = new QHBoxLayout;
+	QIcon       micIcon  = qh_loadIcon("audio-input-microphone-high", NULL);
 
 	volabel->setText(QString("100%"));
 	QSize sz = volabel->sizeHint();
@@ -210,15 +164,50 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, QWidget *parent)
 	volabel->setMinimumWidth(sz.width());
 	volabel->setMaximumWidth(sz.width());
 
-	volabel->setText(QString("%1%").arg(vol));
-	slider = new QSlider(Qt::Vertical);
+	if (!tray) {
+		micPic->setPixmap(micIcon.pixmap(16));
+		micHbox->addWidget(micPic);
+		micHbox->addWidget(recCB);
+		recElem->setLayout(micHbox);
+
+		if (!rec) {
+			/* Padding space */
+			QSizePolicy sp;
+			sp.setRetainSizeWhenHidden(true);
+			recElem->setSizePolicy(sp);
+			recElem->hide();
+			layout->addWidget(recElem, 0, Qt::AlignHCenter);
+		} else {
+			recCB->setToolTip(tr("Set/unset recording source"));
+			layout->addWidget(recElem, 0, Qt::AlignHCenter);
+			connect(recCB, SIGNAL(stateChanged(int)), this,
+			    SLOT(emitRecSourceChanged(int)));
+		}
+	}
+	layout->addWidget(volabel, 0, Qt::AlignHCenter);
+
 	slider->setMinimum(0);
 	slider->setMaximum(100);
 	slider->setTickPosition(QSlider::TicksLeft);
-	setVol(vol);
-	layout->addWidget(volabel, 0, Qt::AlignHCenter);
-	layout->addWidget(slider, 1, Qt::AlignHCenter);
+	setVol(lvol, rvol);
+
+	layout->addWidget(slider, 0, Qt::AlignHCenter);
+	if (!tray) {
+		if (!muteable) {
+			/* Padding space */
+			QSizePolicy sp;
+			sp.setRetainSizeWhenHidden(true);
+			muteCB->setSizePolicy(sp);
+			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
+			muteCB->hide();
+		} else {
+			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
+			connect(muteCB, SIGNAL(stateChanged(int)), this,
+			    SLOT(emitMuteChanged(int)));
+		}
+	}
 	setLayout(layout);
+
 	connect(slider, SIGNAL(valueChanged(int)), this,
 	    SLOT(emitVolumeChanged(int)));
 }
@@ -226,40 +215,47 @@ ChanSlider::ChanSlider(const QString &name, int id, int vol, QWidget *parent)
 void
 ChanSlider::emitVolumeChanged(int val)
 {
+
 	if (muteCB != 0 && mute) {
 		slider->setValue(val);
 		return;
 	}
-	this->vol = val;
-	sliderSetToolTip(val);
-	volabel->setText(QString("%1%").arg(val));
-	emit VolumeChanged(this->id, val);
+	addVol(val - vol);
+	emit volumeChanged(this->id, lvol, rvol);
 }
 
 void
-ChanSlider::emitLVolumeChanged(int vol)
+ChanSlider::emitLVolumeChanged(int val)
 {
+
 	if (muteCB != 0 && mute) {
 		lslider->setValue(lvol);
 		return;
 	}
-	this->lvol = vol;
-	sliderSetToolTip(this->lvol, this->rvol);
-	volabell->setText(QString("%1%").arg(this->lvol));
-	emit lVolumeChanged(this->id, vol);
+	if (lrlocked) {
+		addVol(val - lvol);
+		emit volumeChanged(this->id, lvol, rvol);
+	} else {
+		lvol = val;
+		emit lVolumeChanged(this->id, lvol);
+	}
 }
 
 void
-ChanSlider::emitRVolumeChanged(int vol)
+ChanSlider::emitRVolumeChanged(int val)
 {
+
 	if (muteCB != 0 && mute) {
 		rslider->setValue(rvol);
 		return;
 	}
-	this->rvol = vol;
-	sliderSetToolTip(this->lvol, this->rvol);
-	volabelr->setText(QString("%1%").arg(this->rvol));
-	emit rVolumeChanged(this->id, vol);
+	if (lrlocked) {
+		addVol(val - rvol);
+		emit volumeChanged(this->id, lvol, rvol);
+	} else {
+		rvol = val;
+		emit rVolumeChanged(this->id, rvol);
+	}
 }
 
 void
@@ -284,15 +280,13 @@ ChanSlider::emitMuteChanged(int state)
 }
 
 void
-ChanSlider::setVol(int vol)
+ChanSlider::emitLockChanged(int state)
 {
-	if (mute)
-		return;
-	if (vol > 100 || vol < 0)
-		return;
-	slider->setValue(vol);
-	sliderSetToolTip(vol);
-	volabel->setText(QString("%1%").arg(vol));
+	if (state == Qt::Unchecked)
+		lrlocked = false;
+	else
+		lrlocked = true;
+	emit lockChanged(state);
 }
 
 void
@@ -304,9 +298,24 @@ ChanSlider::setVol(int lvol, int rvol)
 		return;
 	if (rvol > 100 || rvol < 0)
 		return;
-	lslider->setValue(lvol);
-	rslider->setValue(rvol);
-	sliderSetToolTip(lvol, rvol);
+	if (lrview) {
+		lslider->blockSignals(true);
+		rslider->blockSignals(true);
+		lslider->setValue(lvol);
+		rslider->setValue(rvol);
+		sliderSetToolTip(lvol, rvol);
+		volabell->setText(QString("%1%").arg(lvol));
+		volabelr->setText(QString("%1%").arg(rvol));
+		lslider->blockSignals(false);
+		rslider->blockSignals(false);
+	} else {
+		vol = (lvol + rvol) >> 1;
+		slider->blockSignals(true);
+		slider->setValue(vol);
+		sliderSetToolTip(lvol, rvol);
+		slider->blockSignals(false);
+		volabel->setText(QString("%1%").arg(vol));
+	}
 }
 
 void
@@ -327,19 +336,17 @@ ChanSlider::setMute(bool state)
 }
 
 void
-ChanSlider::sliderSetToolTip(int vol)
-{
-	QString str = QString("%1%").arg(vol);
-	slider->setToolTip(str);
-}
-
-void
 ChanSlider::sliderSetToolTip(int lvol, int rvol)
 {
+	if (!lrview) {
+		QString str = QString("%1%").arg(vol);
+		slider->setToolTip(str);
+		return;
+	}
 	QString lstr = QString("%1%").arg(lvol);
-	lslider->setToolTip(lstr);
-
 	QString rstr = QString("%1%").arg(rvol);
+
+	lslider->setToolTip(lstr);
 	rslider->setToolTip(rstr);
 }
 
@@ -356,3 +363,36 @@ ChanSlider::setTicks(bool on)
 	slider->setTickPosition(on ? QSlider::TicksLeft : QSlider::NoTicks);
 }
 
+void
+ChanSlider::addVol(int volinc)
+{
+	int minvol, maxvol;
+
+	if (lrlocked) {
+		if (volinc < 0) {
+			minvol = MIN(rvol, lvol);
+			if (minvol + volinc < 0)
+				volinc = -minvol;
+		} else {
+			maxvol = MAX(rvol, lvol);
+			if (maxvol + volinc > 100)
+				volinc = 100 - maxvol;
+		}
+		rvol += volinc;
+		lvol += volinc;
+	} else {
+		if (rvol + volinc < 0)
+			rvol = 0;
+		else if (rvol + volinc > 100)
+			rvol = 100;
+		else
+			rvol += volinc;
+		if (lvol + volinc < 0)
+			lvol = 0;
+		else if (lvol + volinc > 100)
+			lvol = 100;
+		else
+			lvol += volinc;
+	}
+	vol = (lvol + rvol) >> 1;
+}

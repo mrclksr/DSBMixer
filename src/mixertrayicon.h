@@ -28,7 +28,7 @@
 #include <QWheelEvent>
 #include <QWidget>
 #include <QTimer>
-#include <QDebug>
+
 #include "mixer.h"
 #include "chanslider.h"
 
@@ -43,28 +43,29 @@ public:
 
 	bool event(QEvent* ev)
 	{
-		if (ev->type() == QEvent::Wheel) {
-			QWheelEvent *we = static_cast<QWheelEvent *>(ev);
-			if (mixer == 0)
-				return (true);
-			int vol = mixer->getMasterVol();
-			if (we->angleDelta().y() < 0) {
-				if ((vol -= 3) < 0)
-					vol = 0;
-			} else if ((vol += 3) > 100)
-				vol = 100;
-			showSlider(vol);
-			if (mixer->muted)
-				return (true);
-			mixer->setVol(DSBMIXER_MASTER, vol);
+		int volinc, lvol, rvol;
+
+		if (ev->type() != QEvent::Wheel)
+			return (QSystemTrayIcon::event(ev));
+		if (mixer == 0)
 			return (true);
-		}
-		return (QSystemTrayIcon::event(ev));
+		if (mixer->muted)
+			return (true);
+		QWheelEvent *we = static_cast<QWheelEvent *>(ev);
+		if (we->angleDelta().y() < 0)
+			volinc = - 3;
+		else
+			volinc = 3;
+		mixer->changeMasterVol(volinc);
+		mixer->getMasterVol(&lvol, &rvol);
+		showSlider(lvol, rvol);
+
+		return (true);
 	}
 
 private slots:
-	void initSlider(int vol);
-	void showSlider(int vol);
+	void initSlider(int lvol, int rvol);
+	void showSlider(int lvol, int rvol);
 	void hideSlider(void);
 
 private:

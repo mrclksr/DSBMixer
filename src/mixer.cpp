@@ -23,6 +23,7 @@
  */
 
 #include <QWidget>
+
 #include "mixer.h"
 
 Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
@@ -49,24 +50,17 @@ Mixer::Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent)
 			continue;
 		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
-		int uvol = (lvol + rvol) >> 1;
 		const char *name = dsbmixer_getchaname(mixer, chan);
-
-		if (lrview) {
-			cs = new ChanSlider(QString(name), chan, lvol, rvol,
-			    dsbmixer_canrec(mixer, chan),
-			    chan == DSBMIXER_MASTER ? true : false);
-			connect(cs, SIGNAL(lVolumeChanged(int, int)), this,
-			    SLOT(setLVol(int, int)));
-			connect(cs, SIGNAL(rVolumeChanged(int, int)), this,
-			    SLOT(setRVol(int, int)));
-		} else {
-			cs = new ChanSlider(QString(name), chan, uvol,
-			    dsbmixer_canrec(mixer, chan),
-			    chan == DSBMIXER_MASTER ? true : false);
-			connect(cs, SIGNAL(VolumeChanged(int, int)), this,
-			    SLOT(setVol(int, int)));
-		}
+		cs = new ChanSlider(QString(name), chan, lvol, rvol,
+				    dsbmixer_canrec(mixer, chan),
+				    chan == DSBMIXER_MASTER ? true : false,
+				    lrview, false);
+		connect(cs, SIGNAL(lVolumeChanged(int, int)), this,
+		    SLOT(setLVol(int, int)));
+		connect(cs, SIGNAL(rVolumeChanged(int, int)), this,
+		    SLOT(setRVol(int, int)));
+		connect(cs, SIGNAL(volumeChanged(int, int, int)), this,
+		    SLOT(setVol(int, int, int)));
 		connect(cs, SIGNAL(recSourceChanged(int, int)), this,
 		    SLOT(setRecSrc(int, int)));
 		if (chan == DSBMIXER_MASTER) {
@@ -100,51 +94,46 @@ Mixer::find_idx(int chan)
 	return (-1);
 }
 
-
-void
-Mixer::setVol(int chan, int vol)
-{
-	dsbmixer_setvol(this->mixer, chan, DSBMIXER_CHAN_CONCAT(vol, vol));
-	if (chan == DSBMIXER_MASTER) {
-		int idx = find_idx(chan);
-		if (idx < 0)
-			return;
-		if (lrview)
-			channel.at(idx)->setVol(vol, vol);
-		else
-			channel.at(idx)->setVol(vol);
-		emit masterVolChanged(vol);
-	}
-}
-
 void
 Mixer::setLVol(int chan, int lvol)
 {
+	int rvol, idx = find_idx(chan);
+	if (idx < 0)
+		return;
 	dsbmixer_setlvol(this->mixer, chan, lvol);
-	if (chan == DSBMIXER_MASTER) {
-		int idx = find_idx(chan);
-		if (idx < 0)
-			return;
-		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
-		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
-		channel.at(idx)->setVol(lvol, rvol);
-		emit masterVolChanged((lvol + rvol) >> 1);
-	}
+	lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
+	rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
+	channel.at(idx)->setVol(lvol, rvol);
+	if (chan == DSBMIXER_MASTER)
+		emit masterVolChanged(lvol, rvol);
 }
 
 void
 Mixer::setRVol(int chan, int rvol)
 {
+	int lvol, idx = find_idx(chan);
+	if (idx < 0)
+		return;
 	dsbmixer_setrvol(this->mixer, chan, rvol);
-	if (chan == DSBMIXER_MASTER) {
-		int idx = find_idx(chan);
-		if (idx < 0)
-			return;
-		int lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
-		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
-		channel.at(chan)->setVol(lvol, rvol);
-		emit masterVolChanged((lvol + rvol) >> 1);
-	}
+	rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
+	lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
+	channel.at(idx)->setVol(lvol, rvol);
+	if (chan == DSBMIXER_MASTER)
+		emit masterVolChanged(lvol, rvol);
+}
+
+void
+Mixer::setVol(int chan, int lvol, int rvol)
+{
+	int idx = find_idx(chan);
+	if (idx < 0)
+		return;
+	dsbmixer_setvol(this->mixer, chan, DSBMIXER_CHAN_CONCAT(lvol, rvol));
+	lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
+	rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
+	channel.at(idx)->setVol(lvol, rvol);
+	if (chan == DSBMIXER_MASTER)
+		emit masterVolChanged(lvol, rvol);
 }
 
 void
@@ -177,27 +166,25 @@ Mixer::update()
 		if (chan == DSBMIXER_MASTER) {
 			if (uvol > 0) {
 				channel.at(i)->setMute(false);
-				emit masterVolChanged(uvol);
+				emit masterVolChanged(lvol, rvol);
 			} else if (muted) {
 				channel.at(i)->setMute(true);
-				emit masterVolChanged(0);
+				emit masterVolChanged(0, 0);
 			}
 		}
-		if (lrview)
-			channel.at(i)->setVol(lvol, rvol);
-		else
-			channel.at(i)->setVol(uvol);
+		channel.at(i)->setVol(lvol, rvol);
 		if (dsbmixer_canrec(mixer, chan))
 			channel.at(i)->setRecSrc(dsbmixer_getrec(mixer, chan));
 	}
 }
 
-int
-Mixer::getMasterVol()
+void
+Mixer::getMasterVol(int *lvol, int *rvol)
 {
 	int vol = dsbmixer_getvol(mixer, DSBMIXER_MASTER);
 
-	return ((DSBMIXER_CHAN_RIGHT(vol) + DSBMIXER_CHAN_LEFT(vol)) >> 1);
+	*lvol = DSBMIXER_CHAN_LEFT(vol);
+	*rvol = DSBMIXER_CHAN_RIGHT(vol);
 }
 
 void
@@ -207,3 +194,20 @@ Mixer::setTicks(bool on)
 		channel.at(i)->setTicks(on);
 }
 
+void
+Mixer::changeMasterVol(int volinc)
+{
+	int chan = DSBMIXER_MASTER;
+	int idx = find_idx(chan);
+	if (idx < 0)
+		return;
+	channel.at(idx)->addVol(volinc);
+	int lvol = channel.at(idx)->lvol;
+	int rvol = channel.at(idx)->rvol;
+	dsbmixer_setlvol(this->mixer, chan, lvol);
+	dsbmixer_setrvol(this->mixer, chan, rvol);
+	lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
+	rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
+	channel.at(idx)->setVol(lvol, rvol);
+	emit masterVolChanged(lvol, rvol);
+}

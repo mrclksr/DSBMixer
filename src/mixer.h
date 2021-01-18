@@ -27,6 +27,7 @@
 
 #include <QWidget>
 #include <QList>
+
 #include "chanslider.h"
 #include "libdsbmixer.h"
 
@@ -37,26 +38,26 @@ public:
 	Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent = 0);
 	dsbmixer_t *getDev() const;
 signals:
-	void masterVolChanged(int vol);
+	void masterVolChanged(int lvol, int rvol);
 public slots:
-	void setVol(int chan, int vol);
 	void setLVol(int chan, int lvol);
 	void setRVol(int chan, int rvol);
+	void setVol(int chan, int lvol, int rvol);
 	void setRecSrc(int chan, int state);
 	void setMute(int state);
+	void changeMasterVol(int volinc);
 	void setTicks(bool on);
 	void update();
 public:
-	int getMasterVol();
-	bool muted;
+	void getMasterVol(int *lvol, int *rvol);
 public:
+	bool muted;
+	bool lrview;
 	QString cardname;
 private:
 	int find_idx(int chan);
 
-	bool lrview;
 	dsbmixer_t *mixer;
 	QList<ChanSlider *> channel;
 };
 #endif // MIXER_H
-

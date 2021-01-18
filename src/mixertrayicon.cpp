@@ -37,18 +37,22 @@ void
 MixerTrayIcon::setMixer(Mixer *mixer)
 {
 	this->mixer = mixer;
+	if (slider != 0) {
+		delete slider;
+		slider = 0;
+	}
 }
 
 void
-MixerTrayIcon::showSlider(int vol)
+MixerTrayIcon::showSlider(int lvol, int rvol)
 {
 	int   sx, sy;
 	QRect rect = geometry();
 
 	if (slider == 0)
-		initSlider(vol);
+		initSlider(lvol, rvol);
 	QSize scrsize = slider->screen()->availableSize();
-	slider->setVol(vol);
+	slider->setVol(lvol, rvol);
 	slider_timer->start(1000);
 	if (!slider->isVisible()) {
 		sx = rect.x() - slider->width() / 2 + rect.width() / 2;
@@ -62,9 +66,10 @@ MixerTrayIcon::showSlider(int vol)
 }
 
 void
-MixerTrayIcon::initSlider(int vol)
+MixerTrayIcon::initSlider(int lvol, int rvol)
 {
-	slider = new ChanSlider(QString("Vol"), DSBMIXER_MASTER, vol);
+	slider = new ChanSlider("Vol", DSBMIXER_MASTER, lvol, rvol, false,
+	    false, mixer->lrview, true);
 	slider->setWindowFlags(Qt::ToolTip);
 	slider_timer = new QTimer(this);
 	connect(slider_timer, SIGNAL(timeout()), this, SLOT(hideSlider()));
