@@ -4,43 +4,47 @@
 <context>
     <name>ChanSlider</name>
     <message>
-        <location filename="../src/chanslider.cpp" line="50"/>
-        <location filename="../src/chanslider.cpp" line="105"/>
+        <location filename="../src/chanslider.cpp" line="62"/>
+        <location filename="../src/chanslider.cpp" line="154"/>
+        <source>mute</source>
+        <translation>stumm</translation>
+    </message>
+    <message>
+        <location filename="../src/chanslider.cpp" line="100"/>
+        <location filename="../src/chanslider.cpp" line="181"/>
         <source>Set/unset recording source</source>
         <translation>Aufnahmequelle aktivieren/deaktieren</translation>
     </message>
     <message>
-        <location filename="../src/chanslider.cpp" line="72"/>
-        <location filename="../src/chanslider.cpp" line="137"/>
         <source>Mute</source>
-        <translation>Stumm</translation>
+        <translation type="vanished">Stumm</translation>
     </message>
 </context>
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="374"/>
+        <location filename="../src/mainwin.cpp" line="403"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="375"/>
+        <location filename="../src/mainwin.cpp" line="404"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="376"/>
+        <location filename="../src/mainwin.cpp" line="405"/>
         <source>Show/hide window</source>
         <translation>Zeige/verstecke Fenster</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="387"/>
+        <location filename="../src/mainwin.cpp" line="416"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="456"/>
-        <location filename="../src/mainwin.cpp" line="489"/>
+        <location filename="../src/mainwin.cpp" line="484"/>
+        <location filename="../src/mainwin.cpp" line="521"/>
         <source>Muted</source>
         <translation>Stumm</translation>
     </message>
