@@ -34,11 +34,12 @@
 
 #include "preferences.h"
 #include "qt-helper/qt-helper.h"
+#include "iconthemeselector.h"
 
 Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	int defaultUnit, int maxAutoVchans, int latency, bool bypassMixer,
 	bool lrView, bool showTicks, int pollIval, const char *playCmd,
-	QWidget *parent) : QDialog(parent) {
+	const char *trayTheme, QWidget *parent) : QDialog(parent) {
 
 	this->chanMask = chanMask;
 	this->amplify = amplify;
@@ -51,6 +52,7 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	this->showTicks = showTicks;
 	this->pollIval = pollIval;
 	this->playCmd = QString(playCmd);
+	this->themeName = QString(trayTheme);
 
 	qApp->setQuitOnLastWindowClosed(false);
 
@@ -112,6 +114,7 @@ Preferences::acceptSlot()
 	pollIval = pollIvalSb->value();
 	if (testSoundPlaying)
 		stopSound();
+	themeName = themeEdit->text();
 	this->accept();
 }
 
@@ -123,14 +126,29 @@ Preferences::rejectSlot()
 	this->reject();
 }
 
+void
+Preferences::selectTheme()
+{
+	IconThemeSelector selector(this);
+	QString name = selector.getTheme();
+	if (name != "") {
+		themeEdit->setText(name);
+		themeName = name;
+	}
+}
+
 QWidget *
 Preferences::createViewTab()
 {
-	QWidget	    *widget = new QWidget(this);
-	const char  **names = dsbmixer_getchanames();
-	QVBoxLayout *vbox = new QVBoxLayout();
-	QGridLayout *grid = new QGridLayout();
-	
+	QWidget	    *widget	= new QWidget(this);
+	const char  **names	= dsbmixer_getchanames();
+	QVBoxLayout *vbox	= new QVBoxLayout();
+	QGridLayout *grid	= new QGridLayout();
+	themeEdit		= new QLineEdit(themeName);
+	QLabel	    *themeLabel	= new QLabel(tr("Tray icon theme:"));
+	QHBoxLayout *hbox	= new QHBoxLayout;
+	QPushButton *openButton = new QPushButton(tr("Select theme"));
+
 	for (int i = 0; i < DSBMIXER_MAX_CHANNELS; i++) {
 		viewTabCb[i] = new QCheckBox(QString(names[i]), this);
 		if (chanMask & (1 << i))
@@ -158,9 +176,13 @@ Preferences::createViewTab()
 
 	vbox->addWidget(lrViewCb);
 	vbox->addWidget(showTicksCb);
-
+	hbox->addWidget(themeLabel);
+	hbox->addWidget(themeEdit);
+	hbox->addWidget(openButton);
+	vbox->addLayout(hbox);
 	widget->setLayout(vbox);
-
+	connect(openButton, &QPushButton::clicked, this,
+	    &Preferences::selectTheme);
 	return (widget);
 }
 

@@ -61,6 +61,42 @@ qh_loadIcon(const char *name, ...)
 	return (QIcon());
 }
 
+/*
+ * Return a QIcon from the given theme that doesn't change when the
+ * current icon theme changes.
+ */
+QIcon
+qh_loadStaticIconFromTheme(const char *theme, const char *name, ...)
+{
+	va_list	   ap;
+	QIcon	   sIcon;
+	QString	   curTheme = QIcon::themeName();
+	const char *s;
+
+	if (theme != NULL)
+		QIcon::setThemeName(theme);
+	va_start(ap, name);
+	for (s = name; s != NULL || (s = va_arg(ap, char *)); s = NULL) {
+		if (!QIcon::hasThemeIcon(s))
+			continue;
+		QIcon icon = QIcon::fromTheme(s);
+		if (icon.isNull())
+			continue;
+		if (icon.name().isEmpty() || icon.name().length() < 1)
+			continue;
+		QList<QSize> sizes = icon.availableSizes();
+		for (int i = 0; i < sizes.size(); i++) {
+			QPixmap pix = icon.pixmap(sizes.at(i));
+			sIcon.addPixmap(pix);
+		}
+		QIcon::setThemeName(curTheme);
+		return (sIcon);
+	}
+	QIcon::setThemeName(curTheme);
+
+	return (QIcon());
+}
+
 static void
 msgwin(const char *title, const char *msg, Icon _icon, QWidget *parent)
 {

@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <QRect>
 #include <QScreen>
+#include <QDebug>
 
 #include "mainwin.h"
 #include "thread.h"
@@ -56,6 +57,8 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	chanMask  = &dsbcfg_getval(cfg, CFG_MASK).integer;
 	pollIval  = &dsbcfg_getval(cfg, CFG_POLL_IVAL).integer;
 	playCmd   = &dsbcfg_getval(cfg, CFG_PLAY_CMD).string;
+	trayTheme = &dsbcfg_getval(cfg, CFG_TRAY_THEME).string;
+
 	trayAvailable = false;
 
 	loadIcons();
@@ -81,7 +84,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 
 	createMenuActions();
 	createMainMenu();
-	setWindowIcon(hVolIcon);
+	setWindowIcon(winIcon);
 	setWindowTitle("DSBMixer");
 	resize(*wWidth, *hHeight);	
 	move(*posX, *posY);
@@ -102,17 +105,22 @@ MainWin::scrGeomChanged(const QRect &g)
 void
 MainWin::loadIcons()
 {
-	muteIcon  = qh_loadIcon("audio-volume-muted-panel",
+	muteIcon  = qh_loadStaticIconFromTheme(*trayTheme,
+				"audio-volume-muted-panel",
 				"audio-volume-muted", NULL);
-	lVolIcon  = qh_loadIcon("audio-volume-low-panel",
+	lVolIcon  = qh_loadStaticIconFromTheme(*trayTheme,
+				"audio-volume-low-panel",
 				"audio-volume-low", NULL);
-	mVolIcon  = qh_loadIcon("audio-volume-medium-panel",
+	mVolIcon  = qh_loadStaticIconFromTheme(*trayTheme,
+				"audio-volume-medium-panel",
 				"audio-volume-medium", NULL);
-	hVolIcon  = qh_loadIcon("audio-volume-high-panel",
+	hVolIcon  = qh_loadStaticIconFromTheme(*trayTheme,
+				"audio-volume-high-panel",
 				"audio-volume-high", NULL);
 	quitIcon  = qh_loadIcon("application-exit", NULL); 
 	prefsIcon = qh_loadIcon("preferences-desktop-multimedia", NULL);
-
+	winIcon   = qh_loadIcon("audio-volume-high", NULL);
+	
 	if (quitIcon.isNull())
 		quitIcon = qh_loadStockIcon(QStyle::SP_DialogCloseButton);
 	if (prefsIcon.isNull())
@@ -125,6 +133,8 @@ MainWin::loadIcons()
 		mVolIcon = QIcon(":/icons/audio-volume-medium.png");
 	if (hVolIcon.isNull())
 		hVolIcon = QIcon(":/icons/audio-volume-high.png");
+	if (winIcon.isNull())
+		winIcon = QIcon(":/icons/audio-volume-high.png");
 }
 
 void
@@ -317,7 +327,8 @@ MainWin::showConfigMenu()
 			   dsbmixer_feeder_rate_quality(),
 			   dsbmixer_default_unit(), dsbmixer_maxautovchans(),
 			   dsbmixer_latency(), dsbmixer_bypass_mixer(),
-			   *lrView, *showTicks, *pollIval, *playCmd, this);
+			   *lrView, *showTicks, *pollIval, *playCmd,
+			   *trayTheme, this);
 
 	/* No need to poll the mixers while the config menu is showing */
 	timer->stop();
@@ -342,7 +353,6 @@ MainWin::showConfigMenu()
 	}
 	QTextCodec *codec = QTextCodec::codecForLocale();
 	QByteArray encstr = codec->fromUnicode(prefs.playCmd);
-
 	if (encstr.data() == NULL || strcmp(encstr.data(), *playCmd) != 0) {
 		free(*playCmd);
 		if (encstr.data() == NULL)
@@ -351,6 +361,19 @@ MainWin::showConfigMenu()
 			*playCmd = strdup(encstr.data());
 		if (*playCmd == NULL)
 			qh_err(this, EXIT_FAILURE, "strdup()");
+	}
+	encstr = codec->fromUnicode(prefs.themeName);
+	if (((encstr.data() != NULL && *trayTheme != NULL) &&
+	    strcmp(encstr.data(), *trayTheme) != 0) ||
+	    (encstr.data() == NULL || *trayTheme == NULL)) {
+		free(*trayTheme);
+		if (encstr.data() != NULL)
+			*trayTheme = strdup(encstr.data());
+		else
+			*trayTheme = NULL;
+		loadIcons();
+		if (trayIcon != 0)
+			updateTrayIcon();
 	}
 	dsbcfg_write(PROGRAM, "config", cfg);
 

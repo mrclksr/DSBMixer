@@ -43,7 +43,7 @@ public:
 	Preferences(int chanMask, int amplify, int feederRateQuality,
 		int defaultUnit, int maxAutoVchans, int latency,
 		bool bypassMixer, bool lrView, bool showTicks, int pollIval,
-		const char *playCmd, QWidget *parent = 0);
+		const char *playCmd, const char *trayTheme, QWidget *parent = 0);
 public slots:
 	void acceptSlot();
 	void rejectSlot();
@@ -52,6 +52,8 @@ public slots:
 	void stopSound();
 	void commandChanged(const QString &);
 	void soundPlayerFinished(int, QProcess::ExitStatus);
+private slots:
+	void selectTheme(void);
 public:
 	int  chanMask;
 	int  amplify;
@@ -64,6 +66,7 @@ public:
 	bool lrView;
 	bool showTicks;
 	QString playCmd;
+	QString themeName;
 private:
 	QWidget	    *createViewTab();
 	QWidget	    *createDefaultDeviceTab();
@@ -78,6 +81,7 @@ private:
 	QSpinBox    *maxAutoVchansSb;
 	QSpinBox    *latencySb;
 	QSpinBox    *pollIvalSb;
+	QLineEdit   *themeEdit;
 	QLineEdit   *commandEdit;
 	QCheckBox   *viewTabCb[DSBMIXER_MAX_CHANNELS];
 	QCheckBox   *lrViewCb;

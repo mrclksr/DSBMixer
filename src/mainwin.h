@@ -29,6 +29,7 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QMoveEvent>
+#include <QIcon>
 
 #include "mixer.h"
 #include "preferences.h"
@@ -83,6 +84,7 @@ private:
 	int	      *chanMask;
 	int	      *pollIval;
 	char	      **playCmd;
+	char          **trayTheme;
 	bool	      *lrView;
 	bool	      *showTicks;
 	bool	      trayAvailable;
@@ -92,6 +94,7 @@ private:
 	QIcon	      hVolIcon;
 	QIcon	      quitIcon;
 	QIcon	      prefsIcon;
+	QIcon	      winIcon;
 	QMenu	      *mainMenu;
 	QTimer	      *traytimer;
 	QTimer	      *timer;
