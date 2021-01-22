@@ -56,8 +56,8 @@ Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 
 	qApp->setQuitOnLastWindowClosed(false);
 
-	QVBoxLayout *vbox = new QVBoxLayout();
-	QHBoxLayout *hbox = new QHBoxLayout();
+	QVBoxLayout *vbox = new QVBoxLayout;
+	QHBoxLayout *hbox = new QHBoxLayout;
 
 	tabs = new QTabWidget(this);
 
@@ -141,9 +141,13 @@ QWidget *
 Preferences::createViewTab()
 {
 	QWidget	    *widget	= new QWidget(this);
+	QGroupBox   *mdGrp	= new QGroupBox(tr("Select mixer devices to be visible\n"));
+	QGroupBox   *slGrp	= new QGroupBox(tr("Slider settings"));
+	QGroupBox   *thGrp	= new QGroupBox(tr("Tray icon theme"));
 	const char  **names	= dsbmixer_getchanames();
-	QVBoxLayout *vbox	= new QVBoxLayout();
-	QGridLayout *grid	= new QGridLayout();
+	QVBoxLayout *vbox	= new QVBoxLayout;
+	QVBoxLayout *slBox	= new QVBoxLayout;
+	QGridLayout *grid	= new QGridLayout;
 	themeEdit		= new QLineEdit(themeName);
 	QLabel	    *themeLabel	= new QLabel(tr("Tray icon theme:"));
 	QHBoxLayout *hbox	= new QHBoxLayout;
@@ -159,14 +163,8 @@ Preferences::createViewTab()
 			grid->addWidget(viewTabCb[row * 5 + col], row, col);
 		}
 	}
-	QLabel *label = new QLabel(tr("Select mixer devices to be visible\n"));
-	label->setStyleSheet("font-weight: bold;");
-	vbox->addWidget(label, 0, Qt::AlignCenter);
-	vbox->addLayout(grid);
-
-	QFrame* frame = new QFrame();
-	frame->setFrameShape(QFrame::HLine);
-	vbox->addWidget(frame);
+	mdGrp->setLayout(grid);
+	vbox->addWidget(mdGrp);
 
 	lrViewCb = new QCheckBox(tr("Show left and right channel"), this);
 	lrViewCb->setCheckState(lrView ? Qt::Checked : Qt::Unchecked);
@@ -174,12 +172,18 @@ Preferences::createViewTab()
 	showTicksCb = new QCheckBox(tr("Show ticks"), this);
 	showTicksCb->setCheckState(showTicks ? Qt::Checked : Qt::Unchecked);
 
-	vbox->addWidget(lrViewCb);
-	vbox->addWidget(showTicksCb);
+	slBox->addWidget(lrViewCb);
+	slBox->addWidget(showTicksCb);
+
+	slGrp->setLayout(slBox);
+	vbox->addWidget(slGrp);
+
 	hbox->addWidget(themeLabel);
 	hbox->addWidget(themeEdit);
 	hbox->addWidget(openButton);
-	vbox->addLayout(hbox);
+	thGrp->setLayout(hbox);
+	vbox->addWidget(thGrp);
+	vbox->addStretch(1);
 	widget->setLayout(vbox);
 	connect(openButton, &QPushButton::clicked, this,
 	    &Preferences::selectTheme);
@@ -190,18 +194,15 @@ QWidget *
 Preferences::createDefaultDeviceTab()
 {
 	QWidget	    *widget = new QWidget(this);
-	QVBoxLayout *vbox   = new QVBoxLayout();
-	QHBoxLayout *hbox   = new QHBoxLayout();
-	QLabel	    *label  = new QLabel(tr("Select default sound device\n"));
+	QVBoxLayout *vbox   = new QVBoxLayout;
+	QHBoxLayout *hbox   = new QHBoxLayout;
+	QVBoxLayout *ddBox  = new QVBoxLayout;
+	QGroupBox   *ddGrp  = new QGroupBox(tr("Select default sound device\n"));
 	testBt		    = new QPushButton(tr("Test sound"));
 	commandEdit	    = new QLineEdit;
 	soundPlayer	    = new QProcess(this);
 
 	testSoundPlaying = false;
-
-	label->setStyleSheet("font-weight: bold;");
-	vbox->addWidget(label, 0, Qt::AlignCenter);
-
 	for (int i = 0; i < dsbmixer_getndevs(); i++) {
 		dsbmixer_t *dev = dsbmixer_getmixer(i);
 		QRadioButton *rb = new QRadioButton(QString(dev->cardname),
@@ -209,13 +210,16 @@ Preferences::createDefaultDeviceTab()
 		defaultDeviceRb.append(rb);
 		if (i == defaultUnit)
 			rb->setChecked(true);
-		vbox->addWidget(rb);
+		ddBox->addWidget(rb);
 	}
+	ddBox->addStretch(1);
+	ddGrp->setLayout(ddBox);
 	commandEdit->setText(playCmd);
 	commandEdit->setToolTip(tr("Enter a command which plays a sound"));
 
 	hbox->addWidget(commandEdit);
 	hbox->addWidget(testBt, 0, Qt::AlignRight);
+	vbox->addWidget(ddGrp);
 	vbox->addLayout(hbox);
 
 	widget->setLayout(vbox);
@@ -303,13 +307,9 @@ QWidget *
 Preferences::createAdvancedTab()
 {
 	QWidget	    *widget = new QWidget(this);
-	QVBoxLayout *vbox   = new QVBoxLayout();
-	QGridLayout *grid   = new QGridLayout();
-
-	QLabel *label = new QLabel(tr("Advanced settings\n"));
-	label->setStyleSheet("font-weight: bold;");
-	vbox->addWidget(label, 1, Qt::AlignCenter);
-	vbox->addStretch(1);
+	QVBoxLayout *vbox   = new QVBoxLayout;
+	QGridLayout *grid   = new QGridLayout;
+	QGroupBox   *grpBox = new QGroupBox(tr("Advanced settings"));
 
 	amplifySb	    = new QSpinBox(this);
 	feederRateQualitySb = new QSpinBox(this);
@@ -359,7 +359,7 @@ Preferences::createAdvancedTab()
 	bypassMixerCb->setCheckState(bypassMixer ? Qt::Checked : \
 	    Qt::Unchecked);
 
-	label = new QLabel(tr("Amplification:"));
+	QLabel *label = new QLabel(tr("Amplification:"));
 	grid->addWidget(label, 0, 0);
 	grid->addWidget(amplifySb, 0, 1);
 
@@ -382,7 +382,8 @@ Preferences::createAdvancedTab()
 	grid->addWidget(new QLabel(""), 5, 0);
 	grid->addWidget(bypassMixerCb, 6, 0);
 
-	vbox->addLayout(grid);
+	grpBox->setLayout(grid);
+	vbox->addWidget(grpBox);
 	vbox->addStretch(1);	
 	widget->setLayout(vbox);
 
