@@ -35,8 +35,9 @@
 IconThemeSelector::IconThemeSelector(QWidget *parent) :
     QDialog(parent)
 {
-	themeList		  = new QListWidget(this);
+	QStringList names;
 	QStringList paths	  = QIcon::themeSearchPaths();
+	themeList		  = new QListWidget(this);
 	QVBoxLayout *vbox	  = new QVBoxLayout;
 	QHBoxLayout *hbox	  = new QHBoxLayout;
 	QPushButton *okButton	  = new QPushButton(tr("&Ok"));
@@ -56,13 +57,16 @@ IconThemeSelector::IconThemeSelector(QWidget *parent) :
 			if (!indexFile.exists())
 				continue;
 			indexFile.close();
-			QListWidgetItem *item = new QListWidgetItem(name);
-			item->setData(Qt::UserRole, QVariant(name));
-			themeList->addItem(item);
+			names.append(name);
 		}
 	}
-	themeList->sortItems();
-	
+	names.sort(Qt::CaseInsensitive);
+	names.removeDuplicates();
+	foreach (const QString &name, names) {
+		QListWidgetItem *item = new QListWidgetItem(name);
+		item->setData(Qt::UserRole, QVariant(name));
+		themeList->addItem(item);
+	}
 	vbox->setContentsMargins(15, 15, 15, 15);
 	hbox->addWidget(okButton, 1, Qt::AlignRight);
 	hbox->addWidget(cancelButton, 0, Qt::AlignLeft);
@@ -80,9 +84,8 @@ IconThemeSelector::getTheme()
 	QListWidgetItem *item;
 	
 	if (this->exec() == QDialog::Accepted) {
-		if ((item = themeList->currentItem()) == 0)
-			return (QString(""));
-		theme = item->data(Qt::UserRole).toString();
+		if ((item = themeList->currentItem()) != 0)
+			theme = item->data(Qt::UserRole).toString();
 	}
 	return (theme);
 }
