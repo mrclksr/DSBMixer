@@ -38,23 +38,9 @@
 #include "preferences.h"
 #include "qt-helper/qt-helper.h"
 
-Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
-	int defaultUnit, int maxAutoVchans, int latency, bool bypassMixer,
-	bool lrView, bool showTicks, int pollIval, const char *playCmd,
-	const char *trayTheme, QWidget *parent) : QDialog(parent) {
-
-	this->chanMask = chanMask;
-	this->amplify = amplify;
-	this->feederRateQuality = feederRateQuality;
-	this->defaultUnit = defaultUnit;
-	this->maxAutoVchans = maxAutoVchans;
-	this->latency = latency;
-	this->bypassMixer = bypassMixer;
-	this->lrView = lrView;
-	this->showTicks = showTicks;
-	this->pollIval = pollIval;
-	this->playCmd = QString(playCmd);
-	this->themeName = QString(trayTheme);
+Preferences::Preferences(Settings& oldSettings, QWidget *parent)
+    : QDialog(parent) {
+	settings = oldSettings;
 
 	qApp->setQuitOnLastWindowClosed(false);
 
@@ -94,26 +80,26 @@ Preferences::acceptSlot()
 {
 	for (int i = 0; i < DSBMIXER_MAX_CHANNELS; i++) {
 		if (viewTabCb[i]->checkState() == Qt::Checked)
-			chanMask |=  (1 << i);
+			settings.chanMask |=  (1 << i);
 		else
-			chanMask &= ~(1 << i);
+			settings.chanMask &= ~(1 << i);
 	}
-	showTicks = showTicksCb->checkState() == Qt::Checked ? true : false;
+	settings.showTicks = showTicksCb->checkState() == Qt::Checked ? true : false;
 	if (lrViewCb->checkState() == Qt::Checked)
-		lrView = true;
+		settings.lrView = true;
 	else
-		lrView = false;
+		settings.lrView = false;
 	for (int i = 0; i < defaultDeviceRb.count(); i++) {
 		if (defaultDeviceRb.at(i)->isChecked())
-			defaultUnit = i;
+			settings.defaultUnit = i;
 	}
-	feederRateQuality = feederRateQualitySb->value();
-	amplify = amplifySb->value();
-	maxAutoVchans = maxAutoVchansSb->value();
-	latency = latencySb->value();
-	bypassMixer = bypassMixerCb->checkState() == Qt::Checked ? \
+	settings.feederRateQuality = feederRateQualitySb->value();
+	settings.amplify = amplifySb->value();
+	settings.maxAutoVchans = maxAutoVchansSb->value();
+	settings.latency = latencySb->value();
+	settings.bypassMixer = bypassMixerCb->checkState() == Qt::Checked ? \
 	    true : false;
-	pollIval = pollIvalSb->value();
+	settings.pollIval = pollIvalSb->value();
 	if (testSoundPlaying)
 		stopSound();
 	this->accept();
@@ -154,7 +140,7 @@ Preferences::createThemeComboBox()
 	names.removeDuplicates();
 	themeBox->addItems(names);
 
-	int index = themeBox->findText(themeName, Qt::MatchExactly);
+	int index = themeBox->findText(QString(settings.themeName), Qt::MatchExactly);
 	if (index != -1)
 		themeBox->setCurrentIndex(index);
 	connect(themeBox, SIGNAL(currentIndexChanged(int)), this,
@@ -165,7 +151,7 @@ void
 Preferences::changeTheme(int index)
 {
 	if (index != -1)
-		themeName = themeBox->currentText();
+		settings.themeName = themeBox->currentText();
 }
 
 QWidget *
@@ -183,7 +169,7 @@ Preferences::createViewTab()
 
 	for (int i = 0; i < DSBMIXER_MAX_CHANNELS; i++) {
 		viewTabCb[i] = new QCheckBox(QString(names[i]), this);
-		if (chanMask & (1 << i))
+		if (settings.chanMask & (1 << i))
 			viewTabCb[i]->setCheckState(Qt::Checked);
 	}
 	for (int row = 0; row < 5; row++) {
@@ -195,10 +181,10 @@ Preferences::createViewTab()
 	vbox->addWidget(mdGrp);
 
 	lrViewCb = new QCheckBox(tr("Show left and right channel"), this);
-	lrViewCb->setCheckState(lrView ? Qt::Checked : Qt::Unchecked);
+	lrViewCb->setCheckState(settings.lrView ? Qt::Checked : Qt::Unchecked);
 
 	showTicksCb = new QCheckBox(tr("Show ticks"), this);
-	showTicksCb->setCheckState(showTicks ? Qt::Checked : Qt::Unchecked);
+	showTicksCb->setCheckState(settings.showTicks ? Qt::Checked : Qt::Unchecked);
 
 	slBox->addWidget(lrViewCb);
 	slBox->addWidget(showTicksCb);
@@ -233,13 +219,13 @@ Preferences::createDefaultDeviceTab()
 		QRadioButton *rb = new QRadioButton(QString(dev->cardname),
 		    this);
 		defaultDeviceRb.append(rb);
-		if (i == defaultUnit)
+		if (i == settings.defaultUnit)
 			rb->setChecked(true);
 		ddBox->addWidget(rb);
 	}
 	ddBox->addStretch(1);
 	ddGrp->setLayout(ddBox);
-	commandEdit->setText(playCmd);
+	commandEdit->setText(settings.playCmd);
 	commandEdit->setToolTip(tr("Enter a command which plays a sound"));
 
 	hbox->addWidget(commandEdit);
@@ -279,14 +265,15 @@ Preferences::playSound(int unit)
 		qh_warn(this, "Couldn't set default sound unit to %d", unit);
 		return;
 	}
-	soundPlayer->start(_PATH_BSHELL, QStringList() << "-c" << playCmd);
+	soundPlayer->start(_PATH_BSHELL, QStringList() << "-c" \
+		<< settings.playCmd.toUtf8().data());
 	soundPlayer->closeReadChannel(QProcess::StandardOutput);
 	soundPlayer->closeReadChannel(QProcess::StandardError);
 	soundPlayer->waitForStarted(-1);
 
 	if (soundPlayer->state() == QProcess::NotRunning) {
 		qh_warnx(this, "Couldn't execute '%s': %s",
-		    playCmd.toLocal8Bit().data(),
+		    settings.playCmd.toLocal8Bit().data(),
 		    soundPlayer->errorString().toLocal8Bit().data());
 		return;
         }
@@ -306,9 +293,9 @@ Preferences::stopSound()
 	soundPlayer->close();
 	testSoundPlaying = false;
 	testBt->setText(tr("Test sound"));
-	if (dsbmixer_set_default_unit(defaultUnit) == -1) {
+	if (dsbmixer_set_default_unit(settings.defaultUnit) == -1) {
 		qh_warn(this, "Couldn't reset default sound unit to %d",
-		    defaultUnit);
+		    settings.defaultUnit);
 	}
 }
 
@@ -325,7 +312,7 @@ Preferences::soundPlayerFinished(int exitCode, QProcess::ExitStatus status)
 void
 Preferences::commandChanged(const QString &text)
 {
-	playCmd = text;
+	settings.playCmd = text;
 }
 
 QWidget *
@@ -348,7 +335,7 @@ Preferences::createAdvancedTab()
 		"their own existing mixer logic to control\n" \
 		"their own channel volume."));
 	maxAutoVchansSb->setRange(0, 256);
-	maxAutoVchansSb->setValue(maxAutoVchans);
+	maxAutoVchansSb->setValue(settings.maxAutoVchans);
 	maxAutoVchansSb->setToolTip(tr(
 		"Defines the max. number of virtual playback\n" \
 		"and recording channels that can be created.\n" \
@@ -357,31 +344,31 @@ Preferences::createAdvancedTab()
 		"provides."));
 
 	latencySb->setRange(0, 10);
-	latencySb->setValue(latency);
+	latencySb->setValue(settings.latency);
 	latencySb->setToolTip(tr(
 		"Lower values mean less buffering and latency."));
 	amplifySb->setRange(0, 100);
-	amplifySb->setValue(amplify);
+	amplifySb->setValue(settings.amplify);
 	amplifySb->setSuffix(" dB");
 	amplifySb->setToolTip(tr(
 		"Lower values mean more amplification, but can\n" \
 		"produce sound clipping when chosen too low.\n" \
 		"Higher values mean finer volume control."));
 	feederRateQualitySb->setRange(1, 4);
-	feederRateQualitySb->setValue(feederRateQuality);
+	feederRateQualitySb->setValue(settings.feederRateQuality);
 	feederRateQualitySb->setToolTip(tr(
 		"Higher values mean better sample rate conversion,\n" \
 		"but more memory and CPU usage."));
 
 	pollIvalSb->setRange(10, 10000);
-	pollIvalSb->setValue(pollIval);
+	pollIvalSb->setValue(settings.pollIval);
 	pollIvalSb->setSuffix(" ms");
 	pollIvalSb->setToolTip(tr(
 		"Defines the time interval in milliseconds mixer\n" \
 		"devices are polled. Higher values mean less CPU usage.\n" \
 		"Lower values mean less latency when showing the\n" \
 		"current volume changed by other programs."));
-	bypassMixerCb->setCheckState(bypassMixer ? Qt::Checked : \
+	bypassMixerCb->setCheckState(settings.bypassMixer ? Qt::Checked : \
 	    Qt::Unchecked);
 
 	QLabel *label = new QLabel(tr("Amplification:"));

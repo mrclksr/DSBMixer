@@ -36,15 +36,13 @@
 #include <QComboBox>
 
 #include "mixer.h"
+#include "settings.h"
 
 class Preferences : public QDialog
 {
 	Q_OBJECT
 public:
-	Preferences(int chanMask, int amplify, int feederRateQuality,
-		int defaultUnit, int maxAutoVchans, int latency,
-		bool bypassMixer, bool lrView, bool showTicks, int pollIval,
-		const char *playCmd, const char *trayTheme, QWidget *parent = 0);
+	Preferences(Settings& oldSettings, QWidget *parent = 0);
 public slots:
 	void acceptSlot();
 	void rejectSlot();
@@ -58,18 +56,7 @@ private slots:
 protected:
 	void keyPressEvent(QKeyEvent *event);
 public:
-	int	    chanMask;
-	int	    amplify;
-	int	    feederRateQuality;
-	int	    defaultUnit;
-	int	    maxAutoVchans;
-	int	    latency;
-	int	    pollIval;
-	bool	    bypassMixer;
-	bool	    lrView;
-	bool	    showTicks;
-	QString	    playCmd;
-	QString	    themeName;
+	Settings    settings;
 private:
 	QWidget	    *createViewTab();
 	QWidget	    *createDefaultDeviceTab();

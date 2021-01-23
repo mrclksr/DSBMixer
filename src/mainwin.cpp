@@ -39,6 +39,7 @@
 #include "mixer.h"
 #include "restartapps.h"
 #include "preferences.h"
+#include "settings.h"
 #include "qt-helper/qt-helper.h"
 
 MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
@@ -323,12 +324,27 @@ MainWin::keyPressEvent(QKeyEvent *e)
 void
 MainWin::showConfigMenu()
 {
-	Preferences prefs(*chanMask, dsbmixer_amplification(),
-			   dsbmixer_feeder_rate_quality(),
-			   dsbmixer_default_unit(), dsbmixer_maxautovchans(),
-			   dsbmixer_latency(), dsbmixer_bypass_mixer(),
-			   *lrView, *showTicks, *pollIval, *playCmd,
-			   *trayTheme, this);
+	Settings settings;
+	
+	settings.chanMask	   = *chanMask;
+	settings.amplify	   = dsbmixer_amplification();
+	settings.feederRateQuality = dsbmixer_feeder_rate_quality(),
+	settings.defaultUnit	   = dsbmixer_default_unit();
+	settings.maxAutoVchans     = dsbmixer_maxautovchans();
+	settings.latency	   = dsbmixer_latency();
+	settings.bypassMixer	   = dsbmixer_bypass_mixer();
+	settings.lrView	           = *lrView;
+	settings.showTicks	   = *showTicks;
+	settings.pollIval	   = *pollIval;
+	if (*playCmd != NULL)
+		settings.playCmd = QString(*playCmd);
+	else
+		settings.playCmd = QString();
+	if (*trayTheme != NULL)
+		settings.themeName = QString(*trayTheme);
+	else
+		settings.themeName = QString();
+	Preferences prefs(settings, this);
 
 	/* No need to poll the mixers while the config menu is showing */
 	timer->stop();
@@ -336,56 +352,54 @@ MainWin::showConfigMenu()
 		timer->start(*pollIval);
 		return;
 	}
-
-	if (prefs.defaultUnit != dsbmixer_default_unit())
-		setDefaultTab(prefs.defaultUnit);
-	if (*lrView    != prefs.lrView || *chanMask != prefs.chanMask ||
-	    *showTicks != prefs.showTicks) {
-		*lrView    = prefs.lrView;
-		*chanMask  = prefs.chanMask;
-		*showTicks = prefs.showTicks;
-		
+	if (settings.defaultUnit != prefs.settings.defaultUnit)
+		setDefaultTab(prefs.settings.defaultUnit);
+	if (settings.lrView    != prefs.settings.lrView     ||
+	    settings.chanMask  != prefs.settings.chanMask   ||
+	    settings.showTicks != prefs.settings.showTicks) {
+		*lrView    = prefs.settings.lrView;
+		*chanMask  = prefs.settings.chanMask;
+		*showTicks = prefs.settings.showTicks;
 		redrawMixers();
 	}
-	if (*pollIval != prefs.pollIval) {
-		timer->start(prefs.pollIval);
-		*pollIval = prefs.pollIval;
+	if (settings.pollIval != prefs.settings.pollIval) {
+		timer->start(prefs.settings.pollIval);
+		*pollIval = prefs.settings.pollIval;
 	}
 	QTextCodec *codec = QTextCodec::codecForLocale();
-	QByteArray encstr = codec->fromUnicode(prefs.playCmd);
-	if (encstr.data() == NULL || strcmp(encstr.data(), *playCmd) != 0) {
+	QByteArray encstr = codec->fromUnicode(prefs.settings.playCmd);
+	if (settings.playCmd != prefs.settings.playCmd) {
 		free(*playCmd);
-		if (encstr.data() == NULL)
-			*playCmd = strdup("");
-		else
+		if (prefs.settings.playCmd.isNull())
+			*playCmd = NULL;
+		else {
 			*playCmd = strdup(encstr.data());
-		if (*playCmd == NULL)
-			qh_err(this, EXIT_FAILURE, "strdup()");
+			if (*playCmd == NULL)
+				qh_err(this, EXIT_FAILURE, "strdup()");
+		}
 	}
-	encstr = codec->fromUnicode(prefs.themeName);
-	if (((encstr.data() != NULL && *trayTheme != NULL) &&
-	    strcmp(encstr.data(), *trayTheme) != 0) ||
-	    (encstr.data() == NULL || *trayTheme == NULL)) {
+	encstr = codec->fromUnicode(prefs.settings.themeName);
+	if (prefs.settings.themeName != settings.themeName) {
 		free(*trayTheme);
-		if (encstr.data() != NULL)
-			*trayTheme = strdup(encstr.data());
-		else
+		if (prefs.settings.themeName.isNull())
 			*trayTheme = NULL;
+		else
+			*trayTheme = strdup(encstr.data());
 		loadIcons();
 		if (trayIcon != 0)
 			updateTrayIcon();
 	}
 	dsbcfg_write(PROGRAM, "config", cfg);
-
-	if (dsbmixer_amplification() != prefs.amplify ||
-	    dsbmixer_default_unit() != prefs.defaultUnit ||
-	    dsbmixer_feeder_rate_quality() != prefs.feederRateQuality ||
-	    dsbmixer_latency() != prefs.latency ||
-	    dsbmixer_maxautovchans() != prefs.maxAutoVchans ||
-	    dsbmixer_bypass_mixer() != prefs.bypassMixer) {
-		if (dsbmixer_change_settings(prefs.defaultUnit, prefs.amplify,
-		    prefs.feederRateQuality, prefs.latency,
-		    prefs.maxAutoVchans, prefs.bypassMixer) == -1)
+	if (prefs.settings.amplify	     != settings.amplify	   ||
+	    prefs.settings.defaultUnit	     != settings.defaultUnit	   ||
+	    prefs.settings.feederRateQuality != settings.feederRateQuality ||
+	    prefs.settings.latency	     != settings.latency	   ||
+	    prefs.settings.maxAutoVchans     != settings.maxAutoVchans	   ||
+	    prefs.settings.bypassMixer	     != settings.bypassMixer) {
+		if (dsbmixer_change_settings(prefs.settings.defaultUnit,
+		    prefs.settings.amplify, prefs.settings.feederRateQuality,
+		    prefs.settings.latency, prefs.settings.maxAutoVchans,
+		    prefs.settings.bypassMixer) == -1)
 			qh_warnx(0, dsbmixer_error());
 	}
 	timer->start(*pollIval);
