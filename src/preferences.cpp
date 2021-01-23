@@ -30,11 +30,13 @@
 #include <QGridLayout>
 #include <QCloseEvent>
 #include <QBoxLayout>
+#include <QFile>
+#include <QIcon>
+#include <QDirIterator>
 #include <paths.h>
 
 #include "preferences.h"
 #include "qt-helper/qt-helper.h"
-#include "iconthemeselector.h"
 
 Preferences::Preferences(int chanMask, int amplify, int feederRateQuality,
 	int defaultUnit, int maxAutoVchans, int latency, bool bypassMixer,
@@ -114,7 +116,6 @@ Preferences::acceptSlot()
 	pollIval = pollIvalSb->value();
 	if (testSoundPlaying)
 		stopSound();
-	themeName = themeEdit->text();
 	this->accept();
 }
 
@@ -127,31 +128,58 @@ Preferences::rejectSlot()
 }
 
 void
-Preferences::selectTheme()
+Preferences::createThemeComboBox()
 {
-	IconThemeSelector selector(this);
-	QString name = selector.getTheme();
-	if (name != "") {
-		themeEdit->setText(name);
-		themeName = name;
+	themeBox	  = new QComboBox;
+	QStringList paths = QIcon::themeSearchPaths();
+	QStringList names;
+
+	for (int i = 0; i < paths.size(); i++) {
+		QDirIterator it(paths.at(i));
+		while (it.hasNext()) {
+			QString indexPath = QString("%1/index.theme").arg(it.next());
+			if (!it.fileInfo().isDir())
+				continue;
+			QString name = it.fileName();
+			if (name == "." || name == "..")
+				continue;
+			QFile indexFile(indexPath);
+			if (!indexFile.exists())
+				continue;
+			indexFile.close();
+			names.append(name);
+		}
 	}
+	names.sort(Qt::CaseInsensitive);
+	names.removeDuplicates();
+	themeBox->addItems(names);
+
+	int index = themeBox->findText(themeName, Qt::MatchExactly);
+	if (index != -1)
+		themeBox->setCurrentIndex(index);
+	connect(themeBox, SIGNAL(currentIndexChanged(int)), this,
+	    SLOT(changeTheme(int)));
+}
+
+void
+Preferences::changeTheme(int index)
+{
+	if (index != -1)
+		themeName = themeBox->currentText();
 }
 
 QWidget *
 Preferences::createViewTab()
 {
-	QWidget	    *widget	= new QWidget(this);
-	QGroupBox   *mdGrp	= new QGroupBox(tr("Select mixer devices to be visible\n"));
-	QGroupBox   *slGrp	= new QGroupBox(tr("Slider settings"));
-	QGroupBox   *thGrp	= new QGroupBox(tr("Tray icon theme"));
-	const char  **names	= dsbmixer_getchanames();
-	QVBoxLayout *vbox	= new QVBoxLayout;
-	QVBoxLayout *slBox	= new QVBoxLayout;
-	QGridLayout *grid	= new QGridLayout;
-	themeEdit		= new QLineEdit(themeName);
-	QLabel	    *themeLabel	= new QLabel(tr("Tray icon theme:"));
-	QHBoxLayout *hbox	= new QHBoxLayout;
-	QPushButton *openButton = new QPushButton(tr("Select theme"));
+	QWidget	    *widget = new QWidget(this);
+	QGroupBox   *mdGrp  = new QGroupBox(tr("Select mixer devices to be visible\n"));
+	QGroupBox   *slGrp  = new QGroupBox(tr("Slider settings"));
+	QGroupBox   *thGrp  = new QGroupBox(tr("Tray icon theme"));
+	const char  **names = dsbmixer_getchanames();
+	QVBoxLayout *vbox   = new QVBoxLayout;
+	QVBoxLayout *slBox  = new QVBoxLayout;
+	QGridLayout *grid   = new QGridLayout;
+	QHBoxLayout *hbox   = new QHBoxLayout;
 
 	for (int i = 0; i < DSBMIXER_MAX_CHANNELS; i++) {
 		viewTabCb[i] = new QCheckBox(QString(names[i]), this);
@@ -177,16 +205,13 @@ Preferences::createViewTab()
 
 	slGrp->setLayout(slBox);
 	vbox->addWidget(slGrp);
-
-	hbox->addWidget(themeLabel);
-	hbox->addWidget(themeEdit);
-	hbox->addWidget(openButton);
+	createThemeComboBox();
+	hbox->addWidget(themeBox);
 	thGrp->setLayout(hbox);
 	vbox->addWidget(thGrp);
 	vbox->addStretch(1);
 	widget->setLayout(vbox);
-	connect(openButton, &QPushButton::clicked, this,
-	    &Preferences::selectTheme);
+
 	return (widget);
 }
 

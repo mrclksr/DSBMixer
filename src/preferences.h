@@ -33,6 +33,7 @@
 #include <QDialog>
 #include <QProcess>
 #include <QLineEdit>
+#include <QComboBox>
 
 #include "mixer.h"
 
@@ -53,26 +54,27 @@ public slots:
 	void commandChanged(const QString &);
 	void soundPlayerFinished(int, QProcess::ExitStatus);
 private slots:
-	void selectTheme(void);
+	void changeTheme(int idx);
+protected:
+	void keyPressEvent(QKeyEvent *event);
 public:
-	int  chanMask;
-	int  amplify;
-	int  feederRateQuality;
-	int  defaultUnit;
-	int  maxAutoVchans;
-	int  latency;
-	int  pollIval;
-	bool bypassMixer;
-	bool lrView;
-	bool showTicks;
-	QString playCmd;
-	QString themeName;
+	int	    chanMask;
+	int	    amplify;
+	int	    feederRateQuality;
+	int	    defaultUnit;
+	int	    maxAutoVchans;
+	int	    latency;
+	int	    pollIval;
+	bool	    bypassMixer;
+	bool	    lrView;
+	bool	    showTicks;
+	QString	    playCmd;
+	QString	    themeName;
 private:
 	QWidget	    *createViewTab();
 	QWidget	    *createDefaultDeviceTab();
 	QWidget	    *createAdvancedTab();
-protected:
-	void keyPressEvent(QKeyEvent *event);
+	void	    createThemeComboBox();
 private:
 	bool	    testSoundPlaying;
 	QProcess    *soundPlayer;
@@ -81,12 +83,12 @@ private:
 	QSpinBox    *maxAutoVchansSb;
 	QSpinBox    *latencySb;
 	QSpinBox    *pollIvalSb;
-	QLineEdit   *themeEdit;
 	QLineEdit   *commandEdit;
 	QCheckBox   *viewTabCb[DSBMIXER_MAX_CHANNELS];
 	QCheckBox   *lrViewCb;
 	QCheckBox   *showTicksCb;
 	QCheckBox   *bypassMixerCb;
+	QComboBox   *themeBox;
 	QTabWidget  *tabs;
 	QPushButton *testBt;
 	QList<QRadioButton *> defaultDeviceRb;
