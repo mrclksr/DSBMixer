@@ -174,7 +174,7 @@ Clicking on the tray icon will show/hide the main window.
 ==== Tray Icon Theme
 
 You can change the icon theme for the tray icon under
-_File_ -> _Preferences_ -> _Select theme_
+_File_ -> _Preferences_ -> _View_
 
 [[prefs-win]]
 === The Preferences Window
