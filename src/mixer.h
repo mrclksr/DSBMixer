@@ -38,7 +38,7 @@ public:
 	Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent = 0);
 	dsbmixer_t *getDev() const;
 signals:
-	void masterVolChanged(int lvol, int rvol);
+	void masterVolChanged(int unit, int lvol, int rvol);
 public slots:
 	void setLVol(int chan, int lvol);
 	void setRVol(int chan, int rvol);

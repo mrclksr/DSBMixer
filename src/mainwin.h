@@ -57,8 +57,9 @@ public slots:
 private slots:
 	void checkForSysTray();
 	void catchCurrentChanged();
-	void catchMasterVolChanged(int lvol, int rvol);
+	void catchMasterVolChanged(int unit, int lvol, int rvol);
 	void scrGeomChanged(const QRect &);
+	void setTabIndex(int index);
 protected:
 	void keyPressEvent(QKeyEvent *event);
 	void closeEvent(QCloseEvent *event);
@@ -72,10 +73,12 @@ private:
 	void createMixerList();
 	void createTabs();
 	void setDefaultTab(int);
-	void createMenuActions();
 	void createMainMenu();
 	void createTrayIcon();
 	void saveGeometry();
+	void addTrayMenuActions();
+	QAction *createQuitAction();
+	QAction *createPrefsAction();
 private:
 	int	      *posX;
 	int	      *posY;
@@ -96,11 +99,9 @@ private:
 	QIcon	      prefsIcon;
 	QIcon	      winIcon;
 	QMenu	      *mainMenu;
+	QMenu	      *trayMenu;
 	QTimer	      *traytimer;
 	QTimer	      *timer;
-	QAction	      *quitAction;
-	QAction	      *preferencesAction;
-	QAction	      *toggleAction;
 	dsbcfg_t      *cfg;
 	QTabWidget    *tabs;
 	MixerTrayIcon *trayIcon;

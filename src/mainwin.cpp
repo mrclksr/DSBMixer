@@ -27,6 +27,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QSignalMapper>
 #include <QTextCodec>
 #include <unistd.h>
 #include <stdlib.h>
@@ -83,7 +84,6 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
 	connect(traytimer, SIGNAL(timeout()), this, SLOT(checkForSysTray()));
 	traytimer->start(500);
 
-	createMenuActions();
 	createMainMenu();
 	setWindowIcon(winIcon);
 	setWindowTitle("DSBMixer");
@@ -146,8 +146,8 @@ MainWin::createMixerList()
 		Mixer *mixer = new Mixer(dev, *chanMask, *lrView, this);
 		mixers.append(mixer);
 		mixer->setTicks(*showTicks);
-		connect(mixer, SIGNAL(masterVolChanged(int, int)), this,
-		    SLOT(catchMasterVolChanged(int, int)));
+		connect(mixer, SIGNAL(masterVolChanged(int, int, int)), this,
+		    SLOT(catchMasterVolChanged(int, int, int)));
 	}
 }
 
@@ -210,6 +210,7 @@ void
 MainWin::addNewMixer()
 {
 	redrawMixers();
+	addTrayMenuActions();
 }
 
 void
@@ -221,6 +222,7 @@ MainWin::removeMixer(dsbmixer_t *mixer)
 			delete mixers.at(i);
 			mixers.removeAt(i);
 			dsbmixer_delmixer(mixer);
+			addTrayMenuActions();
 			return;
 		}
   	}	
@@ -433,26 +435,58 @@ MainWin::saveGeometry()
 	}
 }
 
-void
-MainWin::createMenuActions()
+QAction *
+MainWin::createQuitAction()
 {
+	QAction *action = new QAction(quitIcon, tr("&Quit"), this);
+	connect(action, SIGNAL(triggered()), this, SLOT(quit()));
 
-	quitAction = new QAction(quitIcon, tr("&Quit"), this);
-	preferencesAction = new QAction(prefsIcon, tr("&Preferences"), this);
-	toggleAction = new QAction(winIcon, tr("Show/hide window"), this);
+	return (action);
+}
 
-	connect(toggleAction, SIGNAL(triggered()), this, SLOT(toggleWin()));
-	connect(quitAction, SIGNAL(triggered()), this, SLOT(quit()));
-	connect(preferencesAction, SIGNAL(triggered()), this,
-	    SLOT(showConfigMenu()));
+QAction *
+MainWin::createPrefsAction()
+{
+	QAction *action = new QAction(prefsIcon, tr("&Preferences"), this);
+	connect(action, SIGNAL(triggered()), this, SLOT(showConfigMenu()));
+
+	return (action);
 }
 
 void
 MainWin::createMainMenu()
 {
 	mainMenu = menuBar()->addMenu(tr("&File"));
-	mainMenu->addAction(preferencesAction);
-	mainMenu->addAction(quitAction);
+
+	mainMenu->addAction(createPrefsAction());
+	mainMenu->addAction(createQuitAction());
+}
+
+void
+MainWin::addTrayMenuActions()
+{
+	if (!trayAvailable)
+		return;
+	int	      didx = mixerUnitToTabIndex(dsbmixer_default_unit());
+	QAction	      *toggle = new QAction(winIcon, tr("Show/hide window"), this);
+	QSignalMapper *mapper = new QSignalMapper(this);
+
+	trayMenu->clear();
+	trayMenu->addAction(toggle);
+	for (int i = 0; i < mixers.count(); i++) {
+		QString label(mixers.at(i)->cardname);
+		if (i == didx)
+			label.append("*");
+		QAction *action = new QAction(winIcon, label, this);
+		connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
+		mapper->setMapping(action, i);
+		trayMenu->addAction(action);
+	}
+	connect(mapper, SIGNAL(mapped(int)), this, SLOT(setTabIndex(int)));
+	connect(toggle, SIGNAL(triggered()), this, SLOT(toggleWin()));
+
+	trayMenu->addAction(createPrefsAction());
+	trayMenu->addAction(createQuitAction());
 }
 
 void
@@ -466,9 +500,9 @@ MainWin::checkForSysTray()
 		trayAvailable = false;
 	}
 	if (QSystemTrayIcon::isSystemTrayAvailable()) {
-		createTrayIcon();
 		trayAvailable = true;
 		tries = 60;
+		createTrayIcon();
 		traytimer->stop();
 	} else if (tries-- <= 0) {
 		traytimer->stop();
@@ -480,22 +514,26 @@ MainWin::checkForSysTray()
 void
 MainWin::createTrayIcon()
 {
-	int   idx   = tabs->currentIndex();
-	QMenu *menu = new QMenu(this);
-	trayIcon    = new MixerTrayIcon(idx == -1 ? 0 : mixers.at(idx),
+	int idx  = tabs->currentIndex();
+	trayMenu = new QMenu(this);
+	trayIcon = new MixerTrayIcon(idx == -1 ? 0 : mixers.at(idx),
 					hVolIcon, this);
 	updateTrayIcon();
-	menu->addAction(toggleAction);
-	menu->addAction(preferencesAction);
-	menu->addAction(quitAction);
+	addTrayMenuActions();
 
-	trayIcon->setContextMenu(menu);
+	trayIcon->setContextMenu(trayMenu);
 	trayIcon->show();
 
 	connect(trayIcon,
 	    SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
 	    this,
 	    SLOT(trayClicked(QSystemTrayIcon::ActivationReason)));
+}
+
+void
+MainWin::setTabIndex(int index)
+{
+	tabs->setCurrentIndex(index);
 }
 
 void
@@ -510,12 +548,14 @@ MainWin::catchCurrentChanged()
 }
 
 void
-MainWin::catchMasterVolChanged(int lvol, int rvol)
+MainWin::catchMasterVolChanged(int unit, int lvol, int rvol)
 {
 	int	idx = tabs->currentIndex();
 	QString trayToolTip;
 
 	if (!trayAvailable)
+		return;
+	if (tabs->currentIndex() != mixerUnitToTabIndex(unit))
 		return;
 	if (mixers.at(idx)->muted)
 		trayToolTip = QString(tr("Muted"));

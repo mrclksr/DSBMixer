@@ -105,7 +105,7 @@ Mixer::setLVol(int chan, int lvol)
 	rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 	channel.at(idx)->setVol(lvol, rvol);
 	if (chan == DSBMIXER_MASTER)
-		emit masterVolChanged(lvol, rvol);
+		emit masterVolChanged(this->mixer->unit, lvol, rvol);
 }
 
 void
@@ -119,7 +119,7 @@ Mixer::setRVol(int chan, int rvol)
 	lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 	channel.at(idx)->setVol(lvol, rvol);
 	if (chan == DSBMIXER_MASTER)
-		emit masterVolChanged(lvol, rvol);
+		emit masterVolChanged(this->mixer->unit, lvol, rvol);
 }
 
 void
@@ -133,7 +133,7 @@ Mixer::setVol(int chan, int lvol, int rvol)
 	rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 	channel.at(idx)->setVol(lvol, rvol);
 	if (chan == DSBMIXER_MASTER)
-		emit masterVolChanged(lvol, rvol);
+		emit masterVolChanged(this->mixer->unit, lvol, rvol);
 }
 
 void
@@ -166,10 +166,10 @@ Mixer::update()
 		if (chan == DSBMIXER_MASTER) {
 			if (uvol > 0) {
 				channel.at(i)->setMute(false);
-				emit masterVolChanged(lvol, rvol);
+				emit masterVolChanged(this->mixer->unit, lvol, rvol);
 			} else if (muted) {
 				channel.at(i)->setMute(true);
-				emit masterVolChanged(0, 0);
+				emit masterVolChanged(this->mixer->unit, 0, 0);
 			}
 		}
 		channel.at(i)->setVol(lvol, rvol);
@@ -209,5 +209,5 @@ Mixer::changeMasterVol(int volinc)
 	lvol = DSBMIXER_CHAN_LEFT(dsbmixer_getvol(mixer, chan));
 	rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 	channel.at(idx)->setVol(lvol, rvol);
-	emit masterVolChanged(lvol, rvol);
+	emit masterVolChanged(this->mixer->unit, lvol, rvol);
 }
