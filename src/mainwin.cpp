@@ -473,6 +473,7 @@ MainWin::addTrayMenuActions()
 
 	trayMenu->clear();
 	trayMenu->addAction(toggle);
+	trayMenu->addSection(tr("Sound devices"));
 	for (int i = 0; i < mixers.count(); i++) {
 		QString label(mixers.at(i)->cardname);
 		if (i == didx)
@@ -482,6 +483,7 @@ MainWin::addTrayMenuActions()
 		mapper->setMapping(action, i);
 		trayMenu->addAction(action);
 	}
+	trayMenu->addSeparator();
 	connect(mapper, SIGNAL(mapped(int)), this, SLOT(setTabIndex(int)));
 	connect(toggle, SIGNAL(triggered()), this, SLOT(toggleWin()));
 
