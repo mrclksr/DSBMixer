@@ -439,7 +439,7 @@ MainWin::createMenuActions()
 
 	quitAction = new QAction(quitIcon, tr("&Quit"), this);
 	preferencesAction = new QAction(prefsIcon, tr("&Preferences"), this);
-	toggleAction = new QAction(hVolIcon, tr("Show/hide window"), this);
+	toggleAction = new QAction(winIcon, tr("Show/hide window"), this);
 
 	connect(toggleAction, SIGNAL(triggered()), this, SLOT(toggleWin()));
 	connect(quitAction, SIGNAL(triggered()), this, SLOT(quit()));
