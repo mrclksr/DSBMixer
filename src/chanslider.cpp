@@ -59,7 +59,7 @@ ChanSlider::initLRView(QWidget *parent)
 	lslider		     = new QSlider(Qt::Vertical);
 	rslider		     = new QSlider(Qt::Vertical);
 	recCB		     = new QCheckBox;
-	muteCB		     = new QCheckBox(tr("mute"));
+	muteCB		     = new QCheckBox("🔇");
 	lockCB		     = new QCheckBox("🔒");
 	QHBoxLayout *micHbox = new QHBoxLayout;
 	QLabel 	    *micPic  = new QLabel;
@@ -130,6 +130,7 @@ ChanSlider::initLRView(QWidget *parent)
 			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 			muteCB->hide();
 		} else {
+			muteCB->setToolTip(tr("mute"));
 			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 			connect(muteCB, SIGNAL(stateChanged(int)), this,
 			    SLOT(emitMuteChanged(int)));
@@ -151,7 +152,7 @@ ChanSlider::initUView(QWidget *parent)
 	recCB		     = new QCheckBox;
 	volabel		     = new QLabel;
 	recCB		     = new QCheckBox;
-	muteCB		     = new QCheckBox(tr("mute"));
+	muteCB		     = new QCheckBox("🔇");
 	slider		     = new QSlider(Qt::Vertical);
 	QLabel	    *micPic  = new QLabel;
 	QWidget	    *recElem = new QWidget(this);
@@ -201,6 +202,7 @@ ChanSlider::initUView(QWidget *parent)
 			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 			muteCB->hide();
 		} else {
+			muteCB->setToolTip(tr("mute"));
 			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
 			connect(muteCB, SIGNAL(stateChanged(int)), this,
 			    SLOT(emitMuteChanged(int)));
