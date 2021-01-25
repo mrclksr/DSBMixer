@@ -201,7 +201,7 @@ MainWin::redrawMixers()
 	createMixerList();
 	createTabs();
 	saveGeometry();
-	if (trayIcon != 0)
+	if (trayAvailable)
 		updateTrayIcon();
 }
 
@@ -388,7 +388,7 @@ MainWin::showConfigMenu()
 		else
 			*trayTheme = strdup(encstr.data());
 		loadIcons();
-		if (trayIcon != 0)
+		if (trayAvailable)
 			updateTrayIcon();
 	}
 	dsbcfg_write(PROGRAM, "config", cfg);
