@@ -467,18 +467,21 @@ MainWin::addTrayMenuActions()
 {
 	if (!trayAvailable)
 		return;
-	int	      didx = mixerUnitToTabIndex(dsbmixer_default_unit());
+	int didx = mixerUnitToTabIndex(dsbmixer_default_unit());
 	QAction	      *toggle = new QAction(winIcon, tr("Show/hide window"), this);
 	QSignalMapper *mapper = new QSignalMapper(this);
 
 	trayMenu->clear();
 	trayMenu->addAction(toggle);
 	trayMenu->addSection(tr("Sound devices"));
+
 	for (int i = 0; i < mixers.count(); i++) {
 		QString label(mixers.at(i)->cardname);
 		if (i == didx)
 			label.append("*");
 		QAction *action = new QAction(winIcon, label, this);
+		if (i == tabs->currentIndex())
+			action->setEnabled(false);
 		connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
 		mapper->setMapping(action, i);
 		trayMenu->addAction(action);
@@ -521,8 +524,6 @@ MainWin::createTrayIcon()
 	trayIcon = new MixerTrayIcon(idx == -1 ? 0 : mixers.at(idx),
 					hVolIcon, this);
 	updateTrayIcon();
-	addTrayMenuActions();
-
 	trayIcon->setContextMenu(trayMenu);
 	trayIcon->show();
 
@@ -595,6 +596,7 @@ MainWin::updateTrayIcon()
 
 	if (idx == -1)
 		return;
+	addTrayMenuActions();
 	trayIcon->setMixer(mixers.at(idx));
 	if (mixers.at(idx)->muted) {
 		trayToolTip = QString(tr("Muted"));
@@ -636,4 +638,3 @@ MainWin::mixerUnitToTabIndex(int unit)
 	}
 	return (-1);
 }
-
