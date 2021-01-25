@@ -22,11 +22,11 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "chanslider.h"
 #include <QGroupBox>
 #include <QLabel>
 #include <QString>
 
+#include "chanslider.h"
 #include "qt-helper/qt-helper.h"
 
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
@@ -54,22 +54,28 @@ ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
 void
 ChanSlider::initLRView(QWidget *parent)
 {
-	volabell	     = new QLabel;
-	volabelr	     = new QLabel;
-	lslider		     = new QSlider(Qt::Vertical);
-	rslider		     = new QSlider(Qt::Vertical);
-	recCB		     = new QCheckBox;
-	muteCB		     = new QCheckBox("🔇");
-	lockCB		     = new QCheckBox("🔒");
-	QHBoxLayout *micHbox = new QHBoxLayout;
-	QLabel 	    *micPic  = new QLabel;
-	QWidget	    *recElem = new QWidget(this);
-	QVBoxLayout *vboxl   = new QVBoxLayout(parent);
-	QVBoxLayout *vboxr   = new QVBoxLayout(parent);
-	QVBoxLayout *layout  = new QVBoxLayout(parent);
-	QHBoxLayout *hbox    = new QHBoxLayout(parent);
-	QIcon micIcon	     = qh_loadIcon("audio-input-microphone-high", NULL);
+	volabell	      = new QLabel;
+	volabelr	      = new QLabel;
+	lslider		      = new QSlider(Qt::Vertical);
+	rslider		      = new QSlider(Qt::Vertical);
+	recCB		      = new QCheckBox;
+	muteCB		      = new QCheckBox;
+	lockCB		      = new QCheckBox("🔒");
+	QHBoxLayout *micHbox  = new QHBoxLayout;
+	QHBoxLayout *muteHbox = new QHBoxLayout;
+	QLabel 	    *micPic   = new QLabel;
+	QLabel	    *mutePic  = new QLabel;
+	QWidget	    *recElem  = new QWidget(this);
+	QWidget	    *muteElem = new QWidget(this);
+	QVBoxLayout *vboxl    = new QVBoxLayout(parent);
+	QVBoxLayout *vboxr    = new QVBoxLayout(parent);
+	QVBoxLayout *layout   = new QVBoxLayout(parent);
+	QHBoxLayout *hbox     = new QHBoxLayout(parent);
+	QIcon micIcon	      = qh_loadIcon("audio-input-microphone-high", NULL);
+	QIcon muteIcon	      = qh_loadIcon("audio-volume-muted", NULL);
 
+	if (muteIcon.isNull())
+		muteIcon = QIcon(":/icons/audio-volume-muted.png");
 	volabell->setText(QString("100%"));
 	volabelr->setText(QString("100%"));
 
@@ -85,8 +91,8 @@ ChanSlider::initLRView(QWidget *parent)
 
 	if (!tray) {
 		micPic->setPixmap(micIcon.pixmap(16));
-		micHbox->addWidget(micPic);
 		micHbox->addWidget(recCB);
+		micHbox->addWidget(micPic);
 		recElem->setLayout(micHbox);
 
 		if (!rec) {
@@ -121,17 +127,21 @@ ChanSlider::initLRView(QWidget *parent)
 
 	layout->addLayout(hbox, 0);
 	if (!tray) {
+		mutePic->setPixmap(muteIcon.pixmap(16));
+		muteHbox->addWidget(muteCB);
+		muteHbox->addWidget(mutePic);
+		muteElem->setLayout(muteHbox);
 		layout->addWidget(lockCB, 0, Qt::AlignCenter);
 		if (!muteable) {
 			/* Padding space */
 			QSizePolicy sp;
 			sp.setRetainSizeWhenHidden(true);
-			muteCB->setSizePolicy(sp);
-			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
-			muteCB->hide();
+			muteElem->setSizePolicy(sp);
+			layout->addWidget(muteElem, 0, Qt::AlignHCenter);
+			muteElem->hide();
 		} else {
-			muteCB->setToolTip(tr("mute"));
-			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
+			muteElem->setToolTip(tr("mute"));
+			layout->addWidget(muteElem, 0, Qt::AlignHCenter);
 			connect(muteCB, SIGNAL(stateChanged(int)), this,
 			    SLOT(emitMuteChanged(int)));
 		}
@@ -148,17 +158,22 @@ ChanSlider::initLRView(QWidget *parent)
 void
 ChanSlider::initUView(QWidget *parent)
 {
-	layout		     = new QVBoxLayout(parent);
-	recCB		     = new QCheckBox;
-	volabel		     = new QLabel;
-	recCB		     = new QCheckBox;
-	muteCB		     = new QCheckBox("🔇");
-	slider		     = new QSlider(Qt::Vertical);
-	QLabel	    *micPic  = new QLabel;
-	QWidget	    *recElem = new QWidget(this);
-	QHBoxLayout *micHbox = new QHBoxLayout;
-	QIcon       micIcon  = qh_loadIcon("audio-input-microphone-high", NULL);
-
+	layout		      = new QVBoxLayout(parent);
+	recCB		      = new QCheckBox;
+	volabel		      = new QLabel;
+	recCB		      = new QCheckBox;
+	muteCB		      = new QCheckBox;
+	slider		      = new QSlider(Qt::Vertical);
+	QLabel	    *micPic   = new QLabel;
+	QLabel	    *mutePic  = new QLabel;
+	QWidget	    *recElem  = new QWidget(this);
+	QWidget	    *muteElem = new QWidget(this);
+	QHBoxLayout *micHbox  = new QHBoxLayout;
+	QHBoxLayout *muteHbox = new QHBoxLayout;
+	QIcon       micIcon   = qh_loadIcon("audio-input-microphone-high", NULL);
+	QIcon	    muteIcon  = qh_loadIcon("audio-volume-muted", NULL);
+	if (muteIcon.isNull())
+		muteIcon = QIcon(":/icons/audio-volume-muted.png");
 	volabel->setText(QString("100%"));
 	QSize sz = volabel->sizeHint();
 
@@ -194,16 +209,20 @@ ChanSlider::initUView(QWidget *parent)
 
 	layout->addWidget(slider, 0, Qt::AlignHCenter);
 	if (!tray) {
+		mutePic->setPixmap(muteIcon.pixmap(16));
+		muteHbox->addWidget(muteCB);
+		muteHbox->addWidget(mutePic);
+		muteElem->setLayout(muteHbox);
 		if (!muteable) {
 			/* Padding space */
 			QSizePolicy sp;
 			sp.setRetainSizeWhenHidden(true);
-			muteCB->setSizePolicy(sp);
-			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
-			muteCB->hide();
+			muteElem->setSizePolicy(sp);
+			layout->addWidget(muteElem, 0, Qt::AlignHCenter);
+			muteElem->hide();
 		} else {
-			muteCB->setToolTip(tr("mute"));
-			layout->addWidget(muteCB, 0, Qt::AlignHCenter);
+			muteElem->setToolTip(tr("mute"));
+			layout->addWidget(muteElem, 0, Qt::AlignHCenter);
 			connect(muteCB, SIGNAL(stateChanged(int)), this,
 			    SLOT(emitMuteChanged(int)));
 		}
