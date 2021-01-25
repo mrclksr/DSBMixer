@@ -169,7 +169,17 @@ tray icon. If possible, both channel volumes are
 .Changing the master volume via tray icon
 image::images/tray-slider.png[]
 
-Clicking on the tray icon will show/hide the main window.
+Left-clicking on the tray icon will show/hide the main window.
+
+Right-clicking will show the tray icon's context menu.
+
+.Tray icon context menu
+image::images/tray-menu.png[]
+
+If you click on one of the listed devices, it will become the active device.
+That is, scrolling on the tray icon will change this device's master volume.
+The active device is greyed out in the menu. The asterisk (`*`) marks the
+default device.
 
 ==== Tray Icon Theme
 
