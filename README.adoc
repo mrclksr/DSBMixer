@@ -29,13 +29,13 @@ image::images/mainwin.png[Main window]
 
 ==== Dependencies
 
-* devel/qt5-buildtools
-* devel/qt5-core
-* devel/qt5-linguisttools
-* devel/qt5-qmake
-* x11-toolkits/qt5-gui
-* x11-toolkits/qt5-widgets
-* sysutils/dsbwrtsysctl
+* https://freshports.org/devel/qt5-buildtools[devel/qt5-buildtools]
+* https://freshports.org/devel/qt5-core[devel/qt5-core]
+* https://freshports.org/devel/qt5-linguisttools[devel/qt5-linguisttools]
+* https://freshports.org/devel/qt5-qmake[devel/qt5-qmake]
+* https://freshports.org/x11-toolkits/qt5-gui[x11-toolkits/qt5-gui]
+* https://freshports.org/x11-toolkits/qt5-widgets[x11-toolkits/qt5-widgets]
+* https://freshports.org/sysutils/dsbwrtsysctl[sysutils/dsbwrtsysctl]
 
 ==== Getting the Source Code
 
