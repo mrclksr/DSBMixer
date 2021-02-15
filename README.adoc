@@ -302,7 +302,7 @@ appearance of Qt5 applications:
 * <<qt5-style-plugins,Qt5-style-plugins>>
 
 [[kvantum]]
-=== qt5ct and the Kvantum theme engine
+=== qt5ct and the Kvantum Theme Engine
 
 ==== qt5ct
 
