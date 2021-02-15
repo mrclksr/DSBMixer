@@ -279,6 +279,7 @@ Bypass mixer::
 Let's say you want to add translations for Russian, you can proceed as follows:
 
 . Create a fork of this repo, and clone it:
++
 [source,sh]
 ----
 % git clone url-of-your-fork
