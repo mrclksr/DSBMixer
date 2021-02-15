@@ -323,9 +323,24 @@ or via the FreeBSD ports:
 ----
 
 In order to make Qt5 applications use _qt5ct_, add the line
-`export QT_QPA_PLATFORMTHEME=qt5ct` to your `~/.xinitrc` or your
-window manager's startup script. After loggin out and in again,
-proceed with the next section.
+`export QT_QPA_PLATFORMTHEME=qt5ct` to one of the following files, depending
+on how you start your X session:
+
+[[session_files]]
+.Session Files
+[options="header,footer"]
+|==================================================
+|X Session Start Method           |File
+|_SliM_, _startx_, _xinit_        |`~/.xinitrc`
+|_GDM_, _LightDM_, _LXDM_, _SDDM_ |`~/.xprofile`
+|_WDM_, _XDM_                     |`~/.xsession`
+|==================================================
+
+Alternatively, you can add the line to your window manager's startup
+script, or, if you are using a Bourne shell compatible login shell, to
+your `~/.profile`.
+
+After loggin out and in again, proceed with the next section.
 
 ==== Kvantum
 
@@ -386,6 +401,21 @@ or via the FreeBSD ports
 ----
 
 In order to make Qt5 applications use qt5-style-plugins, add the line
-`export QT_QPA_PLATFORMTHEME=gtk2` to your `~/.xinitrc` or your
-window manager's startup script. After loggin out and in again,
-your Qt5 applications should look like your GTK applications.
+`export QT_QPA_PLATFORMTHEME=gtk2` to one of the following files, depending
+on how you start your X session:
+
+.Session Files
+[options="header,footer"]
+|==================================================
+|X Session Start Method           |File
+|_SliM_, _startx_, _xinit_        |`~/.xinitrc`
+|_GDM_, _LightDM_, _LXDM_, _SDDM_ |`~/.xprofile`
+|_WDM_, _XDM_                     |`~/.xsession`
+|==================================================
+
+Alternatively, you can add the line to your window manager's startup
+script, or, if you are using a Bourne shell compatible login shell, to
+your `~/.profile`.
+
+After loggin out and in again, your Qt5 applications should look like your
+GTK applications.
