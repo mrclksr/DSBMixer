@@ -3,7 +3,8 @@ include(defs.inc)
 TEMPLATE     = subdirs
 SUBDIRS	    += src lib/backend
 TRANSLATIONS = locale/$${PROGRAM}_de.ts \
-               locale/$${PROGRAM}_fr.ts
+               locale/$${PROGRAM}_fr.ts \
+	       locale/$${PROGRAM}_sv.ts
 INSTALLS     = target dtfile locales scripts
 QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd
 
