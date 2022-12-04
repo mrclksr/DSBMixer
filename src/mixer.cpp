@@ -164,12 +164,14 @@ Mixer::update()
 		int rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_getvol(mixer, chan));
 		int uvol = (lvol + rvol) >> 1;
 		if (chan == DSBMIXER_MASTER) {
-			if (uvol > 0) {
-				channel.at(i)->setMute(false);
-				emit masterVolChanged(this->mixer->unit, lvol, rvol);
-			} else if (muted) {
+			if (muted) {
 				channel.at(i)->setMute(true);
 				emit masterVolChanged(this->mixer->unit, 0, 0);
+			} else {
+				if (uvol > 0)
+					channel.at(i)->setMute(false);
+				emit masterVolChanged(this->mixer->unit,
+				    lvol, rvol);
 			}
 		}
 		channel.at(i)->setVol(lvol, rvol);
