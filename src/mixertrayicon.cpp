@@ -24,6 +24,7 @@
 
 #include <QWidget>
 #include <QScreen>
+#include <QApplication>
 
 #include "mixertrayicon.h"
 
@@ -46,8 +47,10 @@ MixerTrayIcon::setMixer(Mixer *mixer)
 void
 MixerTrayIcon::showSlider(int lvol, int rvol)
 {
-	int   sx, sy;
-	QRect rect = geometry();
+	int    sx, sy;
+	QRect  rect = geometry();
+	QPoint tray_center = geometry().center();
+	QRect  screen_rect = qApp->screenAt(tray_center)->geometry();
 
 	if (slider == 0)
 		initSlider(lvol, rvol);
@@ -56,7 +59,7 @@ MixerTrayIcon::showSlider(int lvol, int rvol)
 	slider_timer->start(1000);
 	if (!slider->isVisible()) {
 		sx = rect.x() - slider->width() / 2 + rect.width() / 2;
-		if (rect.y() < scrsize.height() - rect.y())
+		if (2 * (rect.y() - screen_rect.y()) < scrsize.height())
 			sy = rect.y() + rect.height();
 		else
 			sy = rect.y() - slider->size().height();
