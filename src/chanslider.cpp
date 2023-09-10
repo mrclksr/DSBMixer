@@ -319,6 +319,8 @@ ChanSlider::setVol(int lvol, int rvol)
 		return;
 	if (rvol > 100 || rvol < 0)
 		return;
+	this->lvol = lvol;
+	this->rvol = rvol;
 	if (lrview) {
 		lslider->blockSignals(true);
 		rslider->blockSignals(true);
