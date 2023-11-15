@@ -22,9 +22,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RESTART_APPS_H
-#define RESTART_APPS_H
-
+#pragma once
 #include <QCheckBox>
 #include <QList>
 #include <QDialog>
@@ -55,4 +53,3 @@ private:
 	dsbmixer_audio_proc_t *ap;
 
 };
-#endif // RESTART_APPS_H

@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2016 Marcel Kaiser. All rights reserved.
+ * Copyright (c) 2023 Marcel Kaiser. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -22,42 +22,58 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MIXER_H
-#define MIXER_H
-
-#include <QWidget>
+#pragma once
+#include <QHBoxLayout>
 #include <QList>
+#include <QString>
+#include <QWidget>
 
 #include "chanslider.h"
 #include "libdsbmixer.h"
+#include "mixersettings.h"
 
-class Mixer : public QWidget
-{
-	Q_OBJECT
-public:
-	Mixer(dsbmixer_t *mixer, int chanMask, bool lrview, QWidget *parent = 0);
-	dsbmixer_t *getDev() const;
-signals:
-	void masterVolChanged(int unit, int lvol, int rvol);
-public slots:
-	void setLVol(int chan, int lvol);
-	void setRVol(int chan, int rvol);
-	void setVol(int chan, int lvol, int rvol);
-	void setRecSrc(int chan, int state);
-	void setMute(int state);
-	void changeMasterVol(int volinc);
-	void setTicks(bool on);
-	void update();
-public:
-	void getMasterVol(int *lvol, int *rvol);
-public:
-	bool muted;
-	bool lrview;
-	QString cardname;
-private:
-	int find_idx(int chan);
+class Mixer : public QWidget {
+  Q_OBJECT
+ public:
+  Mixer(dsbmixer_t &mixer, const MixerSettings &mixerSettings,
+          QWidget *parent = nullptr);
+  ~Mixer();
+  void update();
+  bool isMuted(int chan) const;
+  int getUnit() const;
+  int getMasterLVol();
+  int getMasterRVol();
+  int getID() const;
+  QString getDevName() const;
+  dsbmixer_t *getDev() const;
+  QString getName() const;
 
-	dsbmixer_t *mixer;
-	QList<ChanSlider *> channel;
+ private slots:
+  void setLVol(int chan, int lvol);
+  void setRVol(int chan, int rvol);
+  void setVol(int chan, int lvol, int rvol);
+  void setRecSrc(int chan, int state);
+  void setMute(int chan, int state);
+  void redrawMixer();
+
+ signals:
+  void masterVolChanged(int unit, int lvol, int rvol);
+  void muteStateChanged(int unit, bool muted);
+
+ public slots:
+  void changeMasterVol(int volinc);
+
+ private:
+  int channelIndex(int chan) const;
+  void deleteChannels();
+  void createChannels();
+
+ private:
+  bool muted{false};
+  QString cardName;
+  QString devName;
+  QHBoxLayout *layout{};
+  dsbmixer_t *mixer{nullptr};
+  QList<ChanSlider *> channels;
+  const MixerSettings *mixerSettings{nullptr};
 };
-#endif // MIXER_H

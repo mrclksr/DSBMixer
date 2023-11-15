@@ -27,15 +27,19 @@ image::images/mainwin.png[Main window]
 
 === Building from Source
 
-==== Dependencies
-
+==== Dependencies (Qt5)
+* https://www.freshports.org/devel/cmake[devel/cmake]
 * https://freshports.org/devel/qt5-buildtools[devel/qt5-buildtools]
 * https://freshports.org/devel/qt5-core[devel/qt5-core]
 * https://freshports.org/devel/qt5-linguisttools[devel/qt5-linguisttools]
 * https://freshports.org/devel/qt5-qmake[devel/qt5-qmake]
 * https://freshports.org/x11-toolkits/qt5-gui[x11-toolkits/qt5-gui]
 * https://freshports.org/x11-toolkits/qt5-widgets[x11-toolkits/qt5-widgets]
-* https://freshports.org/sysutils/dsbwrtsysctl[sysutils/dsbwrtsysctl]
+
+==== Dependencies (Qt6)
+* https://www.freshports.org/devel/cmake[devel/cmake]
+* https://www.freshports.org/devel/qt6-base[devel/qt6-base]
+* https://www.freshports.org/devel/qt6-tools/[devel/qt6-tools]
 
 ==== Getting the Source Code
 
@@ -45,19 +49,28 @@ image::images/mainwin.png[Main window]
 # git clone https://github.com/mrclksr/dsbcfg.git
 ----
 
-==== Building and Installation
+==== Building and Installing from Source (Qt5)
 
 [source,sh]
 ----
-# cd DSBMixer && qmake
-# make && make install
+# cd DSBMixer
+# cmake -S . -B build
+# cmake --build build
+# cmake --build build -t install
 ----
 
-or if you don't want _devd_ support:
+==== Building and Installing from Source (Qt6)
+
 [source,sh]
 ----
-# make -DWITHOUT_DEVD && make install
+# cd DSBMixer
+# cmake -D USE_QT6=ON -S . -B build
+# cmake --build build
+# cmake --build build -t install
 ----
+
+Add the option `-D WITHOUT_DEVD=ON` to the first _cmake_ command if you
+don't want _devd_ support.
 
 === Installing via _pkg(8)_
 
@@ -224,7 +237,7 @@ _pulseaudio_ for you.
 .Restarting the _pulseaudio_ daemon via _DSBMixer_
 image::images/restart.png[]
 
-=== The Advanced Settings Tab
+==== The Advanced Settings Tab
 
 The _Advanced_ tab allows you to configure various sound settings.
 
@@ -255,6 +268,14 @@ Bypass mixer::
 		their own existing mixer logic to control
 		their own channel volume.
 
+=== The Applications Mixer
+
+The applications mixer allows you to control the volume of each application
+currently using the sound system.
+
+.Applications Mixer
+image::images/apps-mixer.png[Applications mixer]
+
 === Command-line
 
 ==== Usage
@@ -271,12 +292,12 @@ Bypass mixer::
 
 ==== Available Translations
 
-* French
+* French (incomplete)
 * German
+* Swedish (incomplete)
 
 ==== Instructions
-
-Let's say you want to add translations for Russian, you can proceed as follows:
+Let's say you want to add French translations, you can proceed as follows:
 
 . Create a fork of this repo, and clone it:
 +
@@ -284,13 +305,31 @@ Let's say you want to add translations for Russian, you can proceed as follows:
 ----
 % git clone url-of-your-fork
 ----
-. Install `devel/qt5-linguist` and `devel/qt5-linguisttools`
+. Install https://www.freshports.org/devel/qt5-linguist[devel/qt5-linguist]
 . `cd` to `your-forked-dsbmixer-dir`
-. Add `locale/$${PROGRAM}_ru.ts` to `TRANSLATIONS` in `dsbmixer.pro`.
-. Execute `lupdate dsbmixer.pro`
-. Run `linguist locale/dsbmixer_ru.ts`
-. Add the file to the repo: `git add locale/dsbmixer_ru.ts`
-. Commit: `git commit -am 'Add Russian translations.'`
+. Add `locale/dsbmixer_fr.ts` to the `TS_FILES` list in `CMakeLists.txt`.
+. In order to create the `dsbmixer_fr.ts` file, run
++
+.Qt5
+[source,sh]
+----
+% cd your-fork
+% cmake -S . -B build
+% cmake --build build
+----
++
+or
++
+.Qt6
+[source,sh]
+----
+% cd your-fork
+% cmake -D USE_QT6=ON -S . -B build
+% cmake --build build -t dsbmixer_lupdate
+----
+. Run `linguist locale/dsbmixer_fr.ts`
+. Add the file to the repo: `git add locale/dsbmixer_fr.ts`
+. Commit: `git commit -am 'Add French translations.'`
 . Send a pull request.
 
 == Configuring the Look and Behavior of Qt5 Applications

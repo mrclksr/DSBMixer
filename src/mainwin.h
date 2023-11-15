@@ -1,110 +1,83 @@
 /*-
- * Copyright (c) 2016 Marcel Kaiser. All rights reserved.
+ * Copyright (c) 2023 Marcel Kaiser. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * SPDX-License-Identifier: BSD-2-Clause
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAINWIN_H
-#define MAINWIN_H
-
-#include <QWidget>
-#include <QMainWindow>
+#pragma once
 #include <QCloseEvent>
-#include <QMoveEvent>
 #include <QIcon>
+#include <QMainWindow>
+#include <QMoveEvent>
+#include <QWidget>
 
-#include "mixer.h"
-#include "preferences.h"
+#include "appsmixer.h"
 #include "config.h"
-#include "libdsbmixer.h"
+#include "mixerlist.h"
+#include "mixersettings.h"
+#include "mixertabs.h"
 #include "mixertrayicon.h"
 
-class MainWin : public QMainWindow
-{
-	Q_OBJECT
-public:
-	MainWin(dsbcfg_t *cfg, QWidget *parent = 0);
-	QMenu *menu();
+class MainWin : public QMainWindow {
+  Q_OBJECT
+ public:
+  MainWin(dsbcfg_t *cfg, QWidget *parent = 0);
+  QMenu *menu();
 
-public slots:
-#ifndef WITHOUT_DEVD
-	void addNewMixer();
-	void removeMixer(dsbmixer_t *mixer);
-#endif
-	void updateMixers();
-	void trayClicked(QSystemTrayIcon::ActivationReason reason);
-	void showConfigMenu();
-	void toggleWin();
-	void quit();
-private slots:
-	void checkForSysTray();
-	void catchCurrentChanged();
-	void catchMasterVolChanged(int unit, int lvol, int rvol);
-	void scrGeomChanged(const QRect &);
-	void setTabIndex(int index);
-protected:
-	void keyPressEvent(QKeyEvent *event);
-	void closeEvent(QCloseEvent *event);
-	void moveEvent(QMoveEvent *event);
-	void resizeEvent(QResizeEvent *event);
-private:
-	int  mixerUnitToTabIndex(int unit);
-	void loadIcons();
-	void redrawMixers();
-	void updateTrayIcon();
-	void createMixerList();
-	void createTabs();
-	void setDefaultTab(int);
-	void createMainMenu();
-	void createTrayIcon();
-	void saveGeometry();
-	void addTrayMenuActions();
-	QAction *createQuitAction();
-	QAction *createPrefsAction();
-private:
-	int	      *posX;
-	int	      *posY;
-	int	      *wWidth;
-	int	      *hHeight;
-	int	      *chanMask;
-	int	      *pollIval;
-	char	      **playCmd;
-	char          **trayTheme;
-	bool	      *lrView;
-	bool	      *showTicks;
-	bool	      trayAvailable;
-	QIcon	      muteIcon;
-	QIcon	      lVolIcon;
-	QIcon	      mVolIcon;
-	QIcon	      hVolIcon;
-	QIcon	      quitIcon;
-	QIcon	      prefsIcon;
-	QIcon	      winIcon;
-	QMenu	      *mainMenu;
-	QMenu	      *trayMenu;
-	QTimer	      *traytimer;
-	QTimer	      *timer;
-	dsbcfg_t      *cfg;
-	QTabWidget    *tabs;
-	MixerTrayIcon *trayIcon;
-	QList<Mixer *>mixers;
+ public slots:
+  void trayClicked(QSystemTrayIcon::ActivationReason reason);
+  void showConfigMenu();
+  void toggleWin();
+  void quit();
+
+ private slots:
+  void catchDefaultMixerChanged(Mixer *mixer);
+  void catchMixerRemoved();
+  void catchMixerAdded();
+  void catchCurrentMixerChanged(Mixer *mixer);
+  void catchScrGeomChanged();
+  void catchAppsMixerClosed();
+  void checkForSysTray();
+  void restartAudioApps();
+  void showAppsMixer();
+  void setTabIndex(int index);
+
+ protected:
+  void keyPressEvent(QKeyEvent *event);
+  void closeEvent(QCloseEvent *event);
+  void moveEvent(QMoveEvent *event);
+  void resizeEvent(QResizeEvent *event);
+
+ private:
+  void createMainMenu();
+  void createTrayIcon();
+  void setDefaultTab(int);
+  void setCurrentMixer();
+  void updateMixerSettings();
+  void updateTrayIcon();
+  void updateTrayMenu();
+  void initMixerSettings();
+  void storeMixerSettings();
+  void saveGeometry();
+  QAction *createQuitAction();
+  QAction *createPrefsAction();
+  QAction *createAppsMixerAction();
+
+ private:
+  int trayCheckCounter{60};
+  QMenu *mainMenu;
+  QMenu *trayMenu;
+  QTimer *traytimer;
+  dsbcfg_t *cfg;
+  MixerSettings *mixerSettings{nullptr};
+  IconLoader *iconLoader{nullptr};
+  MixerList *mixerList{nullptr};
+  MixerTabs *mixerTabs{nullptr};
+  TrayIcon *trayIcon{nullptr};
+  AppsMixer *appsMixer{nullptr};
+  Mixer *currentMixer;
+  Mixer *defaultMixer;
+  const int trayCheckIvalMs{500};
+  const int trayCheckTries{60};
 };
-#endif // MAINWIN_H

@@ -1,42 +1,26 @@
 /*-
- * Copyright (c) 2016 Marcel Kaiser. All rights reserved.
+ * Copyright (c) 2023 Marcel Kaiser. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * SPDX-License-Identifier: BSD-2-Clause
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _QT_HELPER_H_
-#define _QT_HELPER_H_
-#include <QApplication>
-#include <QMessageBox>
+#pragma once
+#include <QIcon>
+#include <QString>
+#include <QStringList>
 #include <QStyle>
-#include <errno.h>
-#include <cstdarg>
-#include <cstdio>
+#include <QWidget>
 
-extern void  qh_warn(QWidget *, const char *fmt, ...);
-extern void  qh_warnx(QWidget *, const char *fmt, ...);
-extern void  qh_err(QWidget *, int eval, const char *fmt, ...);
-extern void  qh_errx(QWidget *, int eval, const char *fmt, ...);
-extern QIcon qh_loadStockIcon(QStyle::StandardPixmap pm, QWidget *parent = 0);
-extern QIcon qh_loadIcon(const char *name, ...);
-extern QIcon qh_loadStaticIconFromTheme(const char *theme, const char *name, ...);
-#endif // !_QT_HELPER_H_
+namespace qh {
+extern void warn(QWidget *parent, QString msg);
+extern void warnx(QWidget *parent, QString msg);
+extern void err(QWidget *parent, int eval, QString msg);
+extern void errx(QWidget *parent, int eval, QString msg);
 
+extern QIcon loadStockIcon(QStyle::StandardPixmap pm, QWidget *parent = 0);
+extern QIcon loadIcon(const QStringList iconNames);
+extern QIcon loadIcon(const QString &iconName);
+extern QIcon loadStaticIconFromTheme(const QString theme,
+                                     const QStringList iconNames);
+}  // namespace qh
