@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=DSBMixer
-Exec=dsbmixer
+Exec=dbus-launch dsbmixer
 Icon=audio-volume-high
 Terminal=false
 StartupNotify=false
