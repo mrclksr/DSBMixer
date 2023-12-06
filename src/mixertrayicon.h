@@ -15,15 +15,16 @@
 #include <QTimer>
 #include <QWheelEvent>
 #include <QWidget>
+#include <QtDBus/QDBusConnection>
 
 #include "chanslider.h"
-#include "mixer.h"
 #include "iconloader.h"
+#include "mixer.h"
 #include "mixersettings.h"
 
 class TrayIcon : public QSystemTrayIcon {
   Q_OBJECT
-
+  Q_CLASSINFO("D-Bus Interface", "org.dsb.dsbmixer")
  public:
   TrayIcon(const IconLoader &iconLoader, const MixerSettings &mixerSettings,
            QMenu &trayMenu, Mixer *mixer, QObject *parent = nullptr);
@@ -43,6 +44,14 @@ class TrayIcon : public QSystemTrayIcon {
   void catchLRViewChanged(bool on);
   void catchScaleTicksChanged(bool on);
   void catchVolIncChanged(int volInc);
+
+ public slots:
+  Q_SCRIPTABLE void incVol(uint amount);
+  Q_SCRIPTABLE void decVol(uint amount);
+
+ private:
+  void registerDBusService();
+  void updateSlider();
 
  private:
   int volInc{3};

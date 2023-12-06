@@ -25,9 +25,11 @@ TrayIcon::TrayIcon(const IconLoader &iconLoader,
   this->mixerSettings = &mixerSettings;
   lrView = this->mixerSettings->lrViewEnabled();
   volInc = this->mixerSettings->getVolInc();
+
   sliderTimer = new QTimer();
   setMixer(mixer);
   setContextMenu(&trayMenu);
+  registerDBusService();
   connect(this->iconLoader, SIGNAL(trayIconThemeChanged()), this,
           SLOT(catchTrayIconThemeChanged()));
   connect(this->mixerSettings, SIGNAL(lrViewChanged(bool)), this,
@@ -178,9 +180,34 @@ bool TrayIcon::event(QEvent *ev) {
   else
     inc = volInc;
   mixer->changeMasterVol(inc);
+  updateSlider();
+
+  return (true);
+}
+
+void TrayIcon::registerDBusService() {
+  if (!QDBusConnection::sessionBus().isConnected()) return;
+  if (!QDBusConnection::sessionBus().registerService("org.dsb.dsbmixer"))
+    qDebug() << "registerService() failed";
+  if (!QDBusConnection::sessionBus().registerObject(
+          "/Vol", this, QDBusConnection::ExportScriptableSlots))
+    qDebug() << "registerObject() failed";
+}
+
+void TrayIcon::incVol(uint amount) {
+  if (!mixer) return;
+  mixer->changeMasterVol(amount);
+  updateSlider();
+}
+
+void TrayIcon::decVol(uint amount) {
+  if (!mixer) return;
+  mixer->changeMasterVol(-amount);
+  updateSlider();
+}
+
+void TrayIcon::updateSlider() {
   const int lvol{mixer->getMasterLVol()};
   const int rvol{mixer->getMasterRVol()};
   showSlider(lvol, rvol);
-
-  return (true);
 }

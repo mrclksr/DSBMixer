@@ -49,7 +49,8 @@ set(SOURCE_FILES
   lib/dsbcfg/dsbcfg.c
   lib/libdsbmixer.c)
 
-find_package(Qt${QT_MAJOR_VERSION} REQUIRED COMPONENTS Widgets LinguistTools)
+
+find_package(Qt${QT_MAJOR_VERSION} REQUIRED COMPONENTS Widgets LinguistTools DBus)
 if (${QT_MAJOR_VERSION} GREATER OR EQUAL 6)
   qt_standard_project_setup()
 else()
@@ -91,7 +92,7 @@ if (WITHOUT_DEVD)
   add_compile_definitions("-DWITHOUT_DEVD")
 endif()
 
-target_link_libraries(dsbmixer PRIVATE Qt${QT_MAJOR_VERSION}::Widgets pthread)
+target_link_libraries(dsbmixer PRIVATE Qt${QT_MAJOR_VERSION}::Widgets Qt${QT_MAJOR_VERSION}::DBus pthread)
 
 install(TARGETS dsbmixer DESTINATION bin)
 install(FILES "${CMAKE_PROJECT_NAME}.desktop"
