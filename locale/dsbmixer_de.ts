@@ -301,7 +301,7 @@ Höhere Werte bedeuten weniger CPU-Last.
 <context>
     <name>TrayIcon</name>
     <message>
-        <location filename="../src/mixertrayicon.cpp" line="160"/>
+        <location filename="../src/mixertrayicon.cpp" line="162"/>
         <source>Muted</source>
         <translation>Stumm</translation>
     </message>
