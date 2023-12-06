@@ -286,7 +286,7 @@ Higher values mean less CPU usage.
 <context>
     <name>TrayIcon</name>
     <message>
-        <location filename="../src/mixertrayicon.cpp" line="160"/>
+        <location filename="../src/mixertrayicon.cpp" line="162"/>
         <source>Muted</source>
         <translation type="unfinished">Muet</translation>
     </message>
