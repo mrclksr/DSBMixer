@@ -62,6 +62,7 @@ class Preferences : public QDialog {
   QCheckBox *lrViewCb;
   QCheckBox *showTicksCb;
   QCheckBox *bypassMixerCb;
+  QCheckBox *inverseScrollCb;
   QComboBox *themeBox;
   QTabWidget *tabs;
   QPushButton *testBt;

@@ -31,6 +31,7 @@ class TrayIcon : public KStatusNotifierItem {
   void updateToolTip(int lvol, int rvol);
   void catchMixerDestroyed();
   void catchTrayIconThemeChanged();
+  void catchInverseScrollChanged(bool on);
   void catchLRViewChanged(bool on);
   void catchVolIncChanged(int volInc);
   void catchScrollRequest(int delta, Qt::Orientation orientation);
@@ -40,6 +41,7 @@ class TrayIcon : public KStatusNotifierItem {
 
  private:
   int volInc{3};
+  int direction{1};
   bool lrView{false};
   Mixer *mixer{nullptr};
   const IconLoader *iconLoader{nullptr};

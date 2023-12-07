@@ -25,6 +25,7 @@ TrayIcon::TrayIcon(const IconLoader &iconLoader,
   this->mixerSettings = &mixerSettings;
   lrView = this->mixerSettings->lrViewEnabled();
   volInc = this->mixerSettings->getVolInc();
+  direction = this->mixerSettings->inverseScrollEnabled() ? -1 : 1;
   setIconByPixmap(this->iconLoader->mixerIcon);
   setMixer(mixer);
   setContextMenu(&trayMenu);
@@ -36,6 +37,8 @@ TrayIcon::TrayIcon(const IconLoader &iconLoader,
           SLOT(catchLRViewChanged(bool)));
   connect(this->mixerSettings, SIGNAL(volIncChanged(int)), this,
           SLOT(catchVolIncChanged(int)));
+  connect(this->mixerSettings, SIGNAL(inverseScrollChanged(bool)), this,
+          SLOT(catchInverseScrollChanged(bool)));
   connect(this, SIGNAL(scrollRequested(int, Qt::Orientation)), this,
           SLOT(catchScrollRequest(int, Qt::Orientation)));
 }
@@ -43,6 +46,10 @@ TrayIcon::TrayIcon(const IconLoader &iconLoader,
 void TrayIcon::catchLRViewChanged(bool on) {
   lrView = on;
   update();
+}
+
+void TrayIcon::catchInverseScrollChanged(bool on) {
+  direction = on ? -1 : 1;
 }
 
 void TrayIcon::catchVolIncChanged(int volInc) {
@@ -124,5 +131,5 @@ void TrayIcon::catchScrollRequest(int delta, Qt::Orientation orientation) {
     inc = -volInc;
   else
     inc = volInc;
-  mixer->changeMasterVol(inc);
+  mixer->changeMasterVol(inc * direction);
 }

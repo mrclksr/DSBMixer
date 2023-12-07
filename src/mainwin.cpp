@@ -5,6 +5,7 @@
  *
  */
 
+#include "src/mixersettings.h"
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -76,13 +77,16 @@ void MainWin::initMixerSettings() {
                         dsbcfg_getval(cfg, CFG_MASK).integer,
                         dsbcfg_getval(cfg, CFG_POLL_IVAL).integer,
                         dsbcfg_getval(cfg, CFG_UNIT_CHK_IVAL).integer,
-                        dsbcfg_getval(cfg, CFG_VOL_INC).integer, this);
+                        dsbcfg_getval(cfg, CFG_VOL_INC).integer,
+                        dsbcfg_getval(cfg, CFG_INVERSE_SCROLL).boolean, this);
   qApp->setWheelScrollLines(mixerSettings->getVolInc());
 }
 
 void MainWin::storeMixerSettings() {
   dsbcfg_set_bool(cfg, CFG_LRVIEW, mixerSettings->lrViewEnabled());
   dsbcfg_set_bool(cfg, CFG_TICKS, mixerSettings->scaleTicksEnabled());
+  dsbcfg_set_bool(cfg, CFG_INVERSE_SCROLL,
+                  mixerSettings->inverseScrollEnabled());
   dsbcfg_set_int(cfg, CFG_MASK, mixerSettings->getChanMask());
   dsbcfg_set_int(cfg, CFG_POLL_IVAL, mixerSettings->getPollIval());
   dsbcfg_set_int(cfg, CFG_UNIT_CHK_IVAL, mixerSettings->getUnitChkIval());
@@ -183,6 +187,7 @@ void MainWin::showConfigMenu() {
   settings.pollIval = mixerSettings->getPollIval();
   settings.unitChkIval = mixerSettings->getUnitChkIval();
   settings.volInc = mixerSettings->getVolInc();
+  settings.inverseScroll = mixerSettings->inverseScrollEnabled();
 
   settings.amplify = dsbmixer_amplification();
   settings.feederRateQuality = dsbmixer_feeder_rate_quality(),
@@ -210,7 +215,9 @@ void MainWin::showConfigMenu() {
   mixerSettings->setPollIval(prefs.settings.pollIval);
   mixerSettings->setUnitChkIval(prefs.settings.unitChkIval);
   mixerSettings->setVolInc(prefs.settings.volInc);
+  mixerSettings->setInverseScroll(prefs.settings.inverseScroll);
   qApp->setWheelScrollLines(prefs.settings.volInc);
+
   storeMixerSettings();
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   auto *codec{QTextCodec::codecForLocale()};
@@ -339,7 +346,7 @@ void MainWin::registerDBusService() {
   if (!QDBusConnection::sessionBus().registerService("org.dsb.dsbmixer"))
     qDebug() << "registerService() failed";
   if (!QDBusConnection::sessionBus().registerObject(
-        "/", this, QDBusConnection::ExportScriptableSlots))
+          "/", this, QDBusConnection::ExportScriptableSlots))
     qDebug() << "registerObject() failed";
 }
 

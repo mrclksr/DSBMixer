@@ -14,7 +14,7 @@ class MixerSettings : public QObject {
   MixerSettings(bool lrView = false, bool scaleTicks = true,
                 int chanMask = 0xff, int pollIvalMs = 900,
                 int unitChkIval = 3000, int volInc = 3,
-                QObject *parent = nullptr);
+                bool inverseScroll = false, QObject *parent = nullptr);
 
   void setLRView(bool on);
   void setScaleTicks(bool on);
@@ -22,8 +22,10 @@ class MixerSettings : public QObject {
   void setPollIval(int ms);
   void setUnitChkIval(int ms);
   void setVolInc(int volInc);
+  void setInverseScroll(bool on);
   bool scaleTicksEnabled() const;
   bool lrViewEnabled() const;
+  bool inverseScrollEnabled() const;
   int getChanMask() const;
   int getPollIval() const;
   int getUnitChkIval() const;
@@ -37,6 +39,7 @@ class MixerSettings : public QObject {
   void chanMaskChanged(int mask);
   void scaleTicksChanged(bool on);
   void volIncChanged(int volInc);
+  void inverseScrollChanged(bool on);
 
  private:
   int volInc{3};
@@ -45,4 +48,5 @@ class MixerSettings : public QObject {
   int unitChkIvalMs{3000};
   bool lrView{false};
   bool scaleTicks{true};
+  bool inverseScroll{false};
 };

@@ -22,6 +22,7 @@ class Settings {
   bool bypassMixer;
   bool lrView;
   bool showTicks;
+  bool inverseScroll;
   QString playCmd;
   QString themeName;
 };

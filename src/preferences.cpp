@@ -24,6 +24,7 @@
 #include <QVBoxLayout>
 
 #include "libdsbmixer.h"
+#include "qnamespace.h"
 #include "qt-helper/qt-helper.h"
 
 Preferences::Preferences(Settings &oldSettings, QWidget *parent)
@@ -71,6 +72,8 @@ void Preferences::acceptSlot() {
       settings.chanMask &= ~(1 << i);
   }
   settings.showTicks = showTicksCb->checkState() == Qt::Checked ? true : false;
+  settings.inverseScroll =
+      inverseScrollCb->checkState() == Qt::Checked ? true : false;
   if (lrViewCb->checkState() == Qt::Checked)
     settings.lrView = true;
   else
@@ -280,7 +283,10 @@ QWidget *Preferences::createBehaviorTab() {
   pollIvalSb = new QSpinBox(this);
   unitChkIvalSb = new QSpinBox(this);
   granularitySb = new QSpinBox(this);
-
+  inverseScrollCb = new QCheckBox(tr("Inverse scroll direction of tray"));
+  inverseScrollCb->setToolTip(
+      tr("On some panels the scroll direction is inversed."));
+  inverseScrollCb->setChecked(settings.inverseScroll);
   pollIvalSb->setRange(10, 10000);
   pollIvalSb->setValue(settings.pollIval);
   pollIvalSb->setSuffix(" ms");
@@ -313,6 +319,8 @@ QWidget *Preferences::createBehaviorTab() {
   label = new QLabel(tr("Mouse wheel scroll lines"));
   grid->addWidget(label, 3, 0);
   grid->addWidget(granularitySb, 3, 1);
+
+  grid->addWidget(inverseScrollCb, 4, 0);
 
   grpBox->setLayout(grid);
   vbox->addWidget(grpBox);
