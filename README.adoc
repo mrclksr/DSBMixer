@@ -310,13 +310,6 @@ VOID org.dsb.dsbmixer.toggleAppsWin()::
 
 -i:: Start _DSBMixer_ as tray icon
 
-== Troubleshooting
-
-=== Mouse Wheel not Working on Tray Icon
-
-==== Solution
-Start DSBMixer via `dbus-launch dsbmixer`
-
 == Development
 
 === Contributing Translations
