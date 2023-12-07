@@ -35,6 +35,8 @@ class MainWin : public QMainWindow {
   Q_SCRIPTABLE void setVol(uint lvol, uint rvol);
   Q_SCRIPTABLE void mute(bool on);
   Q_SCRIPTABLE void toggleMute();
+  Q_SCRIPTABLE void toggleAppsWin();
+
  private slots:
   void catchDefaultMixerChanged(Mixer *mixer);
   void catchMixerRemoved();

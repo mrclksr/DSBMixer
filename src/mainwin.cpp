@@ -367,3 +367,11 @@ void MainWin::toggleMute() {
   if (!currentMixer) return;
   currentMixer->toggleMute(DSBMIXER_MASTER);
 }
+
+void MainWin::toggleAppsWin() {
+  if (appsMixer) {
+    delete appsMixer;
+    appsMixer = nullptr;
+  } else
+    showAppsMixer();
+}
