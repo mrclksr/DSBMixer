@@ -9,15 +9,15 @@
 
 #include <QDebug>
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-# include <QRegExp>
+#include <QRegExp>
 #else
-# include <QRegularExpression>
+#include <QRegularExpression>
 #endif
 
 #include "libdsbmixer.h"
 
 Mixer::Mixer(dsbmixer_t &mixer, const MixerSettings &mixerSettings,
-                 QWidget *parent)
+             QWidget *parent)
     : QWidget(parent) {
   this->mixer = &mixer;
   this->mixerSettings = &mixerSettings;

@@ -339,7 +339,7 @@ void MainWin::registerDBusService() {
   if (!QDBusConnection::sessionBus().registerService("org.dsb.dsbmixer"))
     qDebug() << "registerService() failed";
   if (!QDBusConnection::sessionBus().registerObject(
-        "/Vol", this, QDBusConnection::ExportScriptableSlots))
+          "/Vol", this, QDBusConnection::ExportScriptableSlots))
     qDebug() << "registerObject() failed";
 }
 
