@@ -59,7 +59,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent) : QMainWindow(parent) {
   createMainMenu();
   setWindowIcon(iconLoader->mixerIcon);
   setWindowTitle("DSBMixer");
-
+  registerDBusService();
   resize(dsbcfg_getval(cfg, CFG_WIDTH).integer,
          dsbcfg_getval(cfg, CFG_HEIGHT).integer);
   move(dsbcfg_getval(cfg, CFG_POS_X).integer,
@@ -332,4 +332,38 @@ void MainWin::createTrayIcon() {
   updateTrayMenu();
   trayIcon =
       new TrayIcon(*iconLoader, *mixerSettings, *trayMenu, currentMixer, this);
+}
+
+void MainWin::registerDBusService() {
+  if (!QDBusConnection::sessionBus().isConnected()) return;
+  if (!QDBusConnection::sessionBus().registerService("org.dsb.dsbmixer"))
+    qDebug() << "registerService() failed";
+  if (!QDBusConnection::sessionBus().registerObject(
+        "/Vol", this, QDBusConnection::ExportScriptableSlots))
+    qDebug() << "registerObject() failed";
+}
+
+void MainWin::incVol(uint amount) {
+  if (!currentMixer) return;
+  currentMixer->changeMasterVol(amount);
+}
+
+void MainWin::decVol(uint amount) {
+  if (!currentMixer) return;
+  currentMixer->changeMasterVol(-amount);
+}
+
+void MainWin::setVol(uint lvol, uint rvol) {
+  if (!currentMixer) return;
+  currentMixer->setVol(DSBMIXER_MASTER, lvol, rvol);
+}
+
+void MainWin::mute(bool on) {
+  if (!currentMixer) return;
+  currentMixer->setMute(DSBMIXER_MASTER, on);
+}
+
+void MainWin::toggleMute() {
+  if (!currentMixer) return;
+  currentMixer->toggleMute(DSBMIXER_MASTER);
 }

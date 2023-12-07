@@ -29,7 +29,7 @@ TrayIcon::TrayIcon(const IconLoader &iconLoader,
   setMixer(mixer);
   setContextMenu(&trayMenu);
   setStatus(KStatusNotifierItem::Active);
-  registerDBusService();
+
   connect(this->iconLoader, SIGNAL(trayIconThemeChanged()), this,
           SLOT(catchTrayIconThemeChanged()));
   connect(this->mixerSettings, SIGNAL(lrViewChanged(bool)), this,
@@ -126,25 +126,3 @@ void TrayIcon::catchScrollRequest(int delta, Qt::Orientation orientation) {
     inc = volInc;
   mixer->changeMasterVol(inc);
 }
-
-void TrayIcon::registerDBusService() {
-  if (!QDBusConnection::sessionBus().isConnected()) return;
-  if (!QDBusConnection::sessionBus().registerService("org.dsb.dsbmixer"))
-    qDebug() << "registerService() failed";
-  if (!QDBusConnection::sessionBus().registerObject(
-          "/Vol", this, QDBusConnection::ExportScriptableSlots))
-    qDebug() << "registerObject() failed";
-}
-
-void TrayIcon::incVol(uint amount) {
-  if (!mixer) return;
-  mixer->changeMasterVol(amount);
-  update();
-}
-
-void TrayIcon::decVol(uint amount) {
-  if (!mixer) return;
-  mixer->changeMasterVol(-amount);
-  update();
-}
-

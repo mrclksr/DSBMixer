@@ -143,6 +143,26 @@ void Mixer::setMute(int chan, int state) {
   muted = _muted;
 }
 
+void Mixer::setMute(int chan, bool on) {
+  const int idx{channelIndex(chan)};
+  if (idx < 0) return;
+  dsbmixer_set_mute(mixer, chan, on);
+  bool _muted{dsbmixer_is_muted(mixer, chan)};
+  if (_muted != muted) emit muteStateChanged(dsbmixer_get_unit(mixer), _muted);
+  muted = _muted;
+  channels.at(idx)->setMute(muted);
+}
+
+void Mixer::toggleMute(int chan) {
+  const int idx{channelIndex(chan)};
+  if (idx < 0) return;
+  dsbmixer_set_mute(mixer, chan, !muted);
+  bool _muted{dsbmixer_is_muted(mixer, chan)};
+  if (_muted != muted) emit muteStateChanged(dsbmixer_get_unit(mixer), _muted);
+  muted = _muted;
+  channels.at(idx)->setMute(muted);
+}
+
 void Mixer::update() {
   for (auto &cs : channels) {
     const int chan{cs->id};

@@ -36,7 +36,7 @@ class Mixer : public QWidget {
   Q_OBJECT
  public:
   Mixer(dsbmixer_t &mixer, const MixerSettings &mixerSettings,
-          QWidget *parent = nullptr);
+        QWidget *parent = nullptr);
   ~Mixer();
   void update();
   bool isMuted(int chan) const;
@@ -48,12 +48,16 @@ class Mixer : public QWidget {
   dsbmixer_t *getDev() const;
   QString getName() const;
 
+ public slots:
+  void setVol(int chan, int lvol, int rvol);
+  void setMute(int chan, bool on);
+  void toggleMute(int chan);
+
  private slots:
   void setLVol(int chan, int lvol);
   void setRVol(int chan, int rvol);
-  void setVol(int chan, int lvol, int rvol);
-  void setRecSrc(int chan, int state);
   void setMute(int chan, int state);
+  void setRecSrc(int chan, int state);
   void redrawMixer();
 
  signals:

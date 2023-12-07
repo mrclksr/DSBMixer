@@ -20,7 +20,6 @@
 
 class TrayIcon : public KStatusNotifierItem {
   Q_OBJECT
-  Q_CLASSINFO("D-Bus Interface", "org.dsb.dsbmixer")
  public:
   TrayIcon(const IconLoader &iconLoader, const MixerSettings &mixerSettings,
            QMenu &trayMenu, Mixer *mixer, QObject *parent = nullptr);
@@ -35,10 +34,6 @@ class TrayIcon : public KStatusNotifierItem {
   void catchLRViewChanged(bool on);
   void catchVolIncChanged(int volInc);
   void catchScrollRequest(int delta, Qt::Orientation orientation);
-
-public slots:
-  Q_SCRIPTABLE void incVol(uint amount);
-  Q_SCRIPTABLE void decVol(uint amount);
 
  private:
   void registerDBusService();

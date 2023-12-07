@@ -21,6 +21,7 @@
 
 class MainWin : public QMainWindow {
   Q_OBJECT
+  Q_CLASSINFO("D-Bus Interface", "org.dsb.dsbmixer")
  public:
   MainWin(dsbcfg_t *cfg, QWidget *parent = 0);
   QMenu *menu();
@@ -29,7 +30,11 @@ class MainWin : public QMainWindow {
   void showConfigMenu();
   void toggleWin();
   void quit();
-
+  Q_SCRIPTABLE void incVol(uint amount);
+  Q_SCRIPTABLE void decVol(uint amount);
+  Q_SCRIPTABLE void setVol(uint lvol, uint rvol);
+  Q_SCRIPTABLE void mute(bool on);
+  Q_SCRIPTABLE void toggleMute();
  private slots:
   void catchDefaultMixerChanged(Mixer *mixer);
   void catchMixerRemoved();
@@ -58,6 +63,7 @@ class MainWin : public QMainWindow {
   void initMixerSettings();
   void storeMixerSettings();
   void saveGeometry();
+  void registerDBusService();
   QAction *createQuitAction();
   QAction *createPrefsAction();
   QAction *createAppsMixerAction();
