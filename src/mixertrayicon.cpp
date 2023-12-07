@@ -28,6 +28,7 @@ TrayIcon::TrayIcon(const IconLoader &iconLoader,
   direction = this->mixerSettings->inverseScrollEnabled() ? -1 : 1;
   setIconByPixmap(this->iconLoader->mixerIcon);
   setMixer(mixer);
+  setStandardActionsEnabled(false);
   setContextMenu(&trayMenu);
   setStatus(KStatusNotifierItem::Active);
 
