@@ -26,7 +26,6 @@ class MainWin : public QMainWindow {
   QMenu *menu();
 
  public slots:
-  void trayClicked(QSystemTrayIcon::ActivationReason reason);
   void showConfigMenu();
   void toggleWin();
   void quit();
@@ -38,7 +37,6 @@ class MainWin : public QMainWindow {
   void catchCurrentMixerChanged(Mixer *mixer);
   void catchScrGeomChanged();
   void catchAppsMixerClosed();
-  void checkForSysTray();
   void restartAudioApps();
   void showAppsMixer();
   void setTabIndex(int index);

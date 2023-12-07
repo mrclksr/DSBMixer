@@ -42,7 +42,6 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent) : QMainWindow(parent) {
   iconLoader = new IconLoader(trayThemeStr);
   mixerList = new MixerList(*mixerSettings, this);
   mixerTabs = new MixerTabs(*mixerList, this);
-  traytimer = new QTimer(this);
   defaultMixer = mixerList->getDefaultMixer();
   currentMixer = defaultMixer;
   connect(mixerList, SIGNAL(mixerAdded(Mixer *)), this,
@@ -56,9 +55,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent) : QMainWindow(parent) {
   connect(QGuiApplication::primaryScreen(),
           SIGNAL(geometryChanged(const QRect &)), this,
           SLOT(catchScrGeomChanged()));
-  connect(traytimer, SIGNAL(timeout()), this, SLOT(checkForSysTray()));
-
-  traytimer->start(trayCheckIvalMs);
+  createTrayIcon();
   createMainMenu();
   setWindowIcon(iconLoader->mixerIcon);
   setWindowTitle("DSBMixer");
@@ -111,19 +108,6 @@ void MainWin::catchCurrentMixerChanged(Mixer *mixer) {
 void MainWin::catchMixerRemoved() { updateTrayMenu(); }
 
 void MainWin::catchMixerAdded() { updateTrayMenu(); }
-
-void MainWin::trayClicked(QSystemTrayIcon::ActivationReason reason) {
-  if (reason == QSystemTrayIcon::Trigger ||
-      reason == QSystemTrayIcon::DoubleClick) {
-    if (!this->isVisible()) {
-      this->setVisible(true);
-      saveGeometry();
-    } else {
-      saveGeometry();
-      this->setVisible(false);
-    }
-  }
-}
 
 void MainWin::showAppsMixer() {
   if (appsMixer) {
@@ -343,28 +327,9 @@ void MainWin::updateTrayMenu() {
   connect(toggle, SIGNAL(triggered()), this, SLOT(toggleWin()));
 }
 
-void MainWin::checkForSysTray() {
-  if (!QSystemTrayIcon::isSystemTrayAvailable() && trayIcon) {
-    trayCheckCounter = trayCheckTries;
-    delete trayIcon;
-    trayIcon = nullptr;
-    return;
-  }
-  if (QSystemTrayIcon::isSystemTrayAvailable()) {
-    createTrayIcon();
-    traytimer->stop();
-  } else if (trayCheckCounter-- <= 0) {
-    traytimer->stop();
-    show();
-  }
-}
-
 void MainWin::createTrayIcon() {
   trayMenu = new QMenu(this);
   updateTrayMenu();
   trayIcon =
       new TrayIcon(*iconLoader, *mixerSettings, *trayMenu, currentMixer, this);
-  trayIcon->show();
-  connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this,
-          SLOT(trayClicked(QSystemTrayIcon::ActivationReason)));
 }

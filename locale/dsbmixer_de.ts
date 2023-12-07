@@ -30,32 +30,32 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="293"/>
+        <location filename="../src/mainwin.cpp" line="277"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="299"/>
+        <location filename="../src/mainwin.cpp" line="283"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="306"/>
+        <location filename="../src/mainwin.cpp" line="290"/>
         <source>&amp;Open applications mixer</source>
         <translation>Öffne &amp;Anwendungs-Mixer</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="321"/>
+        <location filename="../src/mainwin.cpp" line="305"/>
         <source>Show/hide window</source>
         <translation>Zeige/verstecke Fenster</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="327"/>
+        <location filename="../src/mainwin.cpp" line="311"/>
         <source>Sound devices</source>
         <translation>Audio-Geräte</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="312"/>
+        <location filename="../src/mainwin.cpp" line="296"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
@@ -301,7 +301,7 @@ Höhere Werte bedeuten weniger CPU-Last.
 <context>
     <name>TrayIcon</name>
     <message>
-        <location filename="../src/mixertrayicon.cpp" line="162"/>
+        <location filename="../src/mixertrayicon.cpp" line="110"/>
         <source>Muted</source>
         <translation>Stumm</translation>
     </message>
