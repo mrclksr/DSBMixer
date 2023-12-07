@@ -35,11 +35,13 @@ image::images/mainwin.png[Main window]
 * https://freshports.org/devel/qt5-qmake[devel/qt5-qmake]
 * https://freshports.org/x11-toolkits/qt5-gui[x11-toolkits/qt5-gui]
 * https://freshports.org/x11-toolkits/qt5-widgets[x11-toolkits/qt5-widgets]
+* https://www.freshports.org/devel/kf5-knotifications/[devel/kf5-knotifications]
 
 ==== Dependencies (Qt6)
 * https://www.freshports.org/devel/cmake[devel/cmake]
 * https://www.freshports.org/devel/qt6-base[devel/qt6-base]
 * https://www.freshports.org/devel/qt6-tools/[devel/qt6-tools]
+* https://www.freshports.org/devel/kf6-knotifications/[devel/kf6-knotifications]
 
 ==== Getting the Source Code
 
@@ -179,9 +181,6 @@ The master volume can be increased/decreased by scrolling up/down on the
 tray icon. If possible, both channel volumes are
 <<uniview,equally increase/decreased>>.
 
-.Changing the master volume via tray icon
-image::images/tray-slider.png[]
-
 Left-clicking on the tray icon will show/hide the main window.
 
 Right-clicking will show the tray icon's context menu.
@@ -275,6 +274,31 @@ currently using the sound system.
 
 .Applications Mixer
 image::images/apps-mixer.png[Applications mixer]
+
+=== The D-Bus Interface
+
+*DSBMixer* registers the D-Bus service *org.dsb.dsbmixer*. The interface
+*org.dsb.dsbmixer* under the path */* provides the following methods:
+
+VOID org.dsb.dsbmixer.setVol(UINT32 lvol, UINT32 rvol)::
+	Sets the left and right volume of the master channel.
+
+VOID org.dsb.dsbmixer.incVol(UINT32 amount)::
+	Increases the volume of the master channel by *amount*.
+
+VOID org.dsb.dsbmixer.decVol(UINT32 amount)::
+	Decreases the volume of the master channel by *amount*.
+
+VOID org.dsb.dsbmixer.mute(BOOLEAN on)::
+	Mutes the master channel if *on* is *true*. Unmutes the master channel
+	if *on* is *false*.
+
+VOID org.dsb.dsbmixer.toggleMute()::
+	Toggles the mute state of the master channel.
+
+VOID org.dsb.dsbmixer.toggleAppsWin()::
+	Toggles the visibility of the applications mixer.
+
 
 === Command-line
 
