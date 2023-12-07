@@ -1,7 +1,7 @@
 #!/bin/sh
 
 dbus_service="org.dsb.dsbmixer"
-dbus_path="/Vol"
+dbus_path="/"
 dbus_interface="org.dsb.dsbmixer"
 
 callDBusSend() {
