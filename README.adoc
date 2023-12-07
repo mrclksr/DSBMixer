@@ -277,7 +277,7 @@ image::images/apps-mixer.png[Applications mixer]
 
 === The D-Bus Interface
 
-*DSBMixer* registers the D-Bus service *org.dsb.dsbmixer*. The interface
+_DSBMixer_ registers the D-Bus service *org.dsb.dsbmixer*. The interface
 *org.dsb.dsbmixer* under the path */* provides the following methods:
 
 VOID org.dsb.dsbmixer.setVol(UINT32 lvol, UINT32 rvol)::
@@ -299,6 +299,23 @@ VOID org.dsb.dsbmixer.toggleMute()::
 VOID org.dsb.dsbmixer.toggleAppsWin()::
 	Toggles the visibility of the applications mixer.
 
+==== The dsbmixer-dbus Script
+
+The shell script *dsbmixer-dbus* can be used to call the methods above.
+
+===== Examples
+Set the master volume to 10:10
+
+[source,sh]
+----
+% dsbmixer-dbus setVol 10 10
+----
+
+Toggle the applications mixer window
+[source,sh]
+----
+% dsbmixer-dbus toggleAppsWin
+----
 
 === Command-line
 
