@@ -103,7 +103,7 @@ target_link_libraries(dsbmixer PRIVATE
   pthread KF${QT_MAJOR_VERSION}::Notifications)
 
 install(TARGETS dsbmixer DESTINATION bin)
-install(PROGRAMS dsbmixer-dbus DESTINATION bin)
+install(PROGRAMS scripts/dsbmixer-dbus DESTINATION bin)
 install(FILES "${CMAKE_PROJECT_NAME}.desktop"
   DESTINATION share/applications)
 install(FILES ${QM_FILES} DESTINATION "${DATADIR}")
