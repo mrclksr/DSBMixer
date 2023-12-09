@@ -10,15 +10,11 @@
 MixerSettings::MixerSettings(bool lrView, bool scaleTicks, int chanMask,
                              int pollIvalMs, int unitChkIvalMs, int volInc,
                              bool inverseScroll, QObject *parent)
-    : QObject(parent) {
-  this->chanMask = chanMask;
-  this->pollIvalMs = pollIvalMs;
-  this->volInc = volInc;
-  this->unitChkIvalMs = unitChkIvalMs;
-  this->lrView = lrView;
-  this->scaleTicks = scaleTicks;
-  this->inverseScroll = inverseScroll;
-}
+    : QObject(parent),
+      chanMask{chanMask},
+      pollIvalMs{pollIvalMs},
+      volInc{volInc},
+      inverseScroll{inverseScroll} {}
 
 void MixerSettings::setLRView(bool on) {
   if (lrView == on) return;
