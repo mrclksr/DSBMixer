@@ -41,6 +41,7 @@
 #define PATH_DEFAULT_MIXER "/dev/mixer"
 #define PATH_PS "/bin/ps"
 
+
 #define RE_STR                                             \
   "([0-9]+)[[:space:]]+([^[:space:]]+)[[:space:]]+"        \
   "([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+" \
@@ -101,11 +102,19 @@ typedef struct mqmsg_s {
 } mqmsg_t;
 #endif
 
-static struct restart_cmd_s {
-  const char *cmd;
-  const char *restart;
-} restart_cmds[] = {{"pulseaudio", PATH_RESTART_PA},
-                    {"sndiod", "kill -HUP %p"}};
+/*
+ * Placeholder   Meaning
+ * %u            Previous audio default unit number
+ * %U            Current audio default unit number
+ * %p            PID of the audio proc
+ */
+#define CMD_MOVE_PA_STREAMS PATH_DSBMIXER_PA " move-streams %u %U"
+#define CMD_RESTART_PA PATH_DSBMIXER_PA " restart"
+#define CMD_RESTART_SNDIO "pkill -HUP %p"
+
+static struct _audio_proc_updater_s audio_proc_updaters[] = {
+    {"pulseaudio", {.move = CMD_MOVE_PA_STREAMS, .restart = CMD_RESTART_PA}},
+    {"sndiod", {.move = NULL, .restart = CMD_RESTART_SNDIO}}};
 
 static int uconnect(const char *path);
 static int get_unit(const char *mixer);
@@ -120,6 +129,7 @@ static int set_recsrc(dsbmixer_t *mixer, int mask);
 static int set_vol(dsbmixer_t *mixer, int dev, int vol);
 static int read_vol(dsbmixer_t *mixer);
 static int read_recsrc(dsbmixer_t *mixer);
+static int run_audio_proc_updater(dsbmixer_audio_proc_t *, const char *);
 static char *get_cardname(const char *mixer);
 static char *get_ugen(int pcmunit);
 static char *exec_backend(const char *cmd, int *ret);
@@ -144,7 +154,8 @@ static pthread_t thr;
 static char errormsg[_POSIX2_LINE_MAX];
 static dsbmixer_t **mixers = NULL;
 static const char *channel_names[] = SOUND_DEVICE_LABELS;
-static const char *lookup_restart_cmd(const char *);
+static const struct _audio_proc_updater_s *lookup_audio_proc_updater(
+    const char *);
 
 int dsbmixer_init() {
   get_snd_settings();
@@ -203,7 +214,7 @@ const char *dsbmixer_get_card_name(const dsbmixer_t *mixer) {
 const char *dsbmixer_get_name(const dsbmixer_t *mixer) { return (mixer->name); }
 
 const char *dsbmixer_get_audio_proc_cmd(const dsbmixer_audio_proc_t *ap) {
-  return (ap->cmd);
+  return (ap->updater->proc);
 }
 
 pid_t dsbmixer_get_audio_proc_pid(const dsbmixer_audio_proc_t *ap) {
@@ -399,6 +410,8 @@ int dsbmixer_poll_default_unit(void) {
   unit = 0;
   if (sysctlbyname("hw.snd.default_unit", &unit, &sz, NULL, 0))
     warn("sysctl(hw.snd.default_unit)");
+  if (unit != dsbmixer_snd_settings.default_unit)
+    dsbmixer_snd_settings.prev_unit = dsbmixer_snd_settings.default_unit;
   dsbmixer_snd_settings.default_unit = unit;
 
   return (unit);
@@ -410,8 +423,8 @@ int dsbmixer_set_default_unit(int unit) {
     warn("Couldn't set hw.snd.default_unit");
     return (-1);
   }
+  dsbmixer_snd_settings.prev_unit = dsbmixer_snd_settings.default_unit;
   dsbmixer_snd_settings.default_unit = unit;
-
   return (0);
 }
 
@@ -438,35 +451,12 @@ int dsbmixer_change_settings(int dfltunit, int amp, int qual, int latency,
   return (0);
 }
 
-int dsbmixer_restart_audio_proc(dsbmixer_audio_proc_t *proc) {
-  int error;
-  char *cmd, *q;
-  size_t n, len;
-  const char *p;
+int dsbmixer_audio_proc_move(dsbmixer_audio_proc_t *proc) {
+  return (run_audio_proc_updater(proc, proc->updater->update_cmds.move));
+}
 
-  _error = 0;
-  len = strlen(proc->restart);
-  for (p = proc->restart; *p != '\0'; p++) {
-    if (*p == '%') len += 16;
-  }
-  if ((cmd = malloc(len)) == NULL) ERROR(-1, FATAL_SYSERR, false, "malloc()");
-  for (p = proc->restart, q = cmd; *p != '\0'; p++) {
-    if (*p == '%') {
-      if (p[1] == '%') {
-        *q++ = '%';
-      } else if (p[1] == 'p') {
-        n = snprintf(q, len - (q - cmd), "%d", proc->pid);
-        q += n;
-      }
-      p++;
-    } else
-      *q++ = *p;
-  }
-  *q = '\0';
-  error = system(cmd);
-  free(cmd);
-
-  return (error);
+int dsbmixer_audio_proc_restart(dsbmixer_audio_proc_t *proc) {
+  return (run_audio_proc_updater(proc, proc->updater->update_cmds.restart));
 }
 
 dsbmixer_audio_proc_t *dsbmixer_get_audio_procs(size_t *_nprocs) {
@@ -478,6 +468,7 @@ dsbmixer_audio_proc_t *dsbmixer_get_audio_procs(size_t *_nprocs) {
   const char *rcmd;
   struct passwd *pwdres, pwd;
   dsbmixer_audio_proc_t *ap;
+  const struct _audio_proc_updater_s *updater;
 
   _error = 0;
   if (getpwuid_r(getuid(), &pwd, pwdbuf, sizeof(pwdbuf), &pwdres) != 0)
@@ -499,21 +490,28 @@ dsbmixer_audio_proc_t *dsbmixer_get_audio_procs(size_t *_nprocs) {
     buf[pmatch[5].rm_eo] = '\0';
     cmd = buf + pmatch[5].rm_so;
     cmd = basename(cmd);
-    if ((rcmd = lookup_restart_cmd(cmd)) == NULL) continue;
+    if ((updater = lookup_audio_proc_updater(cmd)) == NULL) continue;
     if (++nprocs >= nap) {
       nap += 5;
       ap = realloc(ap, nap * sizeof(dsbmixer_audio_proc_t));
       if (ap == NULL) ERROR(NULL, FATAL_SYSERR, false, "realloc()");
     }
-    (void)strlcpy(ap[nprocs - 1].cmd, cmd, sizeof(ap[nprocs - 1].cmd));
     ap[nprocs - 1].pid = strtol(pid, NULL, 10);
-    ap[nprocs - 1].restart = rcmd;
+    ap[nprocs - 1].updater = updater;
   }
   *_nprocs = nprocs;
   regfree(&re);
   (void)pclose(fp);
 
   return (ap);
+}
+
+bool dsbmixer_audio_proc_can_move(const dsbmixer_audio_proc_t *proc) {
+  return ((proc->updater->update_cmds.move != NULL));
+}
+
+bool dsbmixer_audio_proc_can_restart(const dsbmixer_audio_proc_t *proc) {
+  return ((proc->updater->update_cmds.restart != NULL));
 }
 
 dsbappsmixer_t *dsbappsmixer_create_mixer() {
@@ -577,16 +575,16 @@ int dsbappsmixer_set_lvol(dsbappsmixer_t *am, int chan, int lvol) {
   RETURN_ERROR_IF_APPS_CHAN_INVALID(-1, am, chan);
   errno = 0;
   return (dsbappsmixer_set_vol(
-    am, chan,
-    DSBMIXER_CHAN_CONCAT(lvol, DSBMIXER_CHAN_RIGHT(am->chan[chan]->vol))));
+      am, chan,
+      DSBMIXER_CHAN_CONCAT(lvol, DSBMIXER_CHAN_RIGHT(am->chan[chan]->vol))));
 }
 
 int dsbappsmixer_set_rvol(dsbappsmixer_t *am, int chan, int rvol) {
   RETURN_ERROR_IF_APPS_CHAN_INVALID(-1, am, chan);
   errno = 0;
   return (dsbappsmixer_set_vol(
-    am, chan,
-    DSBMIXER_CHAN_CONCAT(DSBMIXER_CHAN_LEFT(am->chan[chan]->vol), rvol)));
+      am, chan,
+      DSBMIXER_CHAN_CONCAT(DSBMIXER_CHAN_LEFT(am->chan[chan]->vol), rvol)));
 }
 
 int dsbappsmixer_set_mute(dsbappsmixer_t *mixer, int chan, bool mute) {
@@ -638,8 +636,7 @@ int dsbappsmixer_poll(dsbappsmixer_t *am) {
       return (DSBAPPSMIXER_CHANS_CHANGED);
     } else if ((vol = read_appvol(am->chan[n]->dev)) != -1) {
       am->chan[n]->vol = vol;
-      if (vol > 0)
-        am->chan[n]->muted = false;
+      if (vol > 0) am->chan[n]->muted = false;
     }
     n++;
   }
@@ -1279,15 +1276,61 @@ static char *exec_backend(const char *cmd, int *ret) {
   return (*ret == -1 ? NULL : buf);
 }
 
-static const char *lookup_restart_cmd(const char *cmd) {
+static const struct _audio_proc_updater_s *lookup_audio_proc_updater(
+    const char *cmd) {
   size_t i;
 
-  for (i = 0; i < sizeof(restart_cmds) / sizeof(restart_cmds[0]); i++) {
-    if (strcmp(cmd, restart_cmds[i].cmd) == 0) return (restart_cmds[i].restart);
+  for (i = 0; i < sizeof(audio_proc_updaters) / sizeof(audio_proc_updaters[0]);
+       i++) {
+    if (strcmp(cmd, audio_proc_updaters[i].proc) == 0)
+      return (&audio_proc_updaters[i]);
   }
   return (NULL);
 }
 
+static int run_audio_proc_updater(dsbmixer_audio_proc_t *proc,
+                                  const char *update_cmd) {
+  int error;
+  char *cmd, *q;
+  size_t n, len;
+  const char *p;
+
+  if (update_cmd == NULL || *update_cmd == '\0') {
+    warnx("Empty update command passed");
+    return (-1);
+  }
+  _error = 0;
+  len = strlen(update_cmd);
+  for (p = update_cmd; *p != '\0'; p++) {
+    if (*p == '%') len += 16;
+  }
+  if ((cmd = malloc(len)) == NULL) ERROR(-1, FATAL_SYSERR, false, "malloc()");
+  for (p = update_cmd, q = cmd; *p != '\0'; p++) {
+    if (*p == '%') {
+      if (p[1] == '%') {
+        *q++ = '%';
+      } else if (p[1] == 'p') {
+        n = snprintf(q, len - (q - cmd), "%d", proc->pid);
+        q += n;
+      } else if (p[1] == 'u') {
+        n = snprintf(q, len - (q - cmd), "%d", dsbmixer_snd_settings.prev_unit);
+        q += n;
+      } else if (p[1] == 'U') {
+        n = snprintf(q, len - (q - cmd), "%d",
+                     dsbmixer_snd_settings.default_unit);
+        q += n;
+      }
+      p++;
+    } else
+      *q++ = *p;
+  }
+  *q = '\0';
+  warnx("Running %s", cmd);
+  error = system(cmd);
+  free(cmd);
+
+  return (error);
+}
 
 static int get_oss_sysinfo(int fd, oss_sysinfo *sysinfo) {
   if (ioctl(fd, SNDCTL_SYSINFO, sysinfo) == 0) return (0);

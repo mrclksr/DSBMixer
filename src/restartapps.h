@@ -23,33 +23,39 @@
  */
 
 #pragma once
+#include <QButtonGroup>
 #include <QCheckBox>
-#include <QList>
 #include <QDialog>
+#include <QGroupBox>
+#include <QList>
+#include <QRadioButton>
+#include <QVBoxLayout>
 
-#include "mixer.h"
+#include "libdsbmixer.h"
 
-struct CbProcMap {
-	QCheckBox *cb;
-	dsbmixer_audio_proc_t *proc;
+enum ButtonId { MOVE_BUTTON_ID = 1, RESTART_BUTTON_ID, IGNORE_BUTTON_ID };
+
+struct BGProcMap {
+  QButtonGroup *group;
+  dsbmixer_audio_proc_t *proc;
 };
 
-class RestartApps : public QDialog
-{
-	Q_OBJECT
-public:
-	RestartApps(dsbmixer_audio_proc_t *ap, size_t nap, QWidget *parent = 0);
-private slots:
-	void acceptSlot(void);
-	void rejectSlot(void);
-	void checkCanRestart(void);
-private:
-	void	    cleanup(void);
-	QVBoxLayout *createAppCbs(void);
-private:
-	size_t nap;
-	QPushButton	      *restartPb;
-	QList<CbProcMap *>    cbmap;
-	dsbmixer_audio_proc_t *ap;
+class RestartApps : public QDialog {
+  Q_OBJECT
+ public:
+  RestartApps(dsbmixer_audio_proc_t apps[], size_t napps, QWidget *parent = 0);
+ private slots:
+  void acceptSlot();
+  void rejectSlot();
 
+ private:
+  void cleanup(void);
+  void addButtons(dsbmixer_audio_proc_t *proc, QWidget *parent = nullptr);
+  void addRadioButton(QString text, ButtonId id, BGProcMap *map, QVBoxLayout *layout);
+  QWidget *createAppList();
+  QGroupBox *createAppGroupBox(dsbmixer_audio_proc_t *proc, QWidget *parent = nullptr);
+ private:
+  size_t napps{0};
+  QList<BGProcMap *> bgmap;
+  dsbmixer_audio_proc_t *apps;
 };

@@ -1,0 +1,73 @@
+#!/bin/sh
+
+restart_pa() {
+  pulseaudio --kill
+  n=0
+  while [ $n -lt 5 ]; do
+    pulseaudio --start
+    sleep 1
+    if pgrep -U $(id -ru) -q pulseaudio; then
+      exit 0
+    fi
+    n=$((n + 1))
+  done
+}
+
+get_pa_sink_id() {
+  local unit=$1
+  pactl list short sinks | grep "\\.dsp${unit}" | cut -f 1
+}
+
+get_pa_streams_at_unit() {
+  local unit=$1
+  local sink=$(get_pa_sink_id ${unit})
+  pactl list short sink-inputs | awk -v sink=${sink} '
+    $2 == sink { print $1 }
+  '
+}
+
+move_pa_streams() {
+  local src_unit=$1
+  local dest_unit=$2
+  local dest_sink=$(get_pa_sink_id ${dest_unit})
+
+  for s in $(get_pa_streams_at_unit ${src_unit}); do
+    pactl move-sink-input $s ${dest_sink}
+  done
+}
+
+check_args() {
+  local command=$1
+  local required=$2
+  local given=$3
+  [ ${given} -ge ${required} ] && return
+  echo "Command ${command} requires ${required} arguments," \
+       "but only ${given} where given." >&2
+  exit 1
+}
+
+usage() {
+  local name="$(basename $0)"
+  echo "Usage: ${name} [command args ...]"
+  echo "${name} move-streams <source unit> <dest unit>"
+  echo "${name} restart"
+  exit 1
+}
+
+[ $# -eq 0 ] && usage
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+  move-streams)
+    shift
+    check_args "move-streams" 2 $#
+    move_pa_streams $*
+    shift
+    ;;
+  restart)
+    restart_pa $*
+    ;;
+  esac
+  shift
+done
+

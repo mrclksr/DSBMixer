@@ -41,12 +41,14 @@ typedef struct appsmixer_s dsbappsmixer_t;
  */
 struct dsbmixer_snd_settings_s {
   int default_unit;
+  int prev_unit;
   int amplify;
   int feeder_rate_quality;
   int maxautovchans;
   int latency;
   bool mixer_bypass;
 };
+
 struct dsbmixer_channel_s {
   int vol;          /* (rvol << 8) + vol */
   int saved_vol;    /* Saved vol before muting */
@@ -86,10 +88,19 @@ struct appsmixer_s {
   dsbappsmixer_channel_t *chan[DSBAPPSMIXER_MAX_CHANS];
 };
 
-typedef struct dsbmixer_audio_proc_s {
-  char cmd[64];
-  pid_t pid;
+struct _audio_proc_update_cmds_s {
+  const char *move;
   const char *restart;
+};
+
+struct _audio_proc_updater_s {
+  const char *proc;
+  const struct _audio_proc_update_cmds_s update_cmds;
+};
+
+typedef struct dsbmixer_audio_proc_s {
+  pid_t pid;
+  struct _audio_proc_updater_s const *updater;
 } dsbmixer_audio_proc_t;
 
 extern struct dsbmixer_snd_settings_s dsbmixer_snd_settings;
@@ -116,7 +127,8 @@ extern int dsbmixer_set_mute(dsbmixer_t *mixer, int chan, bool mute);
 extern int dsbmixer_apply_settings(void);
 extern int dsbmixer_change_settings(int, int, int, int, int, bool);
 extern int dsbmixer_poll_default_unit(void);
-extern int dsbmixer_restart_audio_proc(dsbmixer_audio_proc_t *);
+extern int dsbmixer_audio_proc_move(dsbmixer_audio_proc_t *);
+extern int dsbmixer_audio_proc_restart(dsbmixer_audio_proc_t *);
 extern int dsbappsmixer_reinit(dsbappsmixer_t *);
 extern int dsbappsmixer_get_nchans(const dsbappsmixer_t *);
 extern int dsbappsmixer_get_vol(const dsbappsmixer_t *, int);
@@ -131,6 +143,8 @@ extern bool dsbmixer_bypass_mixer(void);
 extern bool dsbmixer_is_muted(dsbmixer_t *mixer, int chan);
 extern bool dsbmixer_can_rec(const dsbmixer_t *mixer, int chan);
 extern bool dsbmixer_is_recsrc(const dsbmixer_t *mixer, int chan);
+extern bool dsbmixer_audio_proc_can_move(const dsbmixer_audio_proc_t *proc);
+extern bool dsbmixer_audio_proc_can_restart(const dsbmixer_audio_proc_t *proc);
 extern void dsbmixer_cleanup(void);
 extern void dsbmixer_del_mixer(dsbmixer_t *);
 extern pid_t dsbappsmixer_get_pid(const dsbappsmixer_t *, int);
