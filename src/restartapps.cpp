@@ -36,7 +36,7 @@ RestartApps::RestartApps(dsbmixer_audio_proc_t *apps, size_t napps,
     winIcon = QIcon(":/icons/preferences-desktop-multimedia.png");
   qApp->setQuitOnLastWindowClosed(false);
   setWindowIcon(winIcon);
-  setWindowTitle(tr("DSBMixer - Restart audio applications"));
+  setWindowTitle(tr("DSBMixer - Default audio device changed"));
   if (parent) {
     int width{parent->width() * 80 / 100};
     if (width > 0) resize(width, height());
