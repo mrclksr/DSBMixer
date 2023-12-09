@@ -305,9 +305,13 @@ Higher values mean less CPU usage.
         <translation type="unfinished">&amp;Ok</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="39"/>
         <source>DSBMixer - Restart audio applications</source>
-        <translation>DSBMixer - Starta om ljud program</translation>
+        <translation type="vanished">DSBMixer - Starta om ljud program</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="39"/>
+        <source>DSBMixer - Default audio device changed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/restartapps.cpp" line="107"/>

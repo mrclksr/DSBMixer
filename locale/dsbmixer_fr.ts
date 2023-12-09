@@ -289,7 +289,7 @@ Higher values mean less CPU usage.
     </message>
     <message>
         <location filename="../src/restartapps.cpp" line="39"/>
-        <source>DSBMixer - Restart audio applications</source>
+        <source>DSBMixer - Default audio device changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

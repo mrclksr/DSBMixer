@@ -311,9 +311,13 @@ Höhere Werte bedeuten weniger CPU-Last.
         <translation>&amp;Ok</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="39"/>
         <source>DSBMixer - Restart audio applications</source>
-        <translation>DSBMixer - Audioanwendungen neustarten</translation>
+        <translation type="vanished">DSBMixer - Audioanwendungen neustarten</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="39"/>
+        <source>DSBMixer - Default audio device changed</source>
+        <translation>DSBMixer - Standard-Audiogerät geändert</translation>
     </message>
     <message>
         <location filename="../src/restartapps.cpp" line="107"/>
