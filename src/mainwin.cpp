@@ -131,10 +131,10 @@ void MainWin::showAppsMixer() {
 }
 
 void MainWin::restartAudioApps() {
-  size_t nap{0};
-  dsbmixer_audio_proc_t *ap{dsbmixer_get_audio_procs(&nap)};
-  if (ap == NULL) return;
-  RestartApps raWin(ap, nap, this);
+  size_t napps{0};
+  dsbmixer_audio_proc_t *apps{dsbmixer_get_audio_procs(&napps)};
+  if (apps == NULL) return;
+  RestartApps raWin(apps, napps, this);
   (void)raWin.exec();
 }
 
