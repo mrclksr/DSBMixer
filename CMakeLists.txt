@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(PROGRAM ${CMAKE_PROJECT_NAME})
 set(BACKEND "${CMAKE_PROJECT_NAME}_backend")
-set(RESTART_PA "${CMAKE_PROJECT_NAME}_restart_pa")
+set(PA_SCRIPT "${CMAKE_PROJECT_NAME}-pa")
+set(DBUS_SCRIPT "${CMAKE_PROJECT_NAME}-dbus")
 set(SCRIPTS_DIR "${CMAKE_INSTALL_PREFIX}/libexec")
 
 if (NOT DEFINED DATADIR)
@@ -92,7 +93,7 @@ add_compile_definitions(
   LOCALE_PATH="${DATADIR}"
   PATH_BACKEND="${BACKEND_INSTALL_DIR}/${BACKEND}"
   PATH_DSBWRTSYSCTL="${PATH_DSBWRTSYSCTL}"
-  PATH_RESTART_PA="${SCRIPTS_DIR}/${RESTART_PA}")
+  PATH_DSBMIXER_PA="${SCRIPTS_DIR}/${PA_SCRIPT}")
 if (WITHOUT_DEVD)
   add_compile_definitions("-DWITHOUT_DEVD")
 endif()
@@ -103,7 +104,8 @@ target_link_libraries(dsbmixer PRIVATE
   pthread KF${QT_MAJOR_VERSION}::Notifications)
 
 install(TARGETS dsbmixer DESTINATION bin)
-install(PROGRAMS scripts/dsbmixer-dbus DESTINATION bin)
+install(PROGRAMS scripts/${DBUS_SCRIPT} DESTINATION bin)
+install(PROGRAMS scripts/${PA_SCRIPT} DESTINATION ${SCRIPTS_DIR})
 install(FILES "${CMAKE_PROJECT_NAME}.desktop"
   DESTINATION share/applications)
 install(FILES ${QM_FILES} DESTINATION "${DATADIR}")
