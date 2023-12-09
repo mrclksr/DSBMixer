@@ -288,30 +288,53 @@ Höhere Werte bedeuten weniger CPU-Last.
         <translation>&lt;b&gt;Standard-Audiogerät geändert&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="28"/>
         <source>Restart audio applications:</source>
-        <translation>Audioanwendungen neustarten:</translation>
+        <translation type="vanished">Audioanwendungen neustarten:</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="32"/>
+        <location filename="../src/restartapps.cpp" line="33"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="33"/>
         <source>&amp;Restart</source>
-        <translation>&amp;Neustarten</translation>
+        <translation type="vanished">&amp;Neustarten</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="38"/>
+        <location filename="../src/restartapps.cpp" line="29"/>
+        <source>What do you want to do with the audio applications?</source>
+        <translation>Was möchten Sie mit den Audioanwendungen tun?</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="34"/>
+        <source>&amp;Ok</source>
+        <translation>&amp;Ok</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="39"/>
         <source>DSBMixer - Restart audio applications</source>
         <translation>DSBMixer - Audioanwendungen neustarten</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="107"/>
+        <source>Move audio streams to new default audio device</source>
+        <translation>Schiebe Audiostreams auf das neue Standard-Audiogerät</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="111"/>
+        <source>Restart</source>
+        <translation>Neustarten</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="112"/>
+        <source>Do nothing</source>
+        <translation>Tue nichts</translation>
     </message>
 </context>
 <context>
     <name>TrayIcon</name>
     <message>
-        <location filename="../src/mixertrayicon.cpp" line="117"/>
+        <location filename="../src/mixertrayicon.cpp" line="118"/>
         <source>Muted</source>
         <translation>Stumm</translation>
     </message>

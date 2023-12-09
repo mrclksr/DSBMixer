@@ -282,30 +282,53 @@ Higher values mean less CPU usage.
         <translation>&lt;b&gt;Standard-Ljud enhet ändrad&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="28"/>
         <source>Restart audio applications:</source>
-        <translation>Starta om ljud program:</translation>
+        <translation type="vanished">Starta om ljud program:</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="32"/>
+        <location filename="../src/restartapps.cpp" line="33"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Avbryt</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="33"/>
         <source>&amp;Restart</source>
-        <translation>&amp;Starta om</translation>
+        <translation type="vanished">&amp;Starta om</translation>
     </message>
     <message>
-        <location filename="../src/restartapps.cpp" line="38"/>
+        <location filename="../src/restartapps.cpp" line="29"/>
+        <source>What do you want to do with the audio applications?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="34"/>
+        <source>&amp;Ok</source>
+        <translation type="unfinished">&amp;Ok</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="39"/>
         <source>DSBMixer - Restart audio applications</source>
         <translation>DSBMixer - Starta om ljud program</translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="107"/>
+        <source>Move audio streams to new default audio device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="111"/>
+        <source>Restart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/restartapps.cpp" line="112"/>
+        <source>Do nothing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>TrayIcon</name>
     <message>
-        <location filename="../src/mixertrayicon.cpp" line="117"/>
+        <location filename="../src/mixertrayicon.cpp" line="118"/>
         <source>Muted</source>
         <translation type="unfinished">Tystad</translation>
     </message>
