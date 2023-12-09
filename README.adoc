@@ -223,14 +223,15 @@ image::images/prefs-default.png[]
 
 [NOTE]
 ====
-Audio applications must be restarted to use the new default device.
+Some audio applications must be restarted to use the new default device.
 ====
 
 [TIP]
 ====
 When the default audio device was changed either through _DSBMixer_ or
 other means, _DSBMixer_ can restart sound daemons like _sndiod_ and
-_pulseaudio_ for you.
+_pulseaudio_ for you. _Pulseaudio_ streams playing on the previous
+default audio device can be moved to the current one.
 ====
 
 .Restarting the _pulseaudio_ daemon via _DSBMixer_
