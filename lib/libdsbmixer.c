@@ -77,7 +77,7 @@
 
 enum SOCK_ERR { SOCK_ERR_CONN_CLOSED = 1, SOCK_ERR_IO_ERROR };
 
-struct dsbmixer_snd_settings_s dsbmixer_snd_settings;
+struct dsbmixer_snd_settings_s dsbmixer_snd_settings = {0};
 
 #ifndef WITHOUT_DEVD
 /*
@@ -158,6 +158,7 @@ static const struct _audio_proc_updater_s *lookup_audio_proc_updater(
     const char *);
 
 int dsbmixer_init() {
+  dsbmixer_snd_settings.prev_unit = -1;
   get_snd_settings();
 #ifndef WITHOUT_DEVD
   int n;
@@ -432,7 +433,6 @@ int dsbmixer_change_settings(int dfltunit, int amp, int qual, int latency,
                              int max_auto_vchans, bool bypass_mixer) {
   int error = 0;
   char cmd[512], *output;
-
   (void)snprintf(cmd, sizeof(cmd), "%s -u %d -d -a %d -q %d -l %d -v %d -b %d",
                  PATH_BACKEND, dfltunit, amp, qual, latency, max_auto_vchans,
                  bypass_mixer);
@@ -732,6 +732,7 @@ static void set_error(int error, bool prepend, const char *fmt, ...) {
 #define EXPAND(F) dsbmixer_snd_settings.F
 
 static void get_snd_settings() {
+  int prev_unit, curr_unit;
   size_t sz, i;
   struct oid_s {
     const char *oid;
@@ -742,11 +743,17 @@ static void get_snd_settings() {
               {"hw.snd.vpc_mixer_bypass", &EXPAND(mixer_bypass)},
               {"hw.snd.maxautovchans", &EXPAND(maxautovchans)},
               {"hw.snd.latency", &EXPAND(latency)}};
+  prev_unit = EXPAND(prev_unit);
+  curr_unit = EXPAND(default_unit);
   for (i = 0; i < sizeof(oids) / sizeof(struct oid_s); i++) {
     sz = sizeof(int);
     if (sysctlbyname(oids[i].oid, oids[i].val, &sz, NULL, 0))
       warn("sysctl(%s)", oids[i].oid);
   }
+  if (prev_unit == -1)
+    EXPAND(prev_unit) = EXPAND(default_unit);
+  else
+    EXPAND(prev_unit) = curr_unit;
 }
 
 #ifndef WITHOUT_DEVD
