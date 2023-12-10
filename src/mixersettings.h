@@ -25,6 +25,7 @@ class MixerSettings : public QObject {
   void setTrayThemeName(QString theme);
   void setPlayCmd(QString cmd);
   void setWindowGeometry(int x, int y, int width, int height);
+  void storeSettings();
   bool scaleTicksEnabled() const;
   bool lrViewEnabled() const;
   bool inverseScrollEnabled() const;
@@ -40,7 +41,8 @@ class MixerSettings : public QObject {
   QString getTrayThemeName() const;
 
  private:
-  void storeSettings();
+  template <typename T>
+  bool setter(T &member, T val);
  signals:
   void settingsChanged();
   void pollIvalChanged(int ms);

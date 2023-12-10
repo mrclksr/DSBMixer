@@ -61,58 +61,47 @@ void MixerSettings::storeSettings() {
   dsbcfg_set_string(this->cfg, CFG_PLAY_CMD, playCmdStr.data());
 }
 
+template <typename T>
+bool MixerSettings::setter(T &member, T val) {
+  if (member == val) return (false);
+  member = val;
+  return (true);
+}
+
 void MixerSettings::setLRView(bool on) {
-  if (lrView == on) return;
-  lrView = on;
-  emit lrViewChanged(on);
+  if (setter(this->lrView, on)) emit lrViewChanged(on);
 }
 
 void MixerSettings::setScaleTicks(bool on) {
-  if (scaleTicks == on) return;
-  scaleTicks = on;
-  emit scaleTicksChanged(on);
+  if (setter(this->scaleTicks, on)) emit scaleTicksChanged(on);
 }
 
 void MixerSettings::setChanMask(int mask) {
-  if (chanMask == mask) return;
-  chanMask = mask;
-  emit chanMaskChanged(mask);
+  if (setter(this->chanMask, mask)) emit chanMaskChanged(mask);
 }
 
 void MixerSettings::setPollIval(int ms) {
-  if (pollIvalMs == ms) return;
-  pollIvalMs = ms;
-  emit pollIvalChanged(ms);
+  if (setter(this->pollIvalMs, ms)) emit pollIvalChanged(ms);
 }
 
 void MixerSettings::setUnitChkIval(int ms) {
-  if (unitChkIvalMs == ms) return;
-  unitChkIvalMs = ms;
-  emit unitChkIvalChanged(ms);
+  if (setter(this->unitChkIvalMs, ms)) emit unitChkIvalChanged(ms);
 }
 
 void MixerSettings::setVolInc(int inc) {
-  if (volInc == inc) return;
-  volInc = inc;
-  emit volIncChanged(inc);
+  if (setter(volInc, inc)) emit volIncChanged(inc);
 }
 
 void MixerSettings::setInverseScroll(bool on) {
-  if (inverseScroll == on) return;
-  inverseScroll = on;
-  emit inverseScrollChanged(on);
+  if (setter(this->inverseScroll, on)) emit inverseScrollChanged(on);
 }
 
 void MixerSettings::setTrayThemeName(QString theme) {
-  if (trayThemeName == theme) return;
-  trayThemeName = theme;
-  emit trayThemeChanged(theme);
+  if (setter(this->trayThemeName, theme)) emit trayThemeChanged(theme);
 }
 
 void MixerSettings::setPlayCmd(QString cmd) {
-  if (playCmd == cmd) return;
-  playCmd = cmd;
-  emit playCmdChanged(cmd);
+  if (setter(playCmd, cmd)) emit playCmdChanged(cmd);
 }
 
 void MixerSettings::setWindowGeometry(int x, int y, int width, int height) {
@@ -135,9 +124,15 @@ int MixerSettings::getPollIval() const { return (pollIvalMs); }
 int MixerSettings::getUnitChkIval() const { return (unitChkIvalMs); }
 
 int MixerSettings::getVolInc() const { return (volInc); }
+
 int MixerSettings::getWinPosX() const { return (x); }
+
 int MixerSettings::getWinPosY() const { return (y); }
+
 int MixerSettings::getWinWidth() const { return (width); }
+
 int MixerSettings::getWinHeight() const { return (height); }
+
 QString MixerSettings::getPlayCmd() const { return (playCmd); }
+
 QString MixerSettings::getTrayThemeName() const { return (trayThemeName); }
