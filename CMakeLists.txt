@@ -76,8 +76,7 @@ if (NOT USE_QT6)
   list(APPEND SOURCE_FILES ${QM_FILES})
 endif()
 
-add_executable(dsbmixer ${SOURCE_FILES} resources.qrc
-  src/sndsettings.cpp)
+add_executable(dsbmixer ${SOURCE_FILES} resources.qrc)
 
 if (USE_QT6)
   qt_add_translations(dsbmixer
