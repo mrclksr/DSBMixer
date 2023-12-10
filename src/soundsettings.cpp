@@ -47,7 +47,10 @@ void SoundSettings::applySettings() {
 
 void SoundSettings::checkDefaultUnitChanged() {
   int unit{dsbmixer_poll_default_unit()};
-  if (unit < 0) return;
+  if (unit < 0) {
+    qDebug() << "dsbmixer_poll_default_unit() failed:" << dsbmixer_error();
+    return;
+  }
   if (defaultUnit == unit) return;
   defaultUnit = unit;
   emit defaultUnitChanged(unit);
