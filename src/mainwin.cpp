@@ -5,6 +5,7 @@
  *
  */
 
+#include <cstdlib>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -162,8 +163,7 @@ void MainWin::keyPressEvent(QKeyEvent *e) {
 
 void MainWin::showConfigMenu() {
   Preferences prefs(*mixerSettings, *soundSettings, this);
-  if (prefs.exec() != QDialog::Accepted) return;
-  dsbcfg_write(PROGRAM, "config", cfg);
+  (void)prefs.exec();
 }
 
 void MainWin::toggleWin() {
