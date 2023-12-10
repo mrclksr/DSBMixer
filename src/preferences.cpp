@@ -98,6 +98,7 @@ void Preferences::acceptSlot() {
     mixerSettings->setPlayCmd(commandEdit->text());
   if (testSoundPlaying) stopSound();
   soundSettings->applySettings();
+  mixerSettings->storeSettings();
   this->accept();
 }
 
