@@ -45,6 +45,7 @@ set(SOURCE_FILES
   src/mixertabs.cpp
   src/mixersettings.cpp
   src/restartapps.cpp
+  src/soundsettings.cpp
   lib/qt-helper/qt-helper.cpp
   lib/config.c
   lib/dsbcfg/dsbcfg.c
@@ -75,7 +76,8 @@ if (NOT USE_QT6)
   list(APPEND SOURCE_FILES ${QM_FILES})
 endif()
 
-add_executable(dsbmixer ${SOURCE_FILES} resources.qrc)
+add_executable(dsbmixer ${SOURCE_FILES} resources.qrc
+  src/sndsettings.cpp)
 
 if (USE_QT6)
   qt_add_translations(dsbmixer

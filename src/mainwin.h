@@ -13,9 +13,9 @@
 #include <QWidget>
 
 #include "appsmixer.h"
-#include "config.h"
 #include "mixerlist.h"
 #include "mixersettings.h"
+#include "sndsettings.h"
 #include "mixertabs.h"
 #include "mixertrayicon.h"
 
@@ -44,6 +44,8 @@ class MainWin : public QMainWindow {
   void catchCurrentMixerChanged(Mixer *mixer);
   void catchScrGeomChanged();
   void catchAppsMixerClosed();
+  void catchVolIncChanged(int steps);
+  void catchDefaultUnitCheckIvalChanged(int ms);
   void restartAudioApps();
   void showAppsMixer();
   void setTabIndex(int index);
@@ -59,11 +61,8 @@ class MainWin : public QMainWindow {
   void createTrayIcon();
   void setDefaultTab(int);
   void setCurrentMixer();
-  void updateMixerSettings();
   void updateTrayIcon();
   void updateTrayMenu();
-  void initMixerSettings();
-  void storeMixerSettings();
   void saveGeometry();
   void registerDBusService();
   QAction *createQuitAction();
@@ -77,6 +76,7 @@ class MainWin : public QMainWindow {
   QTimer *traytimer;
   dsbcfg_t *cfg;
   MixerSettings *mixerSettings{nullptr};
+  SoundSettings *soundSettings{nullptr};
   IconLoader *iconLoader{nullptr};
   MixerList *mixerList{nullptr};
   MixerTabs *mixerTabs{nullptr};

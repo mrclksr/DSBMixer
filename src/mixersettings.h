@@ -8,14 +8,13 @@
 #pragma once
 #include <QObject>
 
+#include "config.h"
+#include "dsbcfg.h"
+
 class MixerSettings : public QObject {
   Q_OBJECT
  public:
-  MixerSettings(bool lrView = false, bool scaleTicks = true,
-                int chanMask = 0xff, int pollIvalMs = 900,
-                int unitChkIval = 3000, int volInc = 3,
-                bool inverseScroll = false, QObject *parent = nullptr);
-
+  MixerSettings(dsbcfg_t &cfg, QObject *parent = nullptr);
   void setLRView(bool on);
   void setScaleTicks(bool on);
   void setChanMask(int mask);
@@ -23,6 +22,9 @@ class MixerSettings : public QObject {
   void setUnitChkIval(int ms);
   void setVolInc(int volInc);
   void setInverseScroll(bool on);
+  void setTrayThemeName(QString theme);
+  void setPlayCmd(QString cmd);
+  void setWindowGeometry(int x, int y, int width, int height);
   bool scaleTicksEnabled() const;
   bool lrViewEnabled() const;
   bool inverseScrollEnabled() const;
@@ -30,7 +32,15 @@ class MixerSettings : public QObject {
   int getPollIval() const;
   int getUnitChkIval() const;
   int getVolInc() const;
+  int getWinPosX() const;
+  int getWinPosY() const;
+  int getWinWidth() const;
+  int getWinHeight() const;
+  QString getPlayCmd() const;
+  QString getTrayThemeName() const;
 
+ private:
+  void storeSettings();
  signals:
   void settingsChanged();
   void pollIvalChanged(int ms);
@@ -40,13 +50,22 @@ class MixerSettings : public QObject {
   void scaleTicksChanged(bool on);
   void volIncChanged(int volInc);
   void inverseScrollChanged(bool on);
+  void trayThemeChanged(QString theme);
+  void playCmdChanged(QString cmd);
 
  private:
   int volInc{3};
   int chanMask{0xff};
   int pollIvalMs{900};
   int unitChkIvalMs{3000};
+  int x{};
+  int y{};
+  int width{};
+  int height{};
   bool lrView{false};
   bool scaleTicks{true};
   bool inverseScroll{false};
+  dsbcfg_t *cfg{nullptr};
+  QString trayThemeName;
+  QString playCmd;
 };

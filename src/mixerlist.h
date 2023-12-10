@@ -13,19 +13,21 @@
 
 #include "mixer.h"
 #include "mixersettings.h"
+#include "sndsettings.h"
 #include "thread.h"
 
 class MixerList : public QWidget {
   Q_OBJECT
  public:
-  MixerList(const MixerSettings &mixerSettings, QWidget *parent = nullptr);
+  MixerList(const MixerSettings &mixerSettings,
+            const SoundSettings &soundSettings, QWidget *parent = nullptr);
   int setDefaultMixer(const Mixer *mixer);
   int setDefaultMixer(int unit);
   Mixer *at(qsizetype idx) const;
   Mixer *getDefaultMixer() const;
   qsizetype count() const;
 
- private:
+private:
   void initDefaultMixer();
   void createMixerList();
   Mixer *unitToMixer(int unit);
@@ -40,14 +42,15 @@ class MixerList : public QWidget {
   void addNewMixer(dsbmixer_t *dev);
   void removeMixer(dsbmixer_t *dev);
   void pollMixers();
-  void setDefaultUnitCheckIval(int ms);
-  void setPollIval(int ms);
+  void catchPollIvalChanged(int ms);
+  void catchSoundSettingsChanged();
+  void catchDefaultUnitChanged();
 
  private:
   Thread *devdWatcher;
-  QTimer *unitCheckTimer{nullptr};
   QTimer *pollTimer{nullptr};
   Mixer *defaultMixer{nullptr};
   QList<Mixer *> mixers;
   const MixerSettings *mixerSettings{nullptr};
+  const SoundSettings *soundSettings{nullptr};
 };

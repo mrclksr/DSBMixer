@@ -17,28 +17,24 @@
 #include <QTabWidget>
 
 #include "libdsbmixer.h"
-#include "settings.h"
+#include "mixersettings.h"
+#include "sndsettings.h"
 
 class Preferences : public QDialog {
   Q_OBJECT
  public:
-  Preferences(Settings &oldSettings, QWidget *parent = 0);
+  Preferences(MixerSettings &mixerSettings, SoundSettings &soundSettings, QWidget *parent = 0);
+   ~Preferences();
  public slots:
   void acceptSlot();
   void rejectSlot();
   void toggleTestSound();
   void playSound(int unit);
   void stopSound();
-  void commandChanged(const QString &);
   void soundPlayerFinished(int, QProcess::ExitStatus);
- private slots:
-  void changeTheme(int idx);
 
  protected:
   void keyPressEvent(QKeyEvent *event);
-
- public:
-  Settings settings;
 
  private:
   QWidget *createViewTab();
@@ -67,4 +63,6 @@ class Preferences : public QDialog {
   QTabWidget *tabs;
   QPushButton *testBt;
   QList<QRadioButton *> defaultDeviceRb;
+  MixerSettings *mixerSettings;
+  SoundSettings *soundSettings;
 };
