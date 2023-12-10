@@ -405,12 +405,11 @@ dsbmixer_t *dsbmixer_query_devlist(int *state, bool block) {
 #endif /* !WITHOUT_DEVD */
 
 int dsbmixer_poll_default_unit(void) {
-  int unit;
+  int unit = 0;
   size_t sz = sizeof(int);
 
-  unit = 0;
-  if (sysctlbyname("hw.snd.default_unit", &unit, &sz, NULL, 0))
-    warn("sysctl(hw.snd.default_unit)");
+  if (sysctlbyname("hw.snd.default_unit", &unit, &sz, NULL, 0) == -1)
+    ERROR(-1, DSBMIXER_ERR_SYS, false, "sysctl(hw.snd.default_unit)");
   if (unit != dsbmixer_snd_settings.default_unit)
     dsbmixer_snd_settings.prev_unit = dsbmixer_snd_settings.default_unit;
   dsbmixer_snd_settings.default_unit = unit;
@@ -421,8 +420,7 @@ int dsbmixer_poll_default_unit(void) {
 int dsbmixer_set_default_unit(int unit) {
   if (sysctlbyname("hw.snd.default_unit", NULL, NULL, &unit, sizeof(unit)) !=
       0) {
-    warn("Couldn't set hw.snd.default_unit");
-    return (-1);
+    ERROR(-1, DSBMIXER_ERR_SYS, false, "Couldn't set hw.snd.default_unit");
   }
   dsbmixer_snd_settings.prev_unit = dsbmixer_snd_settings.default_unit;
   dsbmixer_snd_settings.default_unit = unit;
