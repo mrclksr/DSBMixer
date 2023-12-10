@@ -27,7 +27,7 @@ image::images/mainwin.png[Main window]
 
 === Building from Source
 
-==== Dependencies (Qt5)
+==== Build Dependencies (Qt5)
 * https://www.freshports.org/devel/cmake[devel/cmake]
 * https://freshports.org/devel/qt5-buildtools[devel/qt5-buildtools]
 * https://freshports.org/devel/qt5-core[devel/qt5-core]
@@ -35,13 +35,16 @@ image::images/mainwin.png[Main window]
 * https://freshports.org/devel/qt5-qmake[devel/qt5-qmake]
 * https://freshports.org/x11-toolkits/qt5-gui[x11-toolkits/qt5-gui]
 * https://freshports.org/x11-toolkits/qt5-widgets[x11-toolkits/qt5-widgets]
-* https://www.freshports.org/devel/kf5-knotifications/[devel/kf5-knotifications]
+* https://www.freshports.org/devel/kf5-knotifications[devel/kf5-knotifications]
 
-==== Dependencies (Qt6)
+==== Build Dependencies (Qt6)
 * https://www.freshports.org/devel/cmake[devel/cmake]
 * https://www.freshports.org/devel/qt6-base[devel/qt6-base]
 * https://www.freshports.org/devel/qt6-tools/[devel/qt6-tools]
-* https://www.freshports.org/devel/kf6-knotifications/[devel/kf6-knotifications]
+* https://www.freshports.org/devel/kf6-knotifications[devel/kf6-knotifications]
+
+==== Run time Dependencies
+* https://www.freshports.org/sysutils/dsbwrtsysctl[sysutils/dsbwrtsysctl]
 
 ==== Getting the Source Code
 
@@ -234,7 +237,7 @@ _pulseaudio_ for you. _Pulseaudio_ streams playing on the previous
 default audio device can be moved to the current one.
 ====
 
-.Restarting the _pulseaudio_ daemon via _DSBMixer_
+.Moving _pulseaudio_ streams to new default device
 image::images/restart.png[]
 
 ==== The Advanced Settings Tab
