@@ -18,7 +18,7 @@
 
 #include "libdsbmixer.h"
 #include "mixersettings.h"
-#include "sndsettings.h"
+#include "soundsettings.h"
 
 class Preferences : public QDialog {
   Q_OBJECT

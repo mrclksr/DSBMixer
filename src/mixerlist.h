@@ -13,7 +13,7 @@
 
 #include "mixer.h"
 #include "mixersettings.h"
-#include "sndsettings.h"
+#include "soundsettings.h"
 #include "thread.h"
 
 class MixerList : public QWidget {

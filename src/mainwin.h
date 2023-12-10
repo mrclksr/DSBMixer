@@ -15,7 +15,7 @@
 #include "appsmixer.h"
 #include "mixerlist.h"
 #include "mixersettings.h"
-#include "sndsettings.h"
+#include "soundsettings.h"
 #include "mixertabs.h"
 #include "mixertrayicon.h"
 

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  *
  */
-#include "sndsettings.h"
+#include "soundsettings.h"
 
 #include <string.h>
 
