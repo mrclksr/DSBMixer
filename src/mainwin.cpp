@@ -182,6 +182,7 @@ void MainWin::saveGeometry() {
   if (!isVisible()) return;
   mixerSettings->setWindowGeometry(this->x(), this->y(), this->width(),
                                    this->height());
+  mixerSettings->storeSettings();
 }
 
 QAction *MainWin::createQuitAction() {
