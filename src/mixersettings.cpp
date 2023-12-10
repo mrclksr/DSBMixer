@@ -13,8 +13,8 @@
 #endif
 #include "mixersettings.h"
 
-MixerSettings::MixerSettings(dsbcfg_t &cfg, QObject *parent) : QObject(parent) {
-  this->cfg = &cfg;
+MixerSettings::MixerSettings(dsbcfg_t &cfg, QObject *parent)
+    : QObject(parent), cfg{&cfg} {
   lrView = dsbcfg_getval(this->cfg, CFG_LRVIEW).boolean;
   scaleTicks = dsbcfg_getval(this->cfg, CFG_TICKS).boolean;
   chanMask = dsbcfg_getval(this->cfg, CFG_MASK).integer;

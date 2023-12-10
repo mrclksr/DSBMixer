@@ -17,16 +17,16 @@
 ChanSlider::ChanSlider(const QString &name, int id, int lvol, int rvol,
                        bool canRecord, bool muteable, bool lrview, bool tray,
                        QWidget *parent)
-    : QGroupBox(name, parent) {
-  this->tray = tray;
-  this->lrview = lrview;
-  this->muted = false;
-  this->muteable = muteable;
-  this->canRec = canRecord;
-  this->id = id;
-  this->lvol = lvol;
-  this->rvol = rvol;
-  this->vol = (lvol + rvol) >> 1;
+    : QGroupBox(name, parent),
+      id{id},
+      lvol{lvol},
+      rvol{rvol},
+      canRec{canRecord},
+      muteable{muteable},
+      lrview{lrview},
+      tray{tray} {
+  muted = false;
+  vol = (lvol + rvol) >> 1;
   if (lrview)
     initLRView();
   else

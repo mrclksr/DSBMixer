@@ -17,9 +17,7 @@
 
 RestartApps::RestartApps(dsbmixer_audio_proc_t *apps, size_t napps,
                          QWidget *parent)
-    : QDialog(parent) {
-  this->apps = apps;
-  this->napps = napps;
+    : QDialog(parent), apps{apps}, napps{napps} {
   QVBoxLayout *vbox{new QVBoxLayout};
   QHBoxLayout *bbox{new QHBoxLayout};
   QHBoxLayout *hbox{new QHBoxLayout};

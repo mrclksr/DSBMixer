@@ -9,8 +9,8 @@
 
 #include "qt-helper/qt-helper.h"
 
-IconLoader::IconLoader(QString &themeName, QObject *parent) : QObject(parent) {
-  this->themeName = themeName;
+IconLoader::IconLoader(QString &themeName, QObject *parent)
+    : QObject(parent), themeName{themeName} {
   loadIcons();
 }
 

@@ -11,8 +11,8 @@
 #include <QVBoxLayout>
 #include <cstddef>
 
-MixerTabs::MixerTabs(MixerList &mixerList, QWidget *parent) : QWidget(parent) {
-  this->mixerList = &mixerList;
+MixerTabs::MixerTabs(MixerList &mixerList, QWidget *parent)
+    : QWidget(parent), mixerList{&mixerList} {
   tabs = new QTabWidget(this);
   for (auto i{0}; i < this->mixerList->count(); i++) {
     Mixer *mixer{this->mixerList->at(i)};

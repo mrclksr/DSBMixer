@@ -7,7 +7,6 @@
 
 #include "mixer.h"
 
-#include <QDebug>
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QRegExp>
 #else
@@ -18,9 +17,7 @@
 
 Mixer::Mixer(dsbmixer_t &mixer, const MixerSettings &mixerSettings,
              QWidget *parent)
-    : QWidget(parent) {
-  this->mixer = &mixer;
-  this->mixerSettings = &mixerSettings;
+    : QWidget(parent), mixer{&mixer}, mixerSettings{&mixerSettings} {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   QRegExp rx("[<>]+");
 #else

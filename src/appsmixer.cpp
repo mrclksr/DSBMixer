@@ -13,9 +13,7 @@
 
 AppsMixer::AppsMixer(dsbappsmixer_t &mixer, const IconLoader &iconLoader,
                      const MixerSettings &mixerSettings, QWidget *parent)
-    : QDialog(parent) {
-  this->mixer = &mixer;
-  this->mixerSettings = &mixerSettings;
+    : QDialog(parent), mixer{&mixer}, mixerSettings{&mixerSettings} {
   timer = new QTimer(this);
   timer->start(this->mixerSettings->getPollIval());
   layout = new QHBoxLayout;
@@ -139,8 +137,7 @@ void AppsMixer::createChannels() {
     hbox->addWidget(cs, 0, Qt::AlignLeft);
   }
   layout->addWidget(channelContainer);
-  if (!channels.count())
-    hbox->addWidget(new QLabel(tr("No audio apps found")));
+  if (!channels.count()) hbox->addWidget(new QLabel(tr("No audio apps found")));
 }
 
 void AppsMixer::deleteChannels() {

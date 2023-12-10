@@ -22,15 +22,16 @@
 #include <QPushButton>
 #include <QTableWidget>
 #include <QVBoxLayout>
+#include <stdexcept>
 
 #include "libdsbmixer.h"
 #include "qt-helper/qt-helper.h"
 
-Preferences::Preferences(MixerSettings &mixerSettings, SoundSettings &soundSettings, QWidget *parent)
-    : QDialog(parent) {
-  this->soundSettings = &soundSettings;
-  this->mixerSettings = &mixerSettings;
-
+Preferences::Preferences(MixerSettings &mixerSettings,
+                         SoundSettings &soundSettings, QWidget *parent)
+    : QDialog(parent),
+      soundSettings{&soundSettings},
+      mixerSettings{&mixerSettings} {
   this->soundSettings->suspendUnitCheck();
   setModal(true);
   qApp->setQuitOnLastWindowClosed(false);
@@ -66,9 +67,7 @@ Preferences::Preferences(MixerSettings &mixerSettings, SoundSettings &soundSetti
   setWindowTitle(tr("Preferences"));
 }
 
-Preferences::~Preferences() {
-  soundSettings->resumeUnitCheck();
-}
+Preferences::~Preferences() { soundSettings->resumeUnitCheck(); }
 
 void Preferences::acceptSlot() {
   for (int i{0}; i < DSBMIXER_MAX_CHANNELS; i++) {
@@ -97,7 +96,11 @@ void Preferences::acceptSlot() {
   if (!commandEdit->text().isEmpty())
     mixerSettings->setPlayCmd(commandEdit->text());
   if (testSoundPlaying) stopSound();
-  soundSettings->applySettings();
+  try {
+    soundSettings->applySettings();
+  } catch (const std::runtime_error &e) {
+    qh::warn(this, e.what());
+  }
   mixerSettings->storeSettings();
   this->accept();
 }

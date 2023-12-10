@@ -20,9 +20,9 @@
 TrayIcon::TrayIcon(const IconLoader &iconLoader,
                    const MixerSettings &mixerSettings, QMenu &trayMenu,
                    Mixer *mixer, QObject *parent)
-    : KStatusNotifierItem(parent) {
-  this->iconLoader = &iconLoader;
-  this->mixerSettings = &mixerSettings;
+    : KStatusNotifierItem(parent),
+      iconLoader{&iconLoader},
+      mixerSettings{&mixerSettings} {
   lrView = this->mixerSettings->lrViewEnabled();
   volInc = this->mixerSettings->getVolInc();
   direction = this->mixerSettings->inverseScrollEnabled() ? -1 : 1;
@@ -49,9 +49,7 @@ void TrayIcon::catchLRViewChanged(bool on) {
   update();
 }
 
-void TrayIcon::catchInverseScrollChanged(bool on) {
-  direction = on ? -1 : 1;
-}
+void TrayIcon::catchInverseScrollChanged(bool on) { direction = on ? -1 : 1; }
 
 void TrayIcon::catchVolIncChanged(int volInc) {
   if (volInc <= 0 || volInc >= 100) return;
