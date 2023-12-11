@@ -23,8 +23,8 @@ Mixer::Mixer(dsbmixer_t &mixer, const MixerSettings &mixerSettings,
 #else
   QRegularExpression rx("[<>]+");
 #endif
-  QStringList tokens = QString(dsbmixer_get_card_name(this->mixer))
-                           .split(rx, Qt::SkipEmptyParts);
+  QStringList tokens{QString(dsbmixer_get_card_name(this->mixer))
+                         .split(rx, Qt::SkipEmptyParts)};
   if (tokens.size() > 1)
     cardName = tokens[0] + tokens[1];
   else
@@ -46,13 +46,13 @@ Mixer::~Mixer() { dsbmixer_del_mixer(mixer); }
 void Mixer::createChannels() {
   for (int i = 0; i < dsbmixer_get_nchans(mixer); i++) {
     const int chan{dsbmixer_get_chan_id(mixer, i)};
+    const bool muteable{chan == DSBMIXER_MASTER};
     if (!((1 << chan) & mixerSettings->getChanMask())) continue;
     const int lvol{DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan))};
     const int rvol{DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan))};
     const char *name{dsbmixer_get_chan_name(mixer, chan)};
     ChanSlider *cs{new ChanSlider(QString(name), chan, lvol, rvol,
-                                  dsbmixer_can_rec(mixer, chan),
-                                  chan == DSBMIXER_MASTER ? true : false,
+                                  dsbmixer_can_rec(mixer, chan), muteable,
                                   mixerSettings->lrViewEnabled(), false)};
     cs->setTicks(mixerSettings->scaleTicksEnabled());
     connect(cs, SIGNAL(lVolumeChanged(int, int)), this,
