@@ -42,7 +42,6 @@
 #define PATH_DEFAULT_MIXER "/dev/mixer"
 #define PATH_PS "/bin/ps"
 
-
 #define RE_STR                                             \
   "([0-9]+)[[:space:]]+([^[:space:]]+)[[:space:]]+"        \
   "([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+" \
@@ -285,8 +284,7 @@ int dsbmixer_set_mute(dsbmixer_t *mixer, int chan, bool mute) {
     mask |= (1 << chan);
   else
     mask &= ~(1 << chan);
-  if (ioctl(mixer->fd , SOUND_MIXER_WRITE_MUTE, &mask) < 0)
-    return (-1);
+  if (ioctl(mixer->fd, SOUND_MIXER_WRITE_MUTE, &mask) < 0) return (-1);
   mixer->mutemask = mask;
   return (0);
 }
@@ -365,7 +363,8 @@ dsbmixer_t *dsbmixer_poll_mixers() {
     read_vol(mixers[i]);
     read_recsrc(mixers[i]);
     read_mute(mixers[i]);
-    if (mixers[i]->changemask || mixers[i]->rchangemask || mixers[i]->mchangemask) {
+    if (mixers[i]->changemask || mixers[i]->rchangemask ||
+        mixers[i]->mchangemask) {
       next = i + 1;
       return (mixers[i]);
     }
@@ -1025,8 +1024,7 @@ static int get_mixers() {
 static int open_mixer(const char *name, int retries) {
   int fd = -1;
   do {
-    if ((fd = open(name, O_RDWR)) != -1)
-      return (fd);
+    if ((fd = open(name, O_RDWR)) != -1) return (fd);
     if (errno == EBADF || errno == EINTR)
       warn("open_mixer(): open(%s)", name);
     else
@@ -1038,8 +1036,7 @@ static int open_mixer(const char *name, int retries) {
 
 static int read_devmask(int fd, int *mask, int retries) {
   do {
-    if (ioctl(fd, SOUND_MIXER_READ_DEVMASK, mask) != -1)
-      return (0);
+    if (ioctl(fd, SOUND_MIXER_READ_DEVMASK, mask) != -1) return (0);
     if (errno == EBADF)
       warn("read_devmask(): ioctl(SOUND_MIXER_READ_DEVMASK");
     else
@@ -1051,8 +1048,7 @@ static int read_devmask(int fd, int *mask, int retries) {
 
 static int read_recmask(int fd, int *mask, int retries) {
   do {
-    if (ioctl(fd, SOUND_MIXER_READ_RECMASK, mask) != -1)
-      return (0);
+    if (ioctl(fd, SOUND_MIXER_READ_RECMASK, mask) != -1) return (0);
     if (errno == EBADF)
       warn("read_recmask(): ioctl(SOUND_MIXER_READ_RECMASK");
     else
@@ -1074,17 +1070,14 @@ static int add_mixer(const char *name) {
    * ioctl()s on it. We must give the device some time and retry
    * if it's not ready yet.
    */
-  if ((mixer.fd = open_mixer(name, retries)) == -1)
-    return (-1);
-  if (read_devmask(mixer.fd, &mixer.dmask, retries) == -1)
-    return (-1);
+  if ((mixer.fd = open_mixer(name, retries)) == -1) return (-1);
+  if (read_devmask(mixer.fd, &mixer.dmask, retries) == -1) return (-1);
   /* Count channels */
   mixer.nchans = 0;
   for (i = 0; i < DSBMIXER_MAX_CHANNELS; i++) {
     if ((1 << i) & mixer.dmask) mixer.nchans++;
   }
-  if (read_recmask(mixer.fd, &mixer.recmask, retries) == -1)
-    return (-1);
+  if (read_recmask(mixer.fd, &mixer.recmask, retries) == -1) return (-1);
   /* Set channel names. */
   for (i = 0; i < SOUND_MIXER_NRDEVICES; i++) {
     if (!((1 << i) & mixer.dmask)) continue;
@@ -1162,8 +1155,7 @@ static int read_mute(dsbmixer_t *mixer) {
     errno = EINVAL;
     return (-1);
   }
-  if (ioctl(mixer->fd, SOUND_MIXER_READ_MUTE, &mask) < 0)
-    return (-1);
+  if (ioctl(mixer->fd, SOUND_MIXER_READ_MUTE, &mask) < 0) return (-1);
   mixer->mchangemask = (mask ^ mixer->mutemask);
   mixer->mutemask = mask;
   return (0);
