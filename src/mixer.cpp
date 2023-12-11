@@ -81,8 +81,6 @@ void Mixer::redrawMixer() {
     chan->setTicks(mixerSettings->scaleTicksEnabled());
 }
 
-dsbmixer_t *Mixer::getDev() const { return (mixer); }
-
 int Mixer::channelIndex(int chan) const {
   for (int idx = 0; idx < channels.count(); idx++) {
     if (channels.at(idx)->id == chan) return (idx);
@@ -91,36 +89,18 @@ int Mixer::channelIndex(int chan) const {
 }
 
 void Mixer::setLVol(int chan, int lvol) {
-  const int idx{channelIndex(chan)};
-  if (idx < 0) return;
   dsbmixer_set_lvol(this->mixer, chan, lvol);
-  lvol = DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan));
-  const int rvol{DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan))};
-  channels.at(idx)->setVol(lvol, rvol);
-  if (chan == DSBMIXER_MASTER)
-    emit masterVolChanged(dsbmixer_get_unit(this->mixer), lvol, rvol);
+  updateSlider(chan);
 }
 
 void Mixer::setRVol(int chan, int rvol) {
-  const int idx{channelIndex(chan)};
-  if (idx < 0) return;
   dsbmixer_set_rvol(this->mixer, chan, rvol);
-  rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan));
-  const int lvol{DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan))};
-  channels.at(idx)->setVol(lvol, rvol);
-  if (chan == DSBMIXER_MASTER)
-    emit masterVolChanged(dsbmixer_get_unit(this->mixer), lvol, rvol);
+  updateSlider(chan);
 }
 
 void Mixer::setVol(int chan, int lvol, int rvol) {
-  const int idx{channelIndex(chan)};
-  if (idx < 0) return;
   dsbmixer_set_vol(this->mixer, chan, DSBMIXER_CHAN_CONCAT(lvol, rvol));
-  lvol = DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan));
-  rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan));
-  channels.at(idx)->setVol(lvol, rvol);
-  if (chan == DSBMIXER_MASTER)
-    emit masterVolChanged(dsbmixer_get_unit(this->mixer), lvol, rvol);
+  updateSlider(chan);
 }
 
 void Mixer::setRecSrc(int chan, int state) {
@@ -152,12 +132,18 @@ void Mixer::toggleMute(int chan) {
   setMute(chan, !dsbmixer_is_muted(mixer, chan));
 }
 
-void Mixer::muteMaster(bool on) {
-  setMute(DSBMIXER_MASTER, on);
-}
+void Mixer::muteMaster(bool on) { setMute(DSBMIXER_MASTER, on); }
 
-void Mixer::toggleMasterMute() {
-  toggleMute(DSBMIXER_MASTER);
+void Mixer::toggleMasterMute() { toggleMute(DSBMIXER_MASTER); }
+
+void Mixer::updateSlider(int chan) {
+  const int idx{channelIndex(chan)};
+  if (idx < 0) return;
+  int lvol{DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan))};
+  int rvol{DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan))};
+  channels.at(idx)->setVol(lvol, rvol);
+  if (chan == DSBMIXER_MASTER)
+    emit masterVolChanged(dsbmixer_get_unit(this->mixer), lvol, rvol);
 }
 
 void Mixer::update() {
@@ -191,10 +177,7 @@ void Mixer::changeMasterVol(int volinc) {
   int rvol{channels.at(idx)->rvol};
   dsbmixer_set_lvol(this->mixer, chan, lvol);
   dsbmixer_set_rvol(this->mixer, chan, rvol);
-  lvol = DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan));
-  rvol = DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan));
-  channels.at(idx)->setVol(lvol, rvol);
-  emit masterVolChanged(dsbmixer_get_unit(this->mixer), lvol, rvol);
+  updateSlider(chan);
 }
 
 void Mixer::deleteChannels() {
@@ -204,9 +187,6 @@ void Mixer::deleteChannels() {
   }
   channels.clear();
 }
-
-QString Mixer::getName() const { return (cardName); }
-QString Mixer::getDevName() const { return (devName); }
 
 bool Mixer::isMuted(int chan) const {
   const int idx{channelIndex(chan)};
@@ -225,3 +205,9 @@ int Mixer::getMasterRVol() {
 }
 
 int Mixer::getID() const { return (dsbmixer_get_id(mixer)); }
+
+dsbmixer_t *Mixer::getDev() const { return (mixer); }
+
+QString Mixer::getName() const { return (cardName); }
+
+QString Mixer::getDevName() const { return (devName); }

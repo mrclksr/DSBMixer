@@ -73,6 +73,7 @@ class Mixer : public QWidget {
   int channelIndex(int chan) const;
   void deleteChannels();
   void createChannels();
+  void updateSlider(int chan);
 
  private:
   QString cardName;
