@@ -133,31 +133,31 @@ void Mixer::setRecSrc(int chan, int state) {
 }
 
 void Mixer::setMute(int chan, int state) {
-  bool _muted{(state == Qt::Checked)};
-  dsbmixer_set_mute(mixer, chan, _muted);
-  _muted = dsbmixer_is_muted(mixer, chan);
-  if (_muted != muted) emit muteStateChanged(dsbmixer_get_unit(mixer), _muted);
-  muted = _muted;
+  bool mute{(state == Qt::Checked)};
+  dsbmixer_set_mute(mixer, chan, mute);
+  if (mute == dsbmixer_is_muted(mixer, chan))
+    emit muteStateChanged(dsbmixer_get_unit(mixer), mute);
 }
 
 void Mixer::setMute(int chan, bool on) {
   const int idx{channelIndex(chan)};
   if (idx < 0) return;
   dsbmixer_set_mute(mixer, chan, on);
-  bool _muted{dsbmixer_is_muted(mixer, chan)};
-  if (_muted != muted) emit muteStateChanged(dsbmixer_get_unit(mixer), _muted);
-  muted = _muted;
-  channels.at(idx)->setMute(muted);
+  if (on == dsbmixer_is_muted(mixer, chan))
+    emit muteStateChanged(dsbmixer_get_unit(mixer), on);
+  channels.at(idx)->setMute(on);
 }
 
 void Mixer::toggleMute(int chan) {
-  const int idx{channelIndex(chan)};
-  if (idx < 0) return;
-  dsbmixer_set_mute(mixer, chan, !muted);
-  bool _muted{dsbmixer_is_muted(mixer, chan)};
-  if (_muted != muted) emit muteStateChanged(dsbmixer_get_unit(mixer), _muted);
-  muted = _muted;
-  channels.at(idx)->setMute(muted);
+  setMute(chan, !dsbmixer_is_muted(mixer, chan));
+}
+
+void Mixer::muteMaster(bool on) {
+  setMute(DSBMIXER_MASTER, on);
+}
+
+void Mixer::toggleMasterMute() {
+  toggleMute(DSBMIXER_MASTER);
 }
 
 void Mixer::update() {
@@ -165,14 +165,12 @@ void Mixer::update() {
     const int chan{cs->id};
     const int lvol{DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan))};
     const int rvol{DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan))};
-    const int uvol{(lvol + rvol) >> 1};
-    if (chan == DSBMIXER_MASTER) {
-      if (uvol > 0) cs->setMute(false);
+    if (chan == DSBMIXER_MASTER)
       emit masterVolChanged(dsbmixer_get_unit(this->mixer), lvol, rvol);
-    }
     cs->setVol(lvol, rvol);
     if (dsbmixer_can_rec(mixer, chan))
       cs->setRecSrc(dsbmixer_is_recsrc(mixer, chan));
+    cs->setMute(dsbmixer_is_muted(this->mixer, chan));
   }
 }
 
@@ -180,11 +178,10 @@ void Mixer::changeMasterVol(int volinc) {
   const int chan{DSBMIXER_MASTER};
   const int idx{channelIndex(chan)};
   if (idx < 0) return;
-  if (muted) {
+  if (dsbmixer_is_muted(mixer, chan)) {
     dsbmixer_set_mute(mixer, chan, false);
     if (!dsbmixer_is_muted(mixer, chan)) {
       emit muteStateChanged(dsbmixer_get_unit(this->mixer), false);
-      muted = false;
       channels.at(idx)->setMute(false);
       return;
     }

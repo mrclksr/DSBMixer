@@ -39,6 +39,8 @@ class Mixer : public QWidget {
         QWidget *parent = nullptr);
   ~Mixer();
   void update();
+  void muteMaster(bool on);
+  void toggleMasterMute();
   bool isMuted(int chan) const;
   int getUnit() const;
   int getMasterLVol();
@@ -73,7 +75,6 @@ class Mixer : public QWidget {
   void createChannels();
 
  private:
-  bool muted{false};
   QString cardName;
   QString devName;
   QHBoxLayout *layout{};
