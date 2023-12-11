@@ -272,12 +272,12 @@ void MainWin::setVol(uint lvol, uint rvol) {
 
 void MainWin::mute(bool on) {
   if (!currentMixer) return;
-  currentMixer->setMute(DSBMIXER_MASTER, on);
+  currentMixer->muteMaster(on);
 }
 
 void MainWin::toggleMute() {
   if (!currentMixer) return;
-  currentMixer->toggleMute(DSBMIXER_MASTER);
+  currentMixer->toggleMasterMute();
 }
 
 void MainWin::toggleAppsWin() {
