@@ -118,6 +118,7 @@ static struct _audio_proc_updater_s audio_proc_updaters[] = {
     {"sndiod", {.move = NULL, .restart = CMD_RESTART_SNDIO}}};
 
 static int uconnect(const char *path);
+static int open_mixer(const char *name, int retries);
 static int get_unit(const char *mixer);
 static int get_mixers(void);
 static int add_mixer(const char *name);
@@ -131,6 +132,8 @@ static int set_vol(dsbmixer_t *mixer, int dev, int vol);
 static int read_vol(dsbmixer_t *mixer);
 static int read_recsrc(dsbmixer_t *mixer);
 static int read_mute(dsbmixer_t *mixer);
+static int read_devmask(int fd, int *mask, int retries);
+static int read_recmask(int fd, int *mask, int retries);
 static int run_audio_proc_updater(dsbmixer_audio_proc_t *, const char *);
 static char *get_cardname(const char *mixer);
 static char *get_ugen(int pcmunit);
@@ -1019,10 +1022,51 @@ static int get_mixers() {
   return (0);
 }
 
+static int open_mixer(const char *name, int retries) {
+  int fd = -1;
+  do {
+    if ((fd = open(name, O_RDWR)) != -1)
+      return (fd);
+    if (errno == EBADF || errno == EINTR)
+      warn("open_mixer(): open(%s)", name);
+    else
+      break;
+    (void)sleep(1);
+  } while (retries-- > 0);
+  ERROR(-1, DSBMIXER_ERR_SYS, false, "Couldn't open mixer %s", name);
+}
+
+static int read_devmask(int fd, int *mask, int retries) {
+  do {
+    if (ioctl(fd, SOUND_MIXER_READ_DEVMASK, mask) != -1)
+      return (0);
+    if (errno == EBADF)
+      warn("read_devmask(): ioctl(SOUND_MIXER_READ_DEVMASK");
+    else
+      ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_DEVMASK)");
+    (void)sleep(1);
+  } while (retries-- > 0);
+  ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_DEVMASK)");
+}
+
+static int read_recmask(int fd, int *mask, int retries) {
+  do {
+    if (ioctl(fd, SOUND_MIXER_READ_RECMASK, mask) != -1)
+      return (0);
+    if (errno == EBADF)
+      warn("read_recmask(): ioctl(SOUND_MIXER_READ_RECMASK");
+    else
+      ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_RECMASK)");
+    (void)sleep(1);
+  } while (retries-- > 0);
+  ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_RECMASK)");
+}
+
 static int add_mixer(const char *name) {
   int i, vol;
   static int id = 1;
-  dsbmixer_t mixer;
+  const int retries = 2;
+  dsbmixer_t mixer = {0};
 
   /*
    * If we immediately add a mixer after it was plugged in, it can
@@ -1030,89 +1074,21 @@ static int add_mixer(const char *name) {
    * ioctl()s on it. We must give the device some time and retry
    * if it's not ready yet.
    */
-  for (i = 0; i < 3; i++) {
-    if ((mixer.fd = open(name, O_RDWR)) == -1) {
-      if (errno == EBADF || errno == EINTR)
-        warn("add_mixer()->open(%s)", name);
-      else {
-        ERROR(-1, DSBMIXER_ERR_SYS, false, "Couldn't open mixer %s", name);
-      }
-      (void)sleep(1);
-    } else
-      break;
-  }
-  if (i == 3) {
-    ERROR(-1, DSBMIXER_ERR_SYS, false, "Couldn't open mixer %s", name);
-  }
-  for (i = 0; i < 3; i++) {
-    if (ioctl(mixer.fd, SOUND_MIXER_READ_DEVMASK, &mixer.dmask) == -1) {
-      if (errno == EBADF) {
-        warn(
-            "add_mixer()->ioctl"
-            "(SOUND_MIXER_READ_DEVMASK");
-      } else {
-        ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_DEVMASK)");
-      }
-      (void)sleep(1);
-    } else
-      break;
-  }
-  if (i == 3) {
-    ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_DEVMASK)");
-  }
-
+  if ((mixer.fd = open_mixer(name, retries)) == -1)
+    return (-1);
+  if (read_devmask(mixer.fd, &mixer.dmask, retries) == -1)
+    return (-1);
   /* Count channels */
   mixer.nchans = 0;
   for (i = 0; i < DSBMIXER_MAX_CHANNELS; i++) {
     if ((1 << i) & mixer.dmask) mixer.nchans++;
   }
-
-  for (i = 0; i < 3; i++) {
-    if (ioctl(mixer.fd, SOUND_MIXER_READ_RECMASK, &mixer.recmask) == -1) {
-      if (errno == EBADF) {
-        warn(
-            "add_mixer()->ioctl"
-            "(SOUND_MIXER_READ_RECMASK");
-      } else {
-        ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_RECMASK)");
-      }
-      (void)sleep(1);
-    } else
-      break;
-  }
-  if (i == 3) {
-    ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_RECMASK)");
-  }
-
-  for (i = 0; i < 3; i++) {
-    if (ioctl(mixer.fd, SOUND_MIXER_READ_RECSRC, &mixer.recsrc) == -1) {
-      if (errno == EBADF) {
-        warn(
-            "add_mixer()->ioctl"
-            "(SOUND_MIXER_READ_RECSRC)");
-      } else {
-        ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_RECSRC)");
-      }
-      (void)sleep(1);
-    } else
-      break;
-  }
-  if (i == 3) {
-    ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_RECSRC)");
-  }
-  for (i = 0; i < 3; i++) {
-    if (read_mute(&mixer) == -1)
-      (void)sleep(1);
-  }
-  /* Init all non-recording devices. */
+  if (read_recmask(mixer.fd, &mixer.recmask, retries) == -1)
+    return (-1);
+  /* Set channel names. */
   for (i = 0; i < SOUND_MIXER_NRDEVICES; i++) {
     if (!((1 << i) & mixer.dmask)) continue;
     mixer.chan[i].name = channel_names[i];
-    if (ioctl(mixer.fd, MIXER_READ(i), &vol) != 0) {
-      warn("ioctl()");
-      continue;
-    }
-    mixer.chan[i].vol = vol;
   }
   mixer.id = id++;
   mixer.unit = get_unit(name);
@@ -1135,9 +1111,8 @@ static int add_mixer(const char *name) {
   }
   if ((mixers[nmixers]->name = strdup(name)) == NULL)
     ERROR(-1, FATAL_SYSERR, false, "strdup()");
-  read_vol(mixers[nmixers]);
   nmixers++;
-
+  dsbmixer_poll_mixers();
   return (0);
 }
 
