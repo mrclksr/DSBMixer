@@ -78,7 +78,7 @@ class Mixer : public QWidget {
  private:
   QString cardName;
   QString devName;
-  QHBoxLayout *layout{};
+  QHBoxLayout *layout{nullptr};
   dsbmixer_t *mixer{nullptr};
   QList<ChanSlider *> channels;
   const MixerSettings *mixerSettings{nullptr};
