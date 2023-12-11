@@ -20,6 +20,7 @@
 #include <regex.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -129,6 +130,7 @@ static int set_recsrc(dsbmixer_t *mixer, int mask);
 static int set_vol(dsbmixer_t *mixer, int dev, int vol);
 static int read_vol(dsbmixer_t *mixer);
 static int read_recsrc(dsbmixer_t *mixer);
+static int read_mute(dsbmixer_t *mixer);
 static int run_audio_proc_updater(dsbmixer_audio_proc_t *, const char *);
 static char *get_cardname(const char *mixer);
 static char *get_ugen(int pcmunit);
@@ -274,27 +276,21 @@ bool dsbmixer_is_recsrc(const dsbmixer_t *mixer, int chan) {
 }
 
 int dsbmixer_set_mute(dsbmixer_t *mixer, int chan, bool mute) {
+  int mask = 0;
   RETURN_ERROR_IF_CHAN_INVALID(-1, mixer, chan);
-  if (!mute && mixer->chan[chan].muted) {
-    if (set_vol(mixer, chan, mixer->chan[chan].saved_vol) == -1) return (-1);
-    mixer->chan[chan].muted = false;
-  } else if (mute && !mixer->chan[chan].muted) {
-    mixer->chan[chan].saved_vol = mixer->chan[chan].vol;
-    if (set_vol(mixer, chan, 0) == -1) return (-1);
-    mixer->chan[chan].muted = true;
-  }
+  if (mute)
+    mask |= (1 << chan);
+  else
+    mask &= ~(1 << chan);
+  if (ioctl(mixer->fd , SOUND_MIXER_WRITE_MUTE, &mask) < 0)
+    return (-1);
+  mixer->mutemask = mask;
   return (0);
 }
 
 bool dsbmixer_is_muted(dsbmixer_t *mixer, int chan) {
   RETURN_ERROR_IF_CHAN_INVALID(false, mixer, chan);
-  if (read_vol(mixer) == -1) return (false);
-  errno = 0;
-  if (mixer->chan[chan].vol != 0)
-    mixer->chan[chan].muted = false;
-  else
-    mixer->chan[chan].muted = true;
-  return (mixer->chan[chan].muted);
+  return ((1 << chan) & mixer->mutemask);
 }
 
 int dsbmixer_get_err(char const **errmsg) {
@@ -365,7 +361,8 @@ dsbmixer_t *dsbmixer_poll_mixers() {
     if (mixers[i]->removed) continue;
     read_vol(mixers[i]);
     read_recsrc(mixers[i]);
-    if (mixers[i]->changemask || mixers[i]->rchangemask) {
+    read_mute(mixers[i]);
+    if (mixers[i]->changemask || mixers[i]->rchangemask || mixers[i]->mchangemask) {
       next = i + 1;
       return (mixers[i]);
     }
@@ -1103,7 +1100,10 @@ static int add_mixer(const char *name) {
   if (i == 3) {
     ERROR(-1, DSBMIXER_ERR_SYS, false, "ioctl(SOUND_MIXER_READ_RECSRC)");
   }
-
+  for (i = 0; i < 3; i++) {
+    if (read_mute(&mixer) == -1)
+      (void)sleep(1);
+  }
   /* Init all non-recording devices. */
   for (i = 0; i < SOUND_MIXER_NRDEVICES; i++) {
     if (!((1 << i) & mixer.dmask)) continue;
@@ -1113,8 +1113,6 @@ static int add_mixer(const char *name) {
       continue;
     }
     mixer.chan[i].vol = vol;
-    mixer.chan[i].saved_vol = vol;
-    mixer.chan[i].muted = vol == 0 ? true : false;
   }
   mixer.id = id++;
   mixer.unit = get_unit(name);
@@ -1161,9 +1159,7 @@ static int read_vol(dsbmixer_t *mixer) {
     }
     if (mixer->chan[i].vol != vol) {
       mixer->changemask |= (1 << i);
-      mixer->chan[i].saved_vol = mixer->chan[i].vol;
       mixer->chan[i].vol = vol;
-      mixer->chan[i].muted = vol == 0 ? true : false;
     }
   }
   errno = _errno;
@@ -1181,6 +1177,20 @@ static int read_recsrc(dsbmixer_t *mixer) {
   if (ioctl(mixer->fd, SOUND_MIXER_READ_RECSRC, &recsrc) == -1) return (-1);
   mixer->rchangemask = (recsrc ^ mixer->recsrc);
   mixer->recsrc = recsrc;
+  return (0);
+}
+
+static int read_mute(dsbmixer_t *mixer) {
+  int mask = 0;
+
+  if (mixer == NULL || mixer->removed) {
+    errno = EINVAL;
+    return (-1);
+  }
+  if (ioctl(mixer->fd, SOUND_MIXER_READ_MUTE, &mask) < 0)
+    return (-1);
+  mixer->mchangemask = (mask ^ mixer->mutemask);
+  mixer->mutemask = mask;
   return (0);
 }
 

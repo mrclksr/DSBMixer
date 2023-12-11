@@ -51,8 +51,6 @@ struct dsbmixer_snd_settings_s {
 
 struct dsbmixer_channel_s {
   int vol;          /* (rvol << 8) + vol */
-  int saved_vol;    /* Saved vol before muting */
-  bool muted;
   char const *name; /* Vol, Pcm, Mic, etc. */
 };
 
@@ -68,8 +66,10 @@ struct mixer_s {
   int recsrc;      /* Bitmask of current recording sources. */
   int recmask;     /* Bitmask of all rec. devices/channels. */
   int dmask;       /* Bitmask of all channels. */
+  int mutemask;    /* Bitmask for mute states of all channels. */
   int changemask;  /* Mask for volume changes since last poll. */
   int rchangemask; /* Mask for record source changes "      "  */
+  int mchangemask; /* Mask for mute state changes "      " */
   dsbmixer_channel_t chan[SOUND_MIXER_NRDEVICES];
 };
 
