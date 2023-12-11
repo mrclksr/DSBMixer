@@ -34,6 +34,7 @@ move_pa_streams() {
   for s in $(get_pa_streams_at_unit ${src_unit}); do
     pactl move-sink-input $s ${dest_sink}
   done
+  pactl set-default-sink ${dest_sink}
 }
 
 check_args() {
