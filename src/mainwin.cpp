@@ -162,8 +162,11 @@ void MainWin::keyPressEvent(QKeyEvent *e) {
 }
 
 void MainWin::showConfigMenu() {
-  Preferences prefs(*mixerSettings, *soundSettings, this);
+  if (!prefsWinMutex.try_lock())
+      return;
+  Preferences prefs{*mixerSettings, *soundSettings, this};
   (void)prefs.exec();
+  prefsWinMutex.unlock();
 }
 
 void MainWin::toggleWin() {

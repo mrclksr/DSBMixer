@@ -11,6 +11,7 @@
 #include <QMainWindow>
 #include <QMoveEvent>
 #include <QWidget>
+#include <QMutex>
 
 #include "appsmixer.h"
 #include "mixerlist.h"
@@ -74,6 +75,7 @@ class MainWin : public QMainWindow {
   QMenu *mainMenu;
   QMenu *trayMenu;
   QTimer *traytimer;
+  QMutex prefsWinMutex;
   dsbcfg_t *cfg;
   MixerSettings *mixerSettings{nullptr};
   SoundSettings *soundSettings{nullptr};
