@@ -66,6 +66,7 @@ class MainWin : public QMainWindow {
   void updateTrayMenu();
   void saveGeometry();
   void registerDBusService();
+  void addMixerChooser(QMenu *menu);
   QAction *createQuitAction();
   QAction *createPrefsAction();
   QAction *createAppsMixerAction();

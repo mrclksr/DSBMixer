@@ -214,16 +214,8 @@ void MainWin::createMainMenu() {
   mainMenu->addAction(createQuitAction());
 }
 
-void MainWin::updateTrayMenu() {
-  if (!currentMixer || !defaultMixer) return;
-  QAction *toggle{
-      new QAction(iconLoader->windowIcon, tr("Show/hide window"), this)};
+void MainWin::addMixerChooser(QMenu *menu) {
   QSignalMapper *mapper{new QSignalMapper(this)};
-
-  trayMenu->clear();
-  trayMenu->addAction(toggle);
-  trayMenu->addAction(createAppsMixerAction());
-  trayMenu->addSection(tr("Sound devices"));
 
   for (auto i{0}; i < mixerTabs->count(); i++) {
     Mixer *mixer{mixerTabs->mixer(i)};
@@ -232,13 +224,24 @@ void MainWin::updateTrayMenu() {
     QAction *action{new QAction(iconLoader->mixerIcon, label)};
     if (mixer->getID() == currentMixer->getID()) action->setEnabled(false);
     mapper->setMapping(action, i);
-    trayMenu->addAction(action);
+    menu->addAction(action);
     connect(action, SIGNAL(triggered()), mapper, SLOT(map()));
   }
+  connect(mapper, SIGNAL(mappedInt(int)), this, SLOT(setTabIndex(int)));
+}
+
+void MainWin::updateTrayMenu() {
+  if (!currentMixer || !defaultMixer) return;
+  QAction *toggle{
+      new QAction(iconLoader->windowIcon, tr("Show/hide window"), this)};
+  trayMenu->clear();
+  trayMenu->addAction(toggle);
+  trayMenu->addAction(createAppsMixerAction());
+  trayMenu->addSection(tr("Sound devices"));
+  addMixerChooser(trayMenu);
   trayMenu->addSeparator();
   trayMenu->addAction(createPrefsAction());
   trayMenu->addAction(createQuitAction());
-  connect(mapper, SIGNAL(mappedInt(int)), this, SLOT(setTabIndex(int)));
   connect(toggle, SIGNAL(triggered()), this, SLOT(toggleWin()));
 }
 
