@@ -7,6 +7,8 @@
 
 #include "mixer.h"
 
+#include "src/chanslider.h"
+
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QRegExp>
 #else
@@ -90,17 +92,17 @@ int Mixer::channelIndex(int chan) const {
 
 void Mixer::setLVol(int chan, int lvol) {
   dsbmixer_set_lvol(this->mixer, chan, lvol);
-  updateSlider(chan);
+  updateSliderVol(chan);
 }
 
 void Mixer::setRVol(int chan, int rvol) {
   dsbmixer_set_rvol(this->mixer, chan, rvol);
-  updateSlider(chan);
+  updateSliderVol(chan);
 }
 
 void Mixer::setVol(int chan, int lvol, int rvol) {
   dsbmixer_set_vol(this->mixer, chan, DSBMIXER_CHAN_CONCAT(lvol, rvol));
-  updateSlider(chan);
+  updateSliderVol(chan);
 }
 
 void Mixer::setRecSrc(int chan, int state) {
@@ -136,24 +138,25 @@ void Mixer::muteMaster(bool on) { setMute(DSBMIXER_MASTER, on); }
 
 void Mixer::toggleMasterMute() { toggleMute(DSBMIXER_MASTER); }
 
-void Mixer::updateSlider(int chan) {
-  const int idx{channelIndex(chan)};
-  if (idx < 0) return;
-  int lvol{DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan))};
-  int rvol{DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan))};
-  channels.at(idx)->setVol(lvol, rvol);
+void Mixer::updateSliderVol(ChanSlider *cs) {
+  const int chan{cs->id};
+  const int lvol{DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan))};
+  const int rvol{DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan))};
+  cs->setVol(lvol, rvol);
   if (chan == DSBMIXER_MASTER)
     emit masterVolChanged(dsbmixer_get_unit(this->mixer), lvol, rvol);
+}
+
+void Mixer::updateSliderVol(int chan) {
+  const int idx{channelIndex(chan)};
+  if (idx < 0) return;
+  updateSliderVol(channels.at(idx));
 }
 
 void Mixer::update() {
   for (auto &cs : channels) {
     const int chan{cs->id};
-    const int lvol{DSBMIXER_CHAN_LEFT(dsbmixer_get_vol(mixer, chan))};
-    const int rvol{DSBMIXER_CHAN_RIGHT(dsbmixer_get_vol(mixer, chan))};
-    if (chan == DSBMIXER_MASTER)
-      emit masterVolChanged(dsbmixer_get_unit(this->mixer), lvol, rvol);
-    cs->setVol(lvol, rvol);
+    updateSliderVol(cs);
     if (dsbmixer_can_rec(mixer, chan))
       cs->setRecSrc(dsbmixer_is_recsrc(mixer, chan));
     cs->setMute(dsbmixer_is_muted(this->mixer, chan));
@@ -177,7 +180,7 @@ void Mixer::changeMasterVol(int volinc) {
   int rvol{channels.at(idx)->rvol};
   dsbmixer_set_lvol(this->mixer, chan, lvol);
   dsbmixer_set_rvol(this->mixer, chan, rvol);
-  updateSlider(chan);
+  updateSliderVol(chan);
 }
 
 void Mixer::deleteChannels() {
