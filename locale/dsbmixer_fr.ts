@@ -45,12 +45,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="220"/>
+        <location filename="../src/mainwin.cpp" line="236"/>
         <source>Show/hide window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="226"/>
+        <location filename="../src/mainwin.cpp" line="240"/>
         <source>Sound devices</source>
         <translation type="unfinished"></translation>
     </message>
