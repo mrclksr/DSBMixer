@@ -118,7 +118,7 @@ void Mixer::setMute(int chan, int state) {
   bool mute{(state == Qt::Checked)};
   dsbmixer_set_mute(mixer, chan, mute);
   if (mute == dsbmixer_is_muted(mixer, chan))
-    emit muteStateChanged(dsbmixer_get_unit(mixer), mute);
+    emit muteStateChanged(chan, mute);
 }
 
 void Mixer::setMute(int chan, bool on) {
@@ -126,7 +126,7 @@ void Mixer::setMute(int chan, bool on) {
   if (idx < 0) return;
   dsbmixer_set_mute(mixer, chan, on);
   if (on == dsbmixer_is_muted(mixer, chan))
-    emit muteStateChanged(dsbmixer_get_unit(mixer), on);
+    emit muteStateChanged(chan, on);
   channels.at(idx)->setMute(on);
 }
 
