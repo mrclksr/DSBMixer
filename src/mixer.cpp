@@ -124,7 +124,8 @@ void Mixer::setMute(int chan, bool on) {
   const int idx{channelIndex(chan)};
   if (idx < 0) return;
   dsbmixer_set_mute(mixer, chan, on);
-  if (on == dsbmixer_is_muted(mixer, chan)) emit muteStateChanged(chan, on);
+  if (on != dsbmixer_is_muted(mixer, chan)) return;
+  emit muteStateChanged(chan, on);
   channels.at(idx)->setMute(on);
 }
 
