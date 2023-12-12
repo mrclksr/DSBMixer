@@ -117,16 +117,14 @@ void Mixer::setRecSrc(int chan, int state) {
 void Mixer::setMute(int chan, int state) {
   bool mute{(state == Qt::Checked)};
   dsbmixer_set_mute(mixer, chan, mute);
-  if (mute == dsbmixer_is_muted(mixer, chan))
-    emit muteStateChanged(chan, mute);
+  if (mute == dsbmixer_is_muted(mixer, chan)) emit muteStateChanged(chan, mute);
 }
 
 void Mixer::setMute(int chan, bool on) {
   const int idx{channelIndex(chan)};
   if (idx < 0) return;
   dsbmixer_set_mute(mixer, chan, on);
-  if (on == dsbmixer_is_muted(mixer, chan))
-    emit muteStateChanged(chan, on);
+  if (on == dsbmixer_is_muted(mixer, chan)) emit muteStateChanged(chan, on);
   channels.at(idx)->setMute(on);
 }
 
@@ -174,9 +172,7 @@ void Mixer::changeMasterVol(int volinc) {
   channels.at(idx)->addVol(volinc);
   int lvol{channels.at(idx)->lvol};
   int rvol{channels.at(idx)->rvol};
-  dsbmixer_set_lvol(this->mixer, chan, lvol);
-  dsbmixer_set_rvol(this->mixer, chan, rvol);
-  updateSliderVol(chan);
+  setVol(chan, lvol, rvol);
 }
 
 void Mixer::deleteChannels() {
