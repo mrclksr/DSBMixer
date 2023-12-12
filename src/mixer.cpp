@@ -46,7 +46,7 @@ Mixer::Mixer(dsbmixer_t &mixer, const MixerSettings &mixerSettings,
 Mixer::~Mixer() { dsbmixer_del_mixer(mixer); }
 
 void Mixer::createChannels() {
-  for (int i = 0; i < dsbmixer_get_nchans(mixer); i++) {
+  for (int i{0}; i < dsbmixer_get_nchans(mixer); i++) {
     const int chan{dsbmixer_get_chan_id(mixer, i)};
     const bool muteable{chan == DSBMIXER_MASTER};
     if (!((1 << chan) & mixerSettings->getChanMask())) continue;
@@ -84,7 +84,7 @@ void Mixer::redrawMixer() {
 }
 
 int Mixer::channelIndex(int chan) const {
-  for (int idx = 0; idx < channels.count(); idx++) {
+  for (int idx{0}; idx < channels.count(); idx++) {
     if (channels.at(idx)->id == chan) return (idx);
   }
   return (-1);
@@ -168,12 +168,8 @@ void Mixer::changeMasterVol(int volinc) {
   const int idx{channelIndex(chan)};
   if (idx < 0) return;
   if (dsbmixer_is_muted(mixer, chan)) {
-    dsbmixer_set_mute(mixer, chan, false);
-    if (!dsbmixer_is_muted(mixer, chan)) {
-      emit muteStateChanged(dsbmixer_get_unit(this->mixer), false);
-      channels.at(idx)->setMute(false);
-      return;
-    }
+    setMute(chan, false);
+    return;
   }
   channels.at(idx)->addVol(volinc);
   int lvol{channels.at(idx)->lvol};
