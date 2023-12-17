@@ -133,6 +133,7 @@ static int read_recsrc(dsbmixer_t *mixer);
 static int read_mute(dsbmixer_t *mixer);
 static int read_devmask(int fd, int *mask, int retries);
 static int read_recmask(int fd, int *mask, int retries);
+static int read_appchan_mute(const char *dev, bool *muted);
 static int run_audio_proc_updater(dsbmixer_audio_proc_t *, const char *);
 static char *get_cardname(const char *mixer);
 static char *get_ugen(int pcmunit);
@@ -585,18 +586,22 @@ int dsbappsmixer_set_rvol(dsbappsmixer_t *am, int chan, int rvol) {
 }
 
 int dsbappsmixer_set_mute(dsbappsmixer_t *mixer, int chan, bool mute) {
+  int ret, fd, mask = 0;
   RETURN_ERROR_IF_APPS_CHAN_INVALID(-1, mixer, chan);
-  if (!mute && mixer->chan[chan]->muted) {
-    if (dsbappsmixer_set_vol(mixer, chan, mixer->chan[chan]->saved_vol) == -1)
-      return (-1);
-    mixer->chan[chan]->muted = false;
-  } else if (mute && !mixer->chan[chan]->muted) {
-    mixer->chan[chan]->saved_vol = mixer->chan[chan]->vol;
-    if (dsbappsmixer_set_vol(mixer, chan, 0) == -1) return (-1);
-    mixer->chan[chan]->muted = true;
+  if (mute)
+    mask |= (1 << SOUND_MIXER_PCM);
+  else
+    mask &= ~(1 << SOUND_MIXER_PCM);
+  if ((fd = open(mixer->chan[chan]->dev, O_RDONLY, 0)) == -1) {
+    warn("open(%s)", mixer->chan[chan]->dev);
+    return (-1);
   }
-  errno = 0;
-  return (0);
+  if ((ret = ioctl(fd, SOUND_MIXER_WRITE_MUTE, &mask)) < 0)
+    warn("ioctl(%s, SOUND_MIXER_WRITE_MUTE)", mixer->chan[chan]->dev);
+  else
+    mixer->chan[chan]->muted = (mask & (1 << SOUND_MIXER_PCM));
+  (void)close(fd);
+  return (ret);
 }
 
 bool dsbappsmixer_is_muted(const dsbappsmixer_t *mixer, int chan) {
@@ -631,10 +636,9 @@ int dsbappsmixer_poll(dsbappsmixer_t *am) {
     if (n >= am->nchans || am->chan[n]->pid != info.pid) {
       (void)close(fd);
       return (DSBAPPSMIXER_CHANS_CHANGED);
-    } else if ((vol = read_appvol(am->chan[n]->dev)) != -1) {
-      am->chan[n]->vol = vol;
-      if (vol > 0) am->chan[n]->muted = false;
     }
+    if ((vol = read_appvol(am->chan[n]->dev)) != -1) am->chan[n]->vol = vol;
+    (void)read_appchan_mute(am->chan[n]->dev, &am->chan[n]->muted);
     n++;
   }
   (void)close(fd);
@@ -677,8 +681,8 @@ static dsbappsmixer_channel_t *create_appchannel(const char *dev, pid_t pid) {
   }
   chan->muted = false;
   chan->pid = pid;
-  chan->vol = chan->saved_vol = read_appvol(dev);
-
+  if ((chan->vol = read_appvol(dev)) < 0) chan->vol = 0;
+  (void)read_appchan_mute(dev, &chan->muted);
   return (chan);
 }
 
@@ -1401,4 +1405,18 @@ static int read_appvol(const char *dev) {
   (void)close(fd);
 
   return (ret == -1 ? -1 : vol);
+}
+
+static int read_appchan_mute(const char *dev, bool *muted) {
+  int ret, fd, mask = 0;
+  if ((fd = open(dev, O_RDONLY, 0)) == -1) {
+    warn("open(%s)", dev);
+    return (-1);
+  }
+  if ((ret = ioctl(fd, SOUND_MIXER_READ_MUTE, &mask)) < 0)
+    warn("ioctl(%s, SOUND_MIXER_READ_MUTE)", dev);
+  else
+    *muted = (mask & (1 << SOUND_MIXER_PCM));
+  (void)close(fd);
+  return (ret);
 }

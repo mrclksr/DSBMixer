@@ -19,6 +19,7 @@ AppsMixer::AppsMixer(dsbappsmixer_t &mixer, const IconLoader &iconLoader,
   layout = new QHBoxLayout;
 
   createChannels();
+  update();
   setLayout(layout);
   setWinSize(parent);
   setWindowIcon(iconLoader.appsMixerIcon);
@@ -83,10 +84,7 @@ void AppsMixer::setMute(int chan, int state) {
 }
 
 void AppsMixer::updateVolumes() {
-  for (auto i{0}; i < channels.count(); i++) {
-    if (dsbappsmixer_is_muted(mixer, i)) continue;
-    updateSliderVol(i);
-  }
+  for (auto i{0}; i < channels.count(); i++) updateSliderVol(i);
 }
 
 void AppsMixer::updateSliderVol(int chan) {
@@ -94,7 +92,7 @@ void AppsMixer::updateSliderVol(int chan) {
   const int rvol{DSBMIXER_CHAN_RIGHT(dsbappsmixer_get_vol(mixer, chan))};
   ChanSlider *cs{channels.at(chan)};
   cs->setVol(lvol, rvol);
-  if (cs->isMuted()) cs->setMute(false);
+  cs->setMute(dsbappsmixer_is_muted(mixer, chan));
 }
 
 void AppsMixer::update() {

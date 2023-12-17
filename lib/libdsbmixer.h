@@ -75,7 +75,6 @@ struct mixer_s {
 
 struct dsbappsmixer_channel_s {
   int vol; /* (rvol << 8) + lvol */
-  int saved_vol;
   bool muted;
   char *dev;  /* dsp device */
   char *name; /* Name of audio application. */
