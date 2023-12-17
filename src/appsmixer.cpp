@@ -64,23 +64,17 @@ void AppsMixer::catchPollIvalChanged() {
 
 void AppsMixer::setLVol(int chan, int lvol) {
   dsbappsmixer_set_lvol(this->mixer, chan, lvol);
-  lvol = DSBMIXER_CHAN_LEFT(dsbappsmixer_get_vol(mixer, chan));
-  const int rvol{DSBMIXER_CHAN_RIGHT(dsbappsmixer_get_vol(mixer, chan))};
-  channels.at(chan)->setVol(lvol, rvol);
+  updateSliderVol(chan);
 }
 
 void AppsMixer::setRVol(int chan, int rvol) {
   dsbappsmixer_set_rvol(this->mixer, chan, rvol);
-  rvol = DSBMIXER_CHAN_RIGHT(dsbappsmixer_get_vol(mixer, chan));
-  const int lvol{DSBMIXER_CHAN_LEFT(dsbappsmixer_get_vol(mixer, chan))};
-  channels.at(chan)->setVol(lvol, rvol);
+  updateSliderVol(chan);
 }
 
 void AppsMixer::setVol(int chan, int lvol, int rvol) {
   dsbappsmixer_set_vol(this->mixer, chan, DSBMIXER_CHAN_CONCAT(lvol, rvol));
-  lvol = DSBMIXER_CHAN_LEFT(dsbappsmixer_get_vol(mixer, chan));
-  rvol = DSBMIXER_CHAN_RIGHT(dsbappsmixer_get_vol(mixer, chan));
-  channels.at(chan)->setVol(lvol, rvol);
+  updateSliderVol(chan);
 }
 
 void AppsMixer::setMute(int chan, int state) {
@@ -91,12 +85,16 @@ void AppsMixer::setMute(int chan, int state) {
 void AppsMixer::updateVolumes() {
   for (auto i{0}; i < channels.count(); i++) {
     if (dsbappsmixer_is_muted(mixer, i)) continue;
-    const int lvol{DSBMIXER_CHAN_LEFT(dsbappsmixer_get_vol(mixer, i))};
-    const int rvol{DSBMIXER_CHAN_RIGHT(dsbappsmixer_get_vol(mixer, i))};
-    ChanSlider *cs{channels.at(i)};
-    cs->setVol(lvol, rvol);
-    if (cs->isMuted()) cs->setMute(false);
+    updateSliderVol(i);
   }
+}
+
+void AppsMixer::updateSliderVol(int chan) {
+  const int lvol{DSBMIXER_CHAN_LEFT(dsbappsmixer_get_vol(mixer, chan))};
+  const int rvol{DSBMIXER_CHAN_RIGHT(dsbappsmixer_get_vol(mixer, chan))};
+  ChanSlider *cs{channels.at(chan)};
+  cs->setVol(lvol, rvol);
+  if (cs->isMuted()) cs->setMute(false);
 }
 
 void AppsMixer::update() {

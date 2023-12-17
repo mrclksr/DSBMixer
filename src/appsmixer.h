@@ -39,6 +39,7 @@ class AppsMixer : public QDialog {
   void updateVolumes();
   void adjustWinSize();
   void setWinSize(QWidget *parent);
+  void updateSliderVol(int chan);
 
  private:
   const int defaultWidth{200};
