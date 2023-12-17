@@ -9,7 +9,7 @@
         <translation>Anwendungs-Mixer</translation>
     </message>
     <message>
-        <location filename="../src/appsmixer.cpp" line="140"/>
+        <location filename="../src/appsmixer.cpp" line="138"/>
         <source>No audio apps found</source>
         <translation>Keine Audio-Anwendungen gefunden</translation>
     </message>

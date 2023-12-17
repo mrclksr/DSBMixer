@@ -9,7 +9,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/appsmixer.cpp" line="140"/>
+        <location filename="../src/appsmixer.cpp" line="138"/>
         <source>No audio apps found</source>
         <translation type="unfinished"></translation>
     </message>
