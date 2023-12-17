@@ -4,12 +4,12 @@
 <context>
     <name>AppsMixer</name>
     <message>
-        <location filename="../src/appsmixer.cpp" line="25"/>
+        <location filename="../src/appsmixer.cpp" line="26"/>
         <source>Applications mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/appsmixer.cpp" line="138"/>
+        <location filename="../src/appsmixer.cpp" line="136"/>
         <source>No audio apps found</source>
         <translation type="unfinished"></translation>
     </message>
