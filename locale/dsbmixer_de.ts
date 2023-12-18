@@ -30,32 +30,32 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="192"/>
+        <location filename="../src/mainwin.cpp" line="187"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="198"/>
+        <location filename="../src/mainwin.cpp" line="193"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="205"/>
+        <location filename="../src/mainwin.cpp" line="200"/>
         <source>&amp;Open applications mixer</source>
         <translation>Öffne &amp;Anwendungs-Mixer</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="236"/>
+        <location filename="../src/mainwin.cpp" line="231"/>
         <source>Show/hide window</source>
         <translation>Zeige/verstecke Fenster</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="240"/>
+        <location filename="../src/mainwin.cpp" line="235"/>
         <source>Sound devices</source>
         <translation>Audio-Geräte</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="211"/>
+        <location filename="../src/mainwin.cpp" line="206"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
@@ -67,113 +67,113 @@
 <context>
     <name>Preferences</name>
     <message>
-        <location filename="../src/preferences.cpp" line="45"/>
+        <location filename="../src/preferences.cpp" line="44"/>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="49"/>
+        <location filename="../src/preferences.cpp" line="48"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="52"/>
+        <location filename="../src/preferences.cpp" line="51"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="53"/>
+        <location filename="../src/preferences.cpp" line="52"/>
         <source>Default device</source>
         <translation>Standardgerät</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="54"/>
-        <location filename="../src/preferences.cpp" line="285"/>
+        <location filename="../src/preferences.cpp" line="53"/>
+        <location filename="../src/preferences.cpp" line="282"/>
         <source>Behavior</source>
         <translation>Verhalten</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="55"/>
+        <location filename="../src/preferences.cpp" line="54"/>
         <source>Advanced</source>
         <translation>Erweitert</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="67"/>
+        <location filename="../src/preferences.cpp" line="66"/>
         <source>Preferences</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="142"/>
+        <location filename="../src/preferences.cpp" line="139"/>
         <source>Select mixer devices to be visible
 </source>
         <translation>Auswahl anzuzeigender Geräte
 </translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="143"/>
+        <location filename="../src/preferences.cpp" line="140"/>
         <source>Slider settings</source>
         <translation>Regler-Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="144"/>
+        <location filename="../src/preferences.cpp" line="141"/>
         <source>Tray icon theme</source>
         <translation>Tray-Symbolthema</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="164"/>
+        <location filename="../src/preferences.cpp" line="161"/>
         <source>Show left and right channel</source>
         <translation>Zeige linken und rechten Kanal</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="168"/>
+        <location filename="../src/preferences.cpp" line="165"/>
         <source>Show ticks</source>
         <translation>Zeige Skalenmarkierungen</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="191"/>
+        <location filename="../src/preferences.cpp" line="188"/>
         <source>Select default sound device
 </source>
         <translation>Auswahl des Standard-Audiogeräts
 </translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="192"/>
-        <location filename="../src/preferences.cpp" line="264"/>
+        <location filename="../src/preferences.cpp" line="189"/>
+        <location filename="../src/preferences.cpp" line="261"/>
         <source>Test sound</source>
         <translation>Teste Sound</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="208"/>
+        <location filename="../src/preferences.cpp" line="205"/>
         <source>Enter a command which plays a sound</source>
         <translation>Geben Sie einen Befehl zum Testen des Sounds ein</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="255"/>
+        <location filename="../src/preferences.cpp" line="252"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="290"/>
+        <location filename="../src/preferences.cpp" line="287"/>
         <source>Inverse scroll direction of tray</source>
         <translation>Invertiere Scrollrichtung des Trayicons</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="292"/>
+        <location filename="../src/preferences.cpp" line="289"/>
         <source>On some panels the scroll direction is inversed.</source>
         <translation>Macnhe Panels invertieren die Scrollrichtung.</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="341"/>
+        <location filename="../src/preferences.cpp" line="338"/>
         <source>Advanced settings</source>
         <translation>Erweiterte Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="348"/>
+        <location filename="../src/preferences.cpp" line="345"/>
         <source>Bypass mixer</source>
         <translation>Mixer umgehen</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="351"/>
+        <location filename="../src/preferences.cpp" line="348"/>
         <source>Enable this to allow applications to use
 their own existing mixer logic to control
 their own channel volume.</source>
@@ -182,7 +182,7 @@ Lautstärke regeln zu lassen, ohne dass
 dabei die Mixerkanäle geändert werden.</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="357"/>
+        <location filename="../src/preferences.cpp" line="354"/>
         <source>Defines the max. number of virtual playback
 and recording channels that can be created.
 Virtual channels allow programs to use more playback
@@ -194,12 +194,12 @@ Virtuelle Kanäle erlauben Programmen, mehr Wiedergabe-
 und Aufnahmekanäle zu nutzen, als die Hardware besitzt.</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="365"/>
+        <location filename="../src/preferences.cpp" line="362"/>
         <source>Lower values mean less buffering and latency.</source>
         <translation>Niedrigere Werte bedeuten weniger Pufferung und Latenz.</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="370"/>
+        <location filename="../src/preferences.cpp" line="367"/>
         <source>Lower values mean more amplification, but can
 produce sound clipping when chosen too low.
 Higher values mean finer volume control.</source>
@@ -209,7 +209,7 @@ Wert zu niedrig ist. Höhere Werte bedeuten feinere
 Lautstärkenkontrolle.</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="376"/>
+        <location filename="../src/preferences.cpp" line="373"/>
         <source>Higher values mean better sample rate conversion,
 but more memory and CPU usage.</source>
         <translation>Höhere Werte bewirken eine bessere Sampleraten-
@@ -217,7 +217,7 @@ Konvertierung, die jedoch mehr Rechenzeit und
 Speicher benötigt.</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="298"/>
+        <location filename="../src/preferences.cpp" line="295"/>
         <source>Defines the time interval in milliseconds mixer
 devices are polled. Higher values mean less CPU usage.
 Lower values mean less latency when showing the
@@ -229,7 +229,7 @@ Anzeige der durch andere Programme geänderten
 Lautstärke.</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="306"/>
+        <location filename="../src/preferences.cpp" line="303"/>
         <source>Defines the time interval in milliseconds to
 check whether the default sound device was changed.
 Higher values mean less CPU usage.
@@ -240,42 +240,42 @@ Höhere Werte bedeuten weniger CPU-Last.
 </translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="313"/>
+        <location filename="../src/preferences.cpp" line="310"/>
         <source>Defines the mouse wheel scroll lines for changing the volume.</source>
         <translation>Legt die Mausrad-Bildlaufzeilen für die Lautstärkenänderung fest.</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="323"/>
+        <location filename="../src/preferences.cpp" line="320"/>
         <source>Mouse wheel scroll lines</source>
         <translation>Mausrad-Bildlaufzeilen</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="381"/>
+        <location filename="../src/preferences.cpp" line="378"/>
         <source>Amplification:</source>
         <translation>Verstärkung:</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="385"/>
+        <location filename="../src/preferences.cpp" line="382"/>
         <source>Sample rate converter quality:</source>
         <translation>Sampleraten-Konverter-Qualität:</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="389"/>
+        <location filename="../src/preferences.cpp" line="386"/>
         <source>Max. auto VCHANS:</source>
         <translation>Max. Anzahl automatischer VCHANS:</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="393"/>
+        <location filename="../src/preferences.cpp" line="390"/>
         <source>Latency (0 low, 10 high):</source>
         <translation>Latenz (0 niedrig, 10 hoch):</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="315"/>
+        <location filename="../src/preferences.cpp" line="312"/>
         <source>Poll mixers every</source>
         <translation>Mixer-Abfrage alle</translation>
     </message>
     <message>
-        <location filename="../src/preferences.cpp" line="319"/>
+        <location filename="../src/preferences.cpp" line="316"/>
         <source>Check for default sound device change every</source>
         <translation>Prüfe auf Wechsel des Standard-Geräts alle</translation>
     </message>
