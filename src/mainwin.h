@@ -10,13 +10,12 @@
 #include <QIcon>
 #include <QMainWindow>
 #include <QMoveEvent>
-#include <QWidget>
 #include <QMutex>
+#include <QWidget>
 
 #include "appsmixer.h"
 #include "mixerlist.h"
 #include "mixersettings.h"
-#include "soundsettings.h"
 #include "mixertabs.h"
 #include "mixertrayicon.h"
 
@@ -46,7 +45,6 @@ class MainWin : public QMainWindow {
   void catchScrGeomChanged();
   void catchAppsMixerClosed();
   void catchVolIncChanged(int steps);
-  void catchDefaultUnitCheckIvalChanged(int ms);
   void restartAudioApps();
   void showAppsMixer();
   void setTabIndex(int index);
@@ -79,7 +77,6 @@ class MainWin : public QMainWindow {
   QMutex prefsWinMutex;
   dsbcfg_t *cfg;
   MixerSettings *mixerSettings{nullptr};
-  SoundSettings *soundSettings{nullptr};
   IconLoader *iconLoader{nullptr};
   MixerList *mixerList{nullptr};
   MixerTabs *mixerTabs{nullptr};

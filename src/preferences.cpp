@@ -26,13 +26,11 @@
 
 #include "libdsbmixer.h"
 #include "qt-helper/qt-helper.h"
+#include "src/soundsettings.h"
 
-Preferences::Preferences(MixerSettings &mixerSettings,
-                         SoundSettings &soundSettings, QWidget *parent)
-    : QDialog(parent),
-      soundSettings{&soundSettings},
-      mixerSettings{&mixerSettings} {
-  this->soundSettings->suspendUnitCheck();
+Preferences::Preferences(MixerSettings &mixerSettings, QWidget *parent)
+    : QDialog(parent), mixerSettings{&mixerSettings} {
+  soundSettings = new SoundSettings(this);
   setModal(true);
   qApp->setQuitOnLastWindowClosed(false);
 
@@ -66,8 +64,6 @@ Preferences::Preferences(MixerSettings &mixerSettings,
   setWindowIcon(icon);
   setWindowTitle(tr("Preferences"));
 }
-
-Preferences::~Preferences() { soundSettings->resumeUnitCheck(); }
 
 void Preferences::acceptSlot() {
   for (int i{0}; i < DSBMIXER_MAX_CHANNELS; i++) {

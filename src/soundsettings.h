@@ -9,10 +9,10 @@
 #include <QObject>
 #include <QTimer>
 
-class SoundSettings: public QObject {
+class SoundSettings : public QObject {
   Q_OBJECT
-public:
-  SoundSettings(int unitCheckIvalMs = 3000, QObject *parent = nullptr);
+ public:
+  SoundSettings(QObject *parent = nullptr);
   void update();
   void setAmplification(int amplification);
   void setFeederRateQuality(int quality);
@@ -20,31 +20,22 @@ public:
   void setMaxAutoVchans(int nchans);
   void setLatency(int latency);
   void setBypassMixer(bool bypass);
-  void setUnitCheckIval(int ms);
-  void suspendUnitCheck();
-  void resumeUnitCheck();
   void applySettings();
   int getAmplification() const;
   int getFeederRateQuality() const;
   int getDefaultUnit() const;
   int getMaxAutoVchans() const;
   int getLatency() const;
-  int getUnitCheckIval() const;
   bool getBypassMixer() const;
 
-signals:
+ signals:
   void settingsChanged();
-  void defaultUnitChanged(int unit);
 
-private slots:
-  void checkDefaultUnitChanged();
-
-private:
+ private:
   template <typename T>
   void setter(T &member, T val);
 
  private:
-  int unitCheckIvalMs{3000};
   int amplification{};
   int feederRateQuality{};
   int defaultUnit{};
@@ -52,6 +43,4 @@ private:
   int latency{};
   bool bypassMixer{false};
   bool changed{false};
-  bool unitCheckSuspended{false};
-  QTimer *unitCheckTimer{nullptr};
 };

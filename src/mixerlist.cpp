@@ -12,11 +12,20 @@
 
 #include "libdsbmixer.h"
 
-MixerList::MixerList(const MixerSettings &mixerSettings, const SoundSettings &soundSettings, QWidget *parent)
-  : QWidget(parent), soundSettings{&soundSettings}, mixerSettings{&mixerSettings} {
+MixerList::MixerList(const MixerSettings &mixerSettings, QWidget *parent)
+    : QWidget(parent), mixerSettings{&mixerSettings} {
   pollTimer = new QTimer(this);
+  unitCheckTimer = new QTimer(this);
   createMixerList();
   connect(pollTimer, SIGNAL(timeout()), this, SLOT(pollMixers()));
+  connect(unitCheckTimer, SIGNAL(timeout()), this,
+          SLOT(checkDefaultUnitChanged()));
+  pollTimer->start(this->mixerSettings->getPollIval());
+  unitCheckTimer->start(this->mixerSettings->getUnitChkIval());
+  connect(this->mixerSettings, SIGNAL(pollIvalChanged(int)), this,
+          SLOT(catchPollIvalChanged(int)));
+  connect(this->mixerSettings, SIGNAL(unitChkIvalChanged(int)), this,
+          SLOT(catchUnitCheckIvalChanged(int)));
 #ifndef WITHOUT_DEVD
   devdWatcher = new Thread();
   connect(devdWatcher, SIGNAL(sendNewMixer(dsbmixer_t *)), this,
@@ -25,13 +34,6 @@ MixerList::MixerList(const MixerSettings &mixerSettings, const SoundSettings &so
           SLOT(removeMixer(dsbmixer_t *)));
   devdWatcher->start();
 #endif
-  pollTimer->start(this->mixerSettings->getPollIval());
-  connect(this->mixerSettings, SIGNAL(pollIvalChanged(int)), this,
-          SLOT(catchPollIvalChanged(int)));
-  connect(this->soundSettings, SIGNAL(settingsChanged()), this,
-          SLOT(catchSoundSettingsChanged()));
-  connect(this->soundSettings, SIGNAL(defaultUnitChanged(int)), this,
-          SLOT(catchDefaultUnitChanged()));
 }
 
 void MixerList::createMixerList() {
@@ -44,7 +46,7 @@ void MixerList::createMixerList() {
 }
 
 void MixerList::initDefaultMixer() {
-  int unit{soundSettings->getDefaultUnit()};
+  int unit{dsbmixer_default_unit()};
   if (unit < 0) throw std::runtime_error{"Failed to detect default mixer unit"};
   defaultMixer = unitToMixer(unit);
   if (!defaultMixer) throw std::runtime_error{"Couldn't find default mixer"};
@@ -74,7 +76,7 @@ void MixerList::removeMixer(dsbmixer_t *dev) {
 }
 
 void MixerList::checkDefaultUnitChanged() {
-  int unit{soundSettings->getDefaultUnit()};
+  int unit{dsbmixer_default_unit()};
   if (defaultMixer->getUnit() == unit) return;
   initDefaultMixer();
   emit defaultMixerChanged(defaultMixer);
@@ -90,12 +92,16 @@ void MixerList::pollMixers() {
     }
   }
 }
+void MixerList::suspendUnitChecker() {
+  unitCheckTimer->stop();
+  unitCheckSuspended = true;
+}
 
-Mixer *MixerList::getDefaultMixer() const { return (defaultMixer); }
-
-Mixer *MixerList::at(qsizetype idx) const { return (mixers.at(idx)); }
-
-qsizetype MixerList::count() const { return (mixers.count()); }
+void MixerList::resumeUnitChecker() {
+  unitCheckTimer->start(mixerSettings->getUnitChkIval());
+  unitCheckSuspended = false;
+  checkDefaultUnitChanged();
+}
 
 void MixerList::catchPollIvalChanged(int ms) {
   if (ms <= 0)
@@ -104,11 +110,16 @@ void MixerList::catchPollIvalChanged(int ms) {
     pollTimer->start(ms);
 }
 
-void MixerList::catchSoundSettingsChanged() {
-  checkDefaultUnitChanged();
+void MixerList::catchUnitCheckIvalChanged(int ms) {
+  if (unitCheckSuspended) return;
+  if (ms <= 0)
+    unitCheckTimer->stop();
+  else
+    unitCheckTimer->start(ms);
 }
 
-void MixerList::catchDefaultUnitChanged() {
-  initDefaultMixer();
-  emit defaultMixerChanged(defaultMixer);
-}
+Mixer *MixerList::getDefaultMixer() const { return (defaultMixer); }
+
+Mixer *MixerList::at(qsizetype idx) const { return (mixers.at(idx)); }
+
+qsizetype MixerList::count() const { return (mixers.count()); }

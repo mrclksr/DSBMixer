@@ -23,8 +23,7 @@
 class Preferences : public QDialog {
   Q_OBJECT
  public:
-  Preferences(MixerSettings &mixerSettings, SoundSettings &soundSettings, QWidget *parent = 0);
-   ~Preferences();
+  Preferences(MixerSettings &mixerSettings, QWidget *parent = 0);
  public slots:
   void acceptSlot();
   void rejectSlot();

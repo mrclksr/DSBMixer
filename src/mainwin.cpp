@@ -5,7 +5,8 @@
  *
  */
 
-#include <cstdlib>
+#include "mainwin.h"
+
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -19,23 +20,23 @@
 #include <QStatusBar>
 #include <QTabWidget>
 #include <QTimer>
+#include <cstdlib>
 
 #include "appsmixer.h"
 #include "iconloader.h"
 #include "libdsbmixer.h"
-#include "mainwin.h"
 #include "mixerlist.h"
 #include "mixertabs.h"
 #include "preferences.h"
 #include "qt-helper/qt-helper.h"
 #include "restartapps.h"
 
-MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent) : QMainWindow(parent), cfg{cfg} {
+MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
+    : QMainWindow(parent), cfg{cfg} {
   mixerSettings = new MixerSettings(*cfg, this);
-  soundSettings = new SoundSettings(mixerSettings->getUnitChkIval(), this);
   QString trayThemeStr(mixerSettings->getTrayThemeName());
   iconLoader = new IconLoader(trayThemeStr);
-  mixerList = new MixerList(*mixerSettings, *soundSettings, this);
+  mixerList = new MixerList(*mixerSettings, this);
   mixerTabs = new MixerTabs(*mixerList, this);
   defaultMixer = mixerList->getDefaultMixer();
   currentMixer = defaultMixer;
@@ -52,8 +53,6 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent) : QMainWindow(parent), cfg{cfg}
           SLOT(catchScrGeomChanged()));
   connect(mixerSettings, SIGNAL(volIncChanged(int)), this,
           SLOT(catchVolIncChanged(int)));
-  connect(mixerSettings, SIGNAL(unitChkIvalChanged(int)), this,
-          SLOT(catchDefaultUnitCheckIvalChanged(int)));
   createTrayIcon();
   createMainMenu();
   setWindowIcon(iconLoader->mixerIcon);
@@ -73,10 +72,6 @@ void MainWin::setTabIndex(int index) { mixerTabs->setCurrentIndex(index); }
 
 void MainWin::catchVolIncChanged(int steps) {
   qApp->setWheelScrollLines(steps);
-}
-
-void MainWin::catchDefaultUnitCheckIvalChanged(int ms) {
-  soundSettings->setUnitCheckIval(ms);
 }
 
 void MainWin::catchDefaultMixerChanged(Mixer *mixer) {
@@ -162,10 +157,11 @@ void MainWin::keyPressEvent(QKeyEvent *e) {
 }
 
 void MainWin::showConfigMenu() {
-  if (!prefsWinMutex.try_lock())
-      return;
-  Preferences prefs{*mixerSettings, *soundSettings, this};
+  if (!prefsWinMutex.try_lock()) return;
+  mixerList->suspendUnitChecker();
+  Preferences prefs{*mixerSettings, this};
   (void)prefs.exec();
+  mixerList->resumeUnitChecker();
   prefsWinMutex.unlock();
 }
 

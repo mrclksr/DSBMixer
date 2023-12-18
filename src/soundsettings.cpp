@@ -14,14 +14,7 @@
 
 #include "libdsbmixer.h"
 
-SoundSettings::SoundSettings(int unitCheckIvalMs, QObject *parent)
-    : QObject(parent), unitCheckIvalMs{unitCheckIvalMs} {
-  update();
-  unitCheckTimer = new QTimer(this);
-  unitCheckTimer->start(unitCheckIvalMs);
-  connect(unitCheckTimer, SIGNAL(timeout()), this,
-          SLOT(checkDefaultUnitChanged()));
-}
+SoundSettings::SoundSettings(QObject *parent) : QObject(parent) { update(); }
 
 void SoundSettings::update() {
   changed = false;
@@ -43,32 +36,6 @@ void SoundSettings::applySettings() {
   }
   update();
   emit settingsChanged();
-}
-
-void SoundSettings::checkDefaultUnitChanged() {
-  int unit{dsbmixer_poll_default_unit()};
-  if (unit < 0) {
-    qDebug() << "dsbmixer_poll_default_unit() failed:" << dsbmixer_error();
-    return;
-  }
-  if (defaultUnit == unit) return;
-  defaultUnit = unit;
-  emit defaultUnitChanged(unit);
-}
-
-void SoundSettings::setUnitCheckIval(int ms) {
-  unitCheckIvalMs = ms;
-  if (!unitCheckSuspended) unitCheckTimer->start(ms);
-}
-
-void SoundSettings::suspendUnitCheck() {
-  unitCheckTimer->stop();
-  unitCheckSuspended = true;
-}
-
-void SoundSettings::resumeUnitCheck() {
-  unitCheckTimer->start(unitCheckIvalMs);
-  unitCheckSuspended = false;
 }
 
 template <typename T>
@@ -99,8 +66,6 @@ void SoundSettings::setLatency(int latency) { setter(this->latency, latency); }
 void SoundSettings::setBypassMixer(bool bypass) {
   setter(this->bypassMixer, bypass);
 }
-
-int SoundSettings::getUnitCheckIval() const { return (unitCheckIvalMs); }
 
 int SoundSettings::getAmplification() const { return (amplification); }
 
