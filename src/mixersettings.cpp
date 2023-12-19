@@ -18,9 +18,6 @@ MixerSettings::MixerSettings(dsbcfg_t &cfg, QObject *parent)
   lrView = dsbcfg_getval(this->cfg, CFG_LRVIEW).boolean;
   scaleTicks = dsbcfg_getval(this->cfg, CFG_TICKS).boolean;
   chanMask = dsbcfg_getval(this->cfg, CFG_MASK).integer;
-  pollIvalMs = dsbcfg_getval(this->cfg, CFG_POLL_IVAL).integer;
-  unitChkIvalMs = dsbcfg_getval(this->cfg, CFG_UNIT_CHK_IVAL).integer;
-  volInc = dsbcfg_getval(this->cfg, CFG_VOL_INC).integer;
   inverseScroll = dsbcfg_getval(this->cfg, CFG_INVERSE_SCROLL).boolean;
   width = dsbcfg_getval(this->cfg, CFG_WIDTH).integer;
   height = dsbcfg_getval(this->cfg, CFG_HEIGHT).integer;
@@ -34,6 +31,9 @@ MixerSettings::MixerSettings(dsbcfg_t &cfg, QObject *parent)
     trayThemeName = QString(dsbcfg_getval(this->cfg, CFG_TRAY_THEME).string);
   else
     trayThemeName = "";
+  setPollIval(dsbcfg_getval(this->cfg, CFG_POLL_IVAL).integer);
+  setUnitChkIval(dsbcfg_getval(this->cfg, CFG_UNIT_CHK_IVAL).integer);
+  setVolInc(dsbcfg_getval(this->cfg, CFG_VOL_INC).integer);
 }
 
 void MixerSettings::storeSettings() {
@@ -61,6 +61,10 @@ void MixerSettings::storeSettings() {
   dsbcfg_set_string(this->cfg, CFG_PLAY_CMD, playCmdStr.data());
 }
 
+bool MixerSettings::inRange(Range range, int val) {
+  return (range.min <= val && range.max >= val);
+}
+
 template <typename T>
 bool MixerSettings::setter(T &member, T val) {
   if (member == val) return (false);
@@ -81,14 +85,17 @@ void MixerSettings::setChanMask(int mask) {
 }
 
 void MixerSettings::setPollIval(int ms) {
+  if (!inRange(pollIvalRange, ms)) return;
   if (setter(this->pollIvalMs, ms)) emit pollIvalChanged(ms);
 }
 
 void MixerSettings::setUnitChkIval(int ms) {
+  if (!inRange(unitChkIvalRange, ms)) return;
   if (setter(this->unitChkIvalMs, ms)) emit unitChkIvalChanged(ms);
 }
 
 void MixerSettings::setVolInc(int inc) {
+  if (!inRange(volIncRange, inc)) return;
   if (setter(volInc, inc)) emit volIncChanged(inc);
 }
 
@@ -136,3 +143,9 @@ int MixerSettings::getWinHeight() const { return (height); }
 QString MixerSettings::getPlayCmd() const { return (playCmd); }
 
 QString MixerSettings::getTrayThemeName() const { return (trayThemeName); }
+
+Range MixerSettings::getPollIvalRange() const { return (pollIvalRange); }
+
+Range MixerSettings::getUnitChkIvalRange() const { return (unitChkIvalRange); }
+
+Range MixerSettings::getVolIncRange() const { return (volIncRange); }

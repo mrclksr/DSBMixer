@@ -9,6 +9,8 @@
 #include <QObject>
 #include <QTimer>
 
+#include "range.h"
+
 class SoundSettings : public QObject {
   Q_OBJECT
  public:
@@ -27,13 +29,17 @@ class SoundSettings : public QObject {
   int getMaxAutoVchans() const;
   int getLatency() const;
   bool getBypassMixer() const;
-
+  Range getAplificationRange() const;
+  Range getFeederRateQualityRange() const;
+  Range getMaxAutoVchansRange() const;
+  Range getLatencyRange() const;
  signals:
   void settingsChanged();
 
  private:
   template <typename T>
   void setter(T &member, T val);
+  bool inRange(Range range, int val);
 
  private:
   int amplification{};
@@ -43,4 +49,9 @@ class SoundSettings : public QObject {
   int latency{};
   bool bypassMixer{false};
   bool changed{false};
+  Range amplificationRange{1, 100};
+  Range feederRateQualityRange{1, 4};
+  Range maxAutoVchansRange{0, 999};
+  Range latencyRange{0, 10};
+  Range unitRange{0, 100};
 };

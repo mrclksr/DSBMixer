@@ -38,6 +38,10 @@ void SoundSettings::applySettings() {
   emit settingsChanged();
 }
 
+bool SoundSettings::inRange(Range range, int val) {
+  return (range.min <= val && range.max >= val);
+}
+
 template <typename T>
 void SoundSettings::setter(T &member, T val) {
   if (member == val) return;
@@ -46,22 +50,29 @@ void SoundSettings::setter(T &member, T val) {
 }
 
 void SoundSettings::setAmplification(int amplification) {
+  if (!inRange(amplificationRange, amplification)) return;
   setter(this->amplification, amplification);
 }
 
 void SoundSettings::setFeederRateQuality(int quality) {
+  if (!inRange(feederRateQualityRange, quality)) return;
   setter(this->feederRateQuality, quality);
 }
 
 void SoundSettings::setDefaultUnit(int unit) {
+  if (!inRange(unitRange, unit)) return;
   setter(this->defaultUnit, unit);
 }
 
 void SoundSettings::setMaxAutoVchans(int nchans) {
+  if (!inRange(maxAutoVchansRange, nchans)) return;
   setter(this->maxAutoVchans, nchans);
 }
 
-void SoundSettings::setLatency(int latency) { setter(this->latency, latency); }
+void SoundSettings::setLatency(int latency) {
+  if (!inRange(latencyRange, latency)) return;
+  setter(this->latency, latency);
+}
 
 void SoundSettings::setBypassMixer(bool bypass) {
   setter(this->bypassMixer, bypass);
@@ -78,3 +89,17 @@ int SoundSettings::getMaxAutoVchans() const { return (maxAutoVchans); }
 int SoundSettings::getLatency() const { return (latency); }
 
 bool SoundSettings::getBypassMixer() const { return (bypassMixer); }
+
+Range SoundSettings::getAplificationRange() const {
+  return (amplificationRange);
+}
+
+Range SoundSettings::getFeederRateQualityRange() const {
+  return (feederRateQualityRange);
+}
+
+Range SoundSettings::getLatencyRange() const { return (latencyRange); }
+
+Range SoundSettings::getMaxAutoVchansRange() const {
+  return (maxAutoVchansRange);
+}

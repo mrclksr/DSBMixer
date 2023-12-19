@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "dsbcfg.h"
+#include "range.h"
 
 class MixerSettings : public QObject {
   Q_OBJECT
@@ -39,10 +40,14 @@ class MixerSettings : public QObject {
   int getWinHeight() const;
   QString getPlayCmd() const;
   QString getTrayThemeName() const;
+  Range getPollIvalRange() const;
+  Range getUnitChkIvalRange() const;
+  Range getVolIncRange() const;
 
  private:
   template <typename T>
   bool setter(T &member, T val);
+  bool inRange(Range range, int val);
  signals:
   void settingsChanged();
   void pollIvalChanged(int ms);
@@ -70,4 +75,7 @@ class MixerSettings : public QObject {
   dsbcfg_t *cfg{nullptr};
   QString trayThemeName;
   QString playCmd;
+  Range pollIvalRange{10, 999999999};
+  Range unitChkIvalRange{10, 999999999};
+  Range volIncRange{1, 50};
 };

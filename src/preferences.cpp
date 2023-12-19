@@ -26,7 +26,7 @@
 
 #include "libdsbmixer.h"
 #include "qt-helper/qt-helper.h"
-#include "src/soundsettings.h"
+#include "soundsettings.h"
 
 Preferences::Preferences(MixerSettings &mixerSettings, QWidget *parent)
     : QDialog(parent), mixerSettings{&mixerSettings} {
@@ -287,7 +287,9 @@ QWidget *Preferences::createBehaviorTab() {
   inverseScrollCb->setToolTip(
       tr("On some panels the scroll direction is inversed."));
   inverseScrollCb->setChecked(mixerSettings->inverseScrollEnabled());
-  pollIvalSb->setRange(10, 10000);
+
+  Range range{mixerSettings->getPollIvalRange()};
+  pollIvalSb->setRange(range.min, range.max);
   pollIvalSb->setValue(mixerSettings->getPollIval());
   pollIvalSb->setSuffix(" ms");
   pollIvalSb->setToolTip(
@@ -295,7 +297,9 @@ QWidget *Preferences::createBehaviorTab() {
          "devices are polled. Higher values mean less CPU usage.\n"
          "Lower values mean less latency when showing the\n"
          "current volume changed by other programs."));
-  unitChkIvalSb->setRange(10, 1000000);
+
+  range = mixerSettings->getUnitChkIvalRange();
+  unitChkIvalSb->setRange(range.min, range.max);
   unitChkIvalSb->setValue(mixerSettings->getUnitChkIval());
   unitChkIvalSb->setSuffix(" ms");
   unitChkIvalSb->setToolTip(
@@ -303,7 +307,8 @@ QWidget *Preferences::createBehaviorTab() {
          "check whether the default sound device was changed.\n"
          "Higher values mean less CPU usage.\n"));
 
-  granularitySb->setRange(1, 10);
+  range = mixerSettings->getVolIncRange();
+  granularitySb->setRange(range.min, range.max);
   granularitySb->setValue(mixerSettings->getVolInc());
   granularitySb->setToolTip(
       tr("Defines the mouse wheel scroll lines for changing the volume."));
@@ -347,7 +352,9 @@ QWidget *Preferences::createAdvancedTab() {
       tr("Enable this to allow applications to use\n"
          "their own existing mixer logic to control\n"
          "their own channel volume."));
-  maxAutoVchansSb->setRange(0, 256);
+
+  Range range{soundSettings->getMaxAutoVchansRange()};
+  maxAutoVchansSb->setRange(range.min, range.max);
   maxAutoVchansSb->setValue(soundSettings->getMaxAutoVchans());
   maxAutoVchansSb->setToolTip(
       tr("Defines the max. number of virtual playback\n"
@@ -356,17 +363,22 @@ QWidget *Preferences::createAdvancedTab() {
          "and recording channels than the physical hardware\n"
          "provides."));
 
-  latencySb->setRange(0, 10);
+  range = soundSettings->getLatencyRange();
+  latencySb->setRange(range.min, range.max);
   latencySb->setValue(soundSettings->getLatency());
   latencySb->setToolTip(tr("Lower values mean less buffering and latency."));
-  amplifySb->setRange(0, 100);
+
+  range = soundSettings->getAplificationRange();
+  amplifySb->setRange(range.min, range.max);
   amplifySb->setValue(soundSettings->getAmplification());
   amplifySb->setSuffix(" dB");
   amplifySb->setToolTip(
       tr("Lower values mean more amplification, but can\n"
          "produce sound clipping when chosen too low.\n"
          "Higher values mean finer volume control."));
-  feederRateQualitySb->setRange(1, 4);
+
+  range = soundSettings->getFeederRateQualityRange();
+  feederRateQualitySb->setRange(range.min, range.max);
   feederRateQualitySb->setValue(soundSettings->getFeederRateQuality());
   feederRateQualitySb->setToolTip(
       tr("Higher values mean better sample rate conversion,\n"
