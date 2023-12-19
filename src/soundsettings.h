@@ -37,9 +37,8 @@ class SoundSettings : public QObject {
   void settingsChanged();
 
  private:
-  template <typename T>
-  void setter(T &member, T val);
   bool inRange(Range range, int val);
+  bool checkSettingsChanged();
 
  private:
   int amplification{};
@@ -48,7 +47,6 @@ class SoundSettings : public QObject {
   int maxAutoVchans{};
   int latency{};
   bool bypassMixer{false};
-  bool changed{false};
   Range amplificationRange{1, 100};
   Range feederRateQualityRange{1, 4};
   Range maxAutoVchansRange{0, 999};
