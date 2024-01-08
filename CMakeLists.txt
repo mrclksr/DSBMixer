@@ -25,6 +25,7 @@ else()
   set(QT_MAJOR_VERSION 5)
 endif()
 option(WITHOUT_DEVD "Build without devd support." OFF)
+option(PORTS "Set to ON when building from ports" OFF)
 
 add_subdirectory(lib/backend)
 if (NOT WITHOUT_DEVD)
