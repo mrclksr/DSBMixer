@@ -41,7 +41,7 @@ image::images/mainwin.png[Main window]
 * https://www.freshports.org/devel/cmake[devel/cmake]
 * https://www.freshports.org/devel/qt6-base[devel/qt6-base]
 * https://www.freshports.org/devel/qt6-tools/[devel/qt6-tools]
-* https://www.freshports.org/devel/kf6-knotifications[devel/kf6-knotifications]
+* https://www.freshports.org/deskutils/kf6-kstatusnotifieritem[deskutils/kf6-kstatusnotifieritem]
 
 ==== Run time Dependencies
 * https://www.freshports.org/sysutils/dsbwrtsysctl[sysutils/dsbwrtsysctl]

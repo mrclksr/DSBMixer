@@ -57,9 +57,13 @@ find_package(Qt${QT_MAJOR_VERSION} REQUIRED COMPONENTS
   LinguistTools
   DBus)
 
-find_package(KF${QT_MAJOR_VERSION}Notifications)
+if (USE_QT6)
+  find_package(KF${QT_MAJOR_VERSION}StatusNotifierItem)
+else()
+  find_package(KF${QT_MAJOR_VERSION}Notifications)
+endif()
 
-if (${QT_MAJOR_VERSION} GREATER OR EQUAL 6)
+if (USE_QT6)
   qt_standard_project_setup()
 else()
   set(CMAKE_AUTOMOC ON)
@@ -100,10 +104,15 @@ if (WITHOUT_DEVD)
   add_compile_definitions("-DWITHOUT_DEVD")
 endif()
 
-target_link_libraries(dsbmixer PRIVATE
-  Qt${QT_MAJOR_VERSION}::Widgets
-  Qt${QT_MAJOR_VERSION}::DBus
-  pthread KF${QT_MAJOR_VERSION}::Notifications)
+set(LIBS Qt${QT_MAJOR_VERSION}::Widgets Qt${QT_MAJOR_VERSION}::DBus pthread)
+
+if (USE_QT6)
+  list(APPEND LIBS KF${QT_MAJOR_VERSION}::StatusNotifierItem)
+else()
+  list(APPEND LIBS KF${QT_MAJOR_VERSION}::Notifications)
+endif()
+
+target_link_libraries(dsbmixer PRIVATE ${LIBS})
 
 install(TARGETS dsbmixer DESTINATION bin)
 install(PROGRAMS scripts/${DBUS_SCRIPT} DESTINATION bin)
