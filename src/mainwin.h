@@ -48,6 +48,7 @@ class MainWin : public QMainWindow {
   void restartAudioApps();
   void showAppsMixer();
   void setTabIndex(int index);
+  void activateWindow(bool activate);
 
  protected:
   void keyPressEvent(QKeyEvent *event);

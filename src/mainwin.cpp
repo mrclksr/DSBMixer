@@ -172,6 +172,13 @@ void MainWin::toggleWin() {
     show();
 }
 
+void MainWin::activateWindow(bool activate) {
+  if (activate)
+    show();
+  else
+    hide();
+}
+
 void MainWin::quit() {
   saveGeometry();
   QApplication::quit();
@@ -246,6 +253,8 @@ void MainWin::createTrayIcon() {
   updateTrayMenu();
   trayIcon =
       new TrayIcon(*iconLoader, *mixerSettings, *trayMenu, currentMixer, this);
+  connect(trayIcon, SIGNAL(activateRequested(bool, const QPoint &)), this,
+          SLOT(activateWindow(bool)));
 }
 
 void MainWin::registerDBusService() {
