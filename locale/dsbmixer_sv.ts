@@ -30,32 +30,32 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="188"/>
+        <location filename="../src/mainwin.cpp" line="195"/>
         <source>&amp;Quit</source>
         <translation>&amp;Avsluta</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="194"/>
+        <location filename="../src/mainwin.cpp" line="201"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Inställningar</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="201"/>
+        <location filename="../src/mainwin.cpp" line="208"/>
         <source>&amp;Open applications mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="232"/>
+        <location filename="../src/mainwin.cpp" line="239"/>
         <source>Show/hide window</source>
         <translation>Visa/dölj fönster</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="207"/>
+        <location filename="../src/mainwin.cpp" line="214"/>
         <source>&amp;File</source>
         <translation>&amp;Fil</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="236"/>
+        <location filename="../src/mainwin.cpp" line="243"/>
         <source>Sound devices</source>
         <translation>Ljud enheter</translation>
     </message>

@@ -30,32 +30,32 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="188"/>
+        <location filename="../src/mainwin.cpp" line="195"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="194"/>
+        <location filename="../src/mainwin.cpp" line="201"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="201"/>
+        <location filename="../src/mainwin.cpp" line="208"/>
         <source>&amp;Open applications mixer</source>
         <translation>Öffne &amp;Anwendungs-Mixer</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="232"/>
+        <location filename="../src/mainwin.cpp" line="239"/>
         <source>Show/hide window</source>
         <translation>Zeige/verstecke Fenster</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="236"/>
+        <location filename="../src/mainwin.cpp" line="243"/>
         <source>Sound devices</source>
         <translation>Audio-Geräte</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="207"/>
+        <location filename="../src/mainwin.cpp" line="214"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
