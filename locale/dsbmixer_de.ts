@@ -2,6 +2,39 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de_DE">
 <context>
+    <name>AboutWin</name>
+    <message>
+        <location filename="../src/aboutwin.cpp" line="25"/>
+        <source>&amp;Close</source>
+        <translation>&amp;Schließen</translation>
+    </message>
+    <message>
+        <location filename="../src/aboutwin.cpp" line="22"/>
+        <source>About</source>
+        <translation>Über</translation>
+    </message>
+    <message>
+        <location filename="../src/aboutwin.cpp" line="23"/>
+        <source>Contributors</source>
+        <translation>Mitwirkende</translation>
+    </message>
+    <message>
+        <location filename="../src/aboutwin.cpp" line="32"/>
+        <source>About DSBMixer</source>
+        <translation>Über DSBMixer</translation>
+    </message>
+    <message>
+        <location filename="../src/aboutwin.cpp" line="43"/>
+        <source>DSBMixer is a tabbed audio mixer for FreeBSD.</source>
+        <translation>DSBMixer ist ein Audio-Mixer für FreeBSD.</translation>
+    </message>
+    <message>
+        <location filename="../src/aboutwin.cpp" line="64"/>
+        <source>&lt;b&gt;Contributors&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Mitwirkende&lt;/b&gt;</translation>
+    </message>
+</context>
+<context>
     <name>AppsMixer</name>
     <message>
         <location filename="../src/appsmixer.cpp" line="26"/>
@@ -30,32 +63,43 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="195"/>
+        <location filename="../src/mainwin.cpp" line="198"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="201"/>
+        <location filename="../src/mainwin.cpp" line="204"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="208"/>
+        <location filename="../src/mainwin.cpp" line="211"/>
         <source>&amp;Open applications mixer</source>
         <translation>Öffne &amp;Anwendungs-Mixer</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="239"/>
+        <location filename="../src/mainwin.cpp" line="224"/>
+        <location filename="../src/mainwin.cpp" line="236"/>
+        <source>&amp;Help</source>
+        <translation>&amp;Hilfe</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwin.cpp" line="230"/>
+        <source>&amp;About</source>
+        <translation>&amp;Über</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwin.cpp" line="267"/>
         <source>Show/hide window</source>
         <translation>Zeige/verstecke Fenster</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="243"/>
+        <location filename="../src/mainwin.cpp" line="271"/>
         <source>Sound devices</source>
         <translation>Audio-Geräte</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="214"/>
+        <location filename="../src/mainwin.cpp" line="217"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
