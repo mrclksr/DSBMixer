@@ -12,6 +12,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QMenu>
 #include <QMenuBar>
 #include <QRect>
@@ -22,6 +23,7 @@
 #include <QTimer>
 #include <cstdlib>
 
+#include "aboutwin.h"
 #include "appsmixer.h"
 #include "iconloader.h"
 #include "libdsbmixer.h"
@@ -55,6 +57,7 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
           SLOT(catchVolIncChanged(int)));
   createTrayIcon();
   createMainMenu();
+  createHelpMenu();
   setWindowIcon(iconLoader->mixerIcon);
   setWindowTitle("DSBMixer");
   registerDBusService();
@@ -216,6 +219,31 @@ void MainWin::createMainMenu() {
   mainMenu->addAction(createPrefsAction());
   mainMenu->addAction(createQuitAction());
 }
+
+void MainWin::createHelpMenu() {
+  QMenu *helpMenu{menuBar()->addMenu(tr("&Help"))};
+  helpMenu->addAction(createAboutAction());
+  helpMenu->addAction(createHelpAction());
+}
+
+QAction *MainWin::createAboutAction() {
+  QAction *action{new QAction(iconLoader->aboutIcon, tr("&About"))};
+  connect(action, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
+  return (action);
+}
+
+QAction *MainWin::createHelpAction() {
+  QAction *action{new QAction(iconLoader->helpIcon, tr("&Help"))};
+  connect(action, SIGNAL(triggered()), this, SLOT(showHelp()));
+  return (action);
+}
+
+void MainWin::showAboutWindow() {
+  AboutWin aboutWin{*iconLoader, this};
+  (void)aboutWin.exec();
+}
+
+void MainWin::showHelp() { QDesktopServices::openUrl(QUrl{PATH_DOC_URL}); }
 
 void MainWin::addMixerChooser(QMenu *menu) {
   QSignalMapper *mapper{new QSignalMapper(this)};

@@ -49,6 +49,8 @@ class MainWin : public QMainWindow {
   void showAppsMixer();
   void setTabIndex(int index);
   void activateWindow(bool activate);
+  void showAboutWindow();
+  void showHelp();
 
  protected:
   void keyPressEvent(QKeyEvent *event);
@@ -58,6 +60,7 @@ class MainWin : public QMainWindow {
 
  private:
   void createMainMenu();
+  void createHelpMenu();
   void createTrayIcon();
   void setDefaultTab(int);
   void setCurrentMixer();
@@ -69,6 +72,8 @@ class MainWin : public QMainWindow {
   QAction *createQuitAction();
   QAction *createPrefsAction();
   QAction *createAppsMixerAction();
+  QAction *createAboutAction();
+  QAction *createHelpAction();
 
  private:
   int trayCheckCounter{60};

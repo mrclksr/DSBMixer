@@ -26,6 +26,10 @@ void IconLoader::loadIcons() {
                                           << "window-maximize"
                                           << "window_fullscreen"
                                           << "window-restore");
+  helpIcon = qh::loadIcon(QStringList() << "help"
+                                        << "stock_help");
+  aboutIcon = qh::loadIcon(QStringList() << "help-about"
+                                         << "stock_about");
   if (quitIcon.isNull())
     quitIcon = qh::loadStockIcon(QStyle::SP_DialogCloseButton);
   if (prefsIcon.isNull())

@@ -29,6 +29,8 @@ class IconLoader : public QObject {
   QIcon quitIcon;
   QIcon prefsIcon;
   QIcon mixerIcon;
+  QIcon aboutIcon;
+  QIcon helpIcon;
   QIcon noMixerIcon;
   QIcon appsMixerIcon;
   QIcon windowIcon;
