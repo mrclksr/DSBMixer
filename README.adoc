@@ -50,28 +50,40 @@ image::images/mainwin.png[Main window]
 
 [source,sh]
 ----
-# git clone https://github.com/mrclksr/DSBMixer.git
-# git clone https://github.com/mrclksr/dsbcfg.git
+$ git clone https://github.com/mrclksr/DSBMixer.git
+$ git clone https://github.com/mrclksr/dsbcfg.git
 ----
 
 ==== Building and Installing from Source (Qt5)
 
 [source,sh]
 ----
-# cd DSBMixer
-# cmake -S . -B build
-# cmake --build build
-# cmake --build build -t install
+$ cd DSBMixer
+$ cmake -S . -B build
+$ cmake --build build
+----
+
+Then as root run
+
+[source,sh]
+----
+# cmake --install build
 ----
 
 ==== Building and Installing from Source (Qt6)
 
 [source,sh]
 ----
-# cd DSBMixer
-# cmake -D USE_QT6=ON -S . -B build
-# cmake --build build
-# cmake --build build -t install
+$ cd DSBMixer
+$ cmake -D USE_QT6=ON -S . -B build
+$ cmake --build build
+----
+
+Then as root run
+
+[source,sh]
+----
+# cmake --install build
 ----
 
 Add the option `-D WITHOUT_DEVD=ON` to the first _cmake_ command if you
