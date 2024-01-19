@@ -14,7 +14,7 @@ class IconLoader : public QObject {
   Q_OBJECT
  public:
   IconLoader(QString &themeName, QObject *parent = nullptr);
-  void setTheme(QString &themeName);
+  void setTrayIconTheme(QString &themeName);
   void loadIcons();
   void loadTrayIcons();
 

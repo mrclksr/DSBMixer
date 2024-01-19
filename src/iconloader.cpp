@@ -57,7 +57,7 @@ void IconLoader::loadTrayIcons() {
   if (hVolIcon.isNull()) hVolIcon = QIcon(":/icons/audio-volume-high.png");
 }
 
-void IconLoader::setTheme(QString &themeName) {
+void IconLoader::setTrayIconTheme(QString &themeName) {
   if (this->themeName == themeName) return;
   this->themeName = themeName;
   loadTrayIcons();
