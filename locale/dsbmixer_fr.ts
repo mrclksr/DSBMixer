@@ -58,43 +58,43 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="199"/>
+        <location filename="../src/mainwin.cpp" line="205"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="205"/>
+        <location filename="../src/mainwin.cpp" line="211"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Préférences</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="212"/>
+        <location filename="../src/mainwin.cpp" line="218"/>
         <source>&amp;Open applications mixer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="225"/>
-        <location filename="../src/mainwin.cpp" line="237"/>
+        <location filename="../src/mainwin.cpp" line="231"/>
+        <location filename="../src/mainwin.cpp" line="243"/>
         <source>&amp;Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="231"/>
+        <location filename="../src/mainwin.cpp" line="237"/>
         <source>&amp;About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="268"/>
+        <location filename="../src/mainwin.cpp" line="274"/>
         <source>Show/hide window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="272"/>
+        <location filename="../src/mainwin.cpp" line="278"/>
         <source>Sound devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="218"/>
+        <location filename="../src/mainwin.cpp" line="224"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
