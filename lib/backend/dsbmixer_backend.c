@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <err.h>
 
+#include "defs.h"
+
 #define PATH_SYSCTL		"/sbin/sysctl"
 
 #define OID_AMPLIFY		"hw.snd.vpc_0db"

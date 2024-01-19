@@ -6,7 +6,7 @@
  */
 
 #include "aboutwin.h"
-
+#include "defs.h"
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QTabWidget>

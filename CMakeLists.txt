@@ -19,6 +19,8 @@ set(PATH_DSBWRTSYSCTL ${CMAKE_INSTALL_PREFIX}/bin/dsbwrtsysctl)
 set(PATH_RESTART_PA ${SCRIPTS_DIR}/${RESTART_PA})
 set(PATH_DOC_URL "https://github.com/mrclksr/DSBMixer/blob/master/README.adoc")
 set(WEBSITE "https://github.com/mrclksr/DSBMixer")
+set(PATH_DSBMIXER_PA "${SCRIPTS_DIR}/${PA_SCRIPT}")
+set(LOCALE_PATH "${DATADIR}")
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/VERSION)
   execute_process(COMMAND sh -c "cat ${CMAKE_SOURCE_DIR}/VERSION | tr -d '\n'"
@@ -39,7 +41,6 @@ endif()
 option(WITHOUT_DEVD "Build without devd support." OFF)
 option(PORTS "Set to ON when building from ports" OFF)
 
-add_subdirectory(lib/backend)
 if(NOT WITHOUT_DEVD)
   set(OPTIONAL_SOURCES src/thread.cpp)
 endif()
@@ -98,22 +99,15 @@ endif()
 
 target_include_directories(
   dsbmixer
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/lib
-         ${CMAKE_CURRENT_SOURCE_DIR}/lib/dsbcfg
-         ${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-helper)
+  PUBLIC "${CMAKE_CURRENT_BINARY_DIR}"
+         "${CMAKE_CURRENT_SOURCE_DIR}"
+         "${CMAKE_CURRENT_SOURCE_DIR}/lib"
+         "${CMAKE_CURRENT_SOURCE_DIR}/lib/dsbcfg"
+         "${CMAKE_CURRENT_SOURCE_DIR}/lib/qt-helper")
 
-add_compile_definitions(
-  PROGRAM="${CMAKE_PROJECT_NAME}"
-  PROGRAM_VERSION="${PROGRAM_VERSION}"
-  LOCALE_PATH="${DATADIR}"
-  WEBSITE="${WEBSITE}"
-  PATH_DOC_URL="${PATH_DOC_URL}"
-  PATH_BACKEND="${BACKEND_INSTALL_DIR}/${BACKEND}"
-  PATH_DSBWRTSYSCTL="${PATH_DSBWRTSYSCTL}"
-  PATH_DSBMIXER_PA="${SCRIPTS_DIR}/${PA_SCRIPT}")
-if(WITHOUT_DEVD)
-  add_compile_definitions("-DWITHOUT_DEVD")
-endif()
+configure_file(defs.h.in defs.h @ONLY)
+
+add_subdirectory(lib/backend)
 
 set(LIBS Qt${QT_MAJOR_VERSION}::Widgets Qt${QT_MAJOR_VERSION}::DBus pthread)
 

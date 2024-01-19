@@ -6,6 +6,7 @@
  */
 
 #include "mainwin.h"
+#include "defs.h"
 
 #include <stdlib.h>
 #include <unistd.h>

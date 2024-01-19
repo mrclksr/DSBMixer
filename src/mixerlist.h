@@ -11,9 +11,12 @@
 #include <QWidget>
 #include <cstddef>
 
+#include "defs.h"
 #include "mixer.h"
 #include "mixersettings.h"
+#ifndef WITHOUT_DEVD
 #include "thread.h"
+#endif
 
 class MixerList : public QWidget {
   Q_OBJECT
@@ -47,7 +50,9 @@ class MixerList : public QWidget {
 
  private:
   bool unitCheckSuspended{false};
+#ifndef WITHOUT_DEVD
   Thread *devdWatcher;
+#endif
   QTimer *pollTimer{nullptr};
   QTimer *unitCheckTimer{nullptr};
   Mixer *defaultMixer{nullptr};

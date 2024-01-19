@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <QTranslator>
 
+#include "defs.h"
 #include "libdsbmixer.h"
 #include "mainwin.h"
 #include "qt-helper/qt-helper.h"
