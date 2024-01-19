@@ -28,11 +28,6 @@
         <source>DSBMixer is a tabbed audio mixer for FreeBSD.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../src/aboutwin.cpp" line="64"/>
-        <source>&lt;b&gt;Contributors&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>AppsMixer</name>

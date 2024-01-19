@@ -29,9 +29,8 @@
         <translation>DSBMixer ist ein Audio-Mixer für FreeBSD.</translation>
     </message>
     <message>
-        <location filename="../src/aboutwin.cpp" line="64"/>
         <source>&lt;b&gt;Contributors&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Mitwirkende&lt;/b&gt;</translation>
+        <translation type="vanished">&lt;b&gt;Mitwirkende&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
