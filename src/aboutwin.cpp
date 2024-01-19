@@ -61,13 +61,11 @@ QWidget *AboutWin::createAboutTab() {
 QWidget *AboutWin::createContribTab() {
   QWidget *container{new QWidget{this}};
   QVBoxLayout *layout{new QVBoxLayout};
-  QLabel *title{new QLabel{tr("<b>Contributors</b>")}};
   QString listText;
   for (auto c : contributors)
     listText.append(QString("%1<br/>").arg(QString::fromStdString(c)));
   QLabel *list{new QLabel{listText}};
   list->setOpenExternalLinks(true);
-  layout->addWidget(title);
   layout->addWidget(list);
   container->setLayout(layout);
   return (container);
