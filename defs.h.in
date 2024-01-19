@@ -1,0 +1,14 @@
+#ifndef DEFS_H
+#define DEFS_H
+#cmakedefine PROGRAM "@CMAKE_PROJECT_NAME@"
+#cmakedefine PROGRAM_VERSION "@PROGRAM_VERSION@"
+#cmakedefine LOCALE_PATH "@DATADIR@"
+#cmakedefine WEBSITE "@WEBSITE@"
+#cmakedefine PATH_DOC_URL "@PATH_DOC_URL@"
+#cmakedefine PATH_BACKEND "@PATH_BACKEND@"
+#cmakedefine PATH_DSBWRTSYSCTL "@PATH_DSBWRTSYSCTL@"
+#cmakedefine PATH_DSBMIXER_PA "@PATH_DSBMIXER_PA@"
+#cmakedefine WITHOUT_DEVD_ENABLE
+#cmakedefine WITHOUT_DEVD 1
+#endif /* !DEFS_H */
+
