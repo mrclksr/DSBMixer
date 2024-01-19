@@ -62,43 +62,43 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="198"/>
+        <location filename="../src/mainwin.cpp" line="199"/>
         <source>&amp;Quit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="204"/>
+        <location filename="../src/mainwin.cpp" line="205"/>
         <source>&amp;Preferences</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="211"/>
+        <location filename="../src/mainwin.cpp" line="212"/>
         <source>&amp;Open applications mixer</source>
         <translation>Öffne &amp;Anwendungs-Mixer</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="224"/>
-        <location filename="../src/mainwin.cpp" line="236"/>
+        <location filename="../src/mainwin.cpp" line="225"/>
+        <location filename="../src/mainwin.cpp" line="237"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="230"/>
+        <location filename="../src/mainwin.cpp" line="231"/>
         <source>&amp;About</source>
         <translation>&amp;Über</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="267"/>
+        <location filename="../src/mainwin.cpp" line="268"/>
         <source>Show/hide window</source>
         <translation>Zeige/verstecke Fenster</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="271"/>
+        <location filename="../src/mainwin.cpp" line="272"/>
         <source>Sound devices</source>
         <translation>Audio-Geräte</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="217"/>
+        <location filename="../src/mainwin.cpp" line="218"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
