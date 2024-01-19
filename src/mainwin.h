@@ -45,6 +45,7 @@ class MainWin : public QMainWindow {
   void catchScrGeomChanged();
   void catchAppsMixerClosed();
   void catchVolIncChanged(int steps);
+  void catchTrayThemeChanged(QString theme);
   void restartAudioApps();
   void showAppsMixer();
   void setTabIndex(int index);

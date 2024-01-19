@@ -6,7 +6,6 @@
  */
 
 #include "mainwin.h"
-#include "defs.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -26,6 +25,7 @@
 
 #include "aboutwin.h"
 #include "appsmixer.h"
+#include "defs.h"
 #include "iconloader.h"
 #include "libdsbmixer.h"
 #include "mixerlist.h"
@@ -56,6 +56,8 @@ MainWin::MainWin(dsbcfg_t *cfg, QWidget *parent)
           SLOT(catchScrGeomChanged()));
   connect(mixerSettings, SIGNAL(volIncChanged(int)), this,
           SLOT(catchVolIncChanged(int)));
+  connect(mixerSettings, SIGNAL(trayThemeChanged(QString)), this,
+          SLOT(catchTrayThemeChanged(QString)));
   createTrayIcon();
   createMainMenu();
   createHelpMenu();
@@ -82,6 +84,10 @@ void MainWin::catchDefaultMixerChanged(Mixer *mixer) {
   defaultMixer = mixer;
   updateTrayMenu();
   restartAudioApps();
+}
+
+void MainWin::catchTrayThemeChanged(QString theme) {
+  iconLoader->setTrayIconTheme(theme);
 }
 
 void MainWin::catchCurrentMixerChanged(Mixer *mixer) {
