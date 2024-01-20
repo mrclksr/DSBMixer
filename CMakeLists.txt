@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
-project(dsbmixer LANGUAGES C CXX)
+project(
+  dsbmixer
+  HOMEPAGE_URL https://github.com/mrclksr/DSBMixer
+  LANGUAGES C CXX)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -17,13 +21,11 @@ set(BACKEND_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/libexec)
 set(PATH_BACKEND ${BACKEND_INSTALL_DIR}/${BACKEND})
 set(PATH_DSBWRTSYSCTL ${CMAKE_INSTALL_PREFIX}/bin/dsbwrtsysctl)
 set(PATH_DOC_URL "https://github.com/mrclksr/DSBMixer/blob/master/README.adoc")
-set(WEBSITE "https://github.com/mrclksr/DSBMixer")
 set(PATH_DSBMIXER_PA "${SCRIPTS_DIR}/${PA_SCRIPT}")
 set(LOCALE_PATH "${DATADIR}")
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/VERSION)
-  execute_process(COMMAND sh -c "cat ${CMAKE_SOURCE_DIR}/VERSION | tr -d '\n'"
-                  OUTPUT_VARIABLE PROGRAM_VERSION)
+if(PROJECT_VERSION)
+  set(PROGRAM_VERSION ${PROJECT_VERSION})
 else()
   execute_process(
     COMMAND sh -c "git describe --abbrev=12 --always --tags | tr -d '\n'"
