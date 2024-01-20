@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(
   dsbmixer
+  VERSION 2.0
   HOMEPAGE_URL https://github.com/mrclksr/DSBMixer
   LANGUAGES C CXX)
 
